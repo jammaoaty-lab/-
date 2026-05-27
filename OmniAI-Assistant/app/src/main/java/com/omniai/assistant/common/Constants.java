@@ -2,7 +2,8 @@ package com.omniai.assistant.common;
 
 public final class Constants {
 
-    public static final String PREF_NAME = "omniai_prefs";
+    public static final String PREFS_NAME = "omniai_prefs";
+    public static final String PREF_KEY_USE_SIMULATION = "use_simulation_mode";
     public static final String KEY_TOKEN = "key_token";
     public static final String KEY_REFRESH_TOKEN = "key_refresh_token";
     public static final String KEY_USER_ID = "key_user_id";

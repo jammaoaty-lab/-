@@ -1,9 +1,15 @@
 package com.omniai.assistant.inference;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.omniai.assistant.OmniAIApplication;
+import com.omniai.assistant.common.Constants;
 import com.omniai.assistant.model.AIModel;
 import com.omniai.assistant.model.LoraWeight;
 import com.omniai.assistant.nativebridge.LlamaBridge;
 import com.omniai.assistant.scheduler.InferenceParams;
+import com.omniai.assistant.simulation.SimulatedInferenceEngine;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -24,10 +30,15 @@ public class InferenceEngine {
     private ExecutorService inferenceExecutor;
     private List<InferenceListener> listeners;
 
+    private SimulatedInferenceEngine simulatedEngine;
+    private boolean useSimulationMode;
+    private Context appContext;
+
     public interface InferenceListener {
         void onModelLoaded(AIModel model);
         void onModelUnloaded();
         void onInferenceStarted();
+        void onInferenceProgress(String partialText);
         void onInferenceCompleted(String result);
         void onInferenceError(String error);
     }
@@ -55,6 +66,9 @@ public class InferenceEngine {
         this.isInitialized = false;
         this.inferenceExecutor = Executors.newSingleThreadExecutor();
         this.listeners = new CopyOnWriteArrayList<>();
+        this.appContext = OmniAIApplication.getInstance();
+        this.simulatedEngine = SimulatedInferenceEngine.getInstance(appContext);
+        loadSimulationModePreference();
     }
 
     public static InferenceEngine getInstance() {
@@ -68,7 +82,32 @@ public class InferenceEngine {
         return instance;
     }
 
+    private void loadSimulationModePreference() {
+        SharedPreferences prefs = appContext.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE);
+        this.useSimulationMode = prefs.getBoolean(Constants.PREF_KEY_USE_SIMULATION, true);
+    }
+
+    public void setUseSimulationMode(boolean enabled) {
+        this.useSimulationMode = enabled;
+        SharedPreferences.Editor editor = appContext.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE).edit();
+        editor.putBoolean(Constants.PREF_KEY_USE_SIMULATION, enabled);
+        editor.apply();
+        unloadModel();
+    }
+
+    public boolean isUsingSimulationMode() {
+        return useSimulationMode;
+    }
+
     public void loadModel(AIModel model, LoadCallback callback) {
+        if (useSimulationMode) {
+            loadModelSimulation(model, callback);
+        } else {
+            loadModelNative(model, callback);
+        }
+    }
+
+    private void loadModelNative(AIModel model, LoadCallback callback) {
         inferenceExecutor.execute(() -> {
             try {
                 if (modelHandle != 0L) {
@@ -98,13 +137,40 @@ public class InferenceEngine {
         });
     }
 
+    private void loadModelSimulation(AIModel model, LoadCallback callback) {
+        simulatedEngine.loadModel(model, new SimulatedInferenceEngine.LoadCallback() {
+            @Override
+            public void onProgress(int current, int total) {}
+
+            @Override
+            public void onSuccess() {
+                currentModel = model;
+                currentModel.setLoaded(true);
+                isInitialized = true;
+                for (InferenceListener l : listeners) {
+                    l.onModelLoaded(model);
+                }
+                if (callback != null) callback.onLoaded(model);
+            }
+
+            @Override
+            public void onError(String error) {
+                if (callback != null) callback.onError(error);
+            }
+        });
+    }
+
     public void unloadModel() {
-        if (contextHandle != 0L) {
-            destroyContext();
-        }
-        if (modelHandle != 0L) {
-            bridge.nativeFreeModel(modelHandle);
-            modelHandle = 0L;
+        if (useSimulationMode) {
+            simulatedEngine.unloadModel();
+        } else {
+            if (contextHandle != 0L) {
+                destroyContext();
+            }
+            if (modelHandle != 0L) {
+                bridge.nativeFreeModel(modelHandle);
+                modelHandle = 0L;
+            }
         }
         if (currentModel != null) {
             currentModel.setLoaded(false);
@@ -117,12 +183,14 @@ public class InferenceEngine {
     }
 
     public long createContext(int nCtx) {
+        if (useSimulationMode) return 0L;
         if (modelHandle == 0L) return 0L;
         contextHandle = bridge.nativeCreateContext(modelHandle, nCtx);
         return contextHandle;
     }
 
     public void destroyContext() {
+        if (useSimulationMode) return;
         if (contextHandle != 0L) {
             bridge.nativeFreeContext(contextHandle);
             contextHandle = 0L;
@@ -130,6 +198,14 @@ public class InferenceEngine {
     }
 
     public void complete(String prompt, InferenceParams params, InferenceCallback callback) {
+        if (useSimulationMode) {
+            completeSimulation(prompt, params, callback);
+        } else {
+            completeNative(prompt, params, callback);
+        }
+    }
+
+    private void completeNative(String prompt, InferenceParams params, InferenceCallback callback) {
         if (!isModelLoaded()) {
             if (callback != null) callback.onError("Model not loaded");
             return;
@@ -170,7 +246,69 @@ public class InferenceEngine {
         });
     }
 
+    private void completeSimulation(String prompt, InferenceParams params, InferenceCallback callback) {
+        if (!isModelLoaded()) {
+            if (callback != null) callback.onError("Model not loaded");
+            return;
+        }
+        simulatedEngine.complete(prompt, params.getNPredict(), params.getTemperature(),
+                new SimulatedInferenceEngine.CompletionCallback() {
+                    @Override
+                    public void onPartialResult(String text) {
+                        for (InferenceListener l : listeners) {
+                            l.onInferenceProgress(text);
+                        }
+                    }
+
+                    @Override
+                    public void onComplete(String text) {
+                        for (InferenceListener l : listeners) {
+                            l.onInferenceCompleted(text);
+                        }
+                        if (callback != null) callback.onSuccess(text);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        for (InferenceListener l : listeners) {
+                            l.onInferenceError(error);
+                        }
+                        if (callback != null) callback.onError(error);
+                    }
+                });
+    }
+
     public void streamComplete(String prompt, InferenceParams params, StreamCallback callback) {
+        if (useSimulationMode) {
+            simulatedEngine.complete(prompt, params.getNPredict(), params.getTemperature(),
+                    new SimulatedInferenceEngine.CompletionCallback() {
+                        @Override
+                        public void onPartialResult(String text) {
+                            if (callback != null) {
+                                callback.onToken(text);
+                            }
+                        }
+
+                        @Override
+                        public void onComplete(String text) {
+                            if (callback != null) {
+                                callback.onComplete(text);
+                            }
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            if (callback != null) {
+                                callback.onError(error);
+                            }
+                        }
+                    });
+        } else {
+            streamCompleteNative(prompt, params, callback);
+        }
+    }
+
+    private void streamCompleteNative(String prompt, InferenceParams params, StreamCallback callback) {
         if (!isModelLoaded()) {
             if (callback != null) callback.onError("Model not loaded");
             return;
@@ -229,38 +367,62 @@ public class InferenceEngine {
     }
 
     public void abortCompletion() {
-        if (isInferencing.get() && contextHandle != 0L) {
+        if (isInferencing.get() && !useSimulationMode && contextHandle != 0L) {
             bridge.nativeAbortCompletion(contextHandle);
         }
     }
 
     public boolean isModelLoaded() {
+        if (useSimulationMode) {
+            return simulatedEngine.isModelLoaded();
+        }
         return isInitialized && modelHandle != 0L;
     }
 
     public boolean isGpuAvailable() {
+        if (useSimulationMode) return false;
         return bridge.nativeIsGpuAvailable();
     }
 
     public long getDeviceMemory() {
+        if (useSimulationMode) return simulatedEngine.getAvailableMemoryMb();
         return bridge.nativeGetDeviceMemory();
     }
 
     public float getDeviceTemperature() {
+        if (useSimulationMode) return simulatedEngine.getDeviceTemperature();
         return bridge.nativeGetDeviceTemperature();
     }
 
+    public float[] getEmbedding(String text) {
+        if (useSimulationMode) {
+            return simulatedEngine.getEmbedding(text);
+        }
+        if (modelHandle == 0L || contextHandle == 0L) return new float[0];
+        return bridge.nativeEmbed(contextHandle, text);
+    }
+
     public void applyLora(LoraWeight lora, float scale) {
+        if (useSimulationMode) return;
         if (modelHandle == 0L) return;
         bridge.nativeApplyLora(modelHandle, lora.getFilePath(), scale);
     }
 
     public void removeLora() {
+        if (useSimulationMode) return;
         if (modelHandle == 0L) return;
         bridge.nativeRemoveLora(modelHandle);
     }
 
     public int[] tokenize(String text) {
+        if (useSimulationMode) {
+            List<String> tokens = simulatedEngine.tokenize(text);
+            int[] result = new int[tokens.size()];
+            for (int i = 0; i < tokens.size(); i++) {
+                result[i] = tokens.get(i).hashCode();
+            }
+            return result;
+        }
         if (modelHandle == 0L) return new int[0];
         return bridge.nativeTokenize(modelHandle, text, true);
     }

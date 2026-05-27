@@ -2,11 +2,15 @@ package com.omniai.assistant.inference;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 
+import com.omniai.assistant.OmniAIApplication;
+import com.omniai.assistant.common.Constants;
 import com.omniai.assistant.model.AIModel;
 import com.omniai.assistant.nativebridge.LlamaBridge;
 import com.omniai.assistant.scheduler.InferenceParams;
 import com.omniai.assistant.settings.InferenceSpeedMode;
+import com.omniai.assistant.simulation.SimulatedVisionEngine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,17 +30,22 @@ public class VisionInferenceEngine {
     private Context context;
     private ExecutorService executorService;
 
+    private SimulatedVisionEngine simulatedEngine;
+    private boolean useSimulationMode;
+
     public interface LoadCallback {
         void onLoaded(AIModel model);
         void onError(String error);
     }
 
     public interface VisionCallback {
+        void onProgress(String partialText);
         void onSuccess(String result);
         void onError(String error);
     }
 
     public interface OcrCallback {
+        void onProgress(int percent, String message);
         void onSuccess(String text);
         void onError(String error);
     }
@@ -48,6 +57,9 @@ public class VisionInferenceEngine {
         this.modeManager = InferenceModeManager.getInstance();
         this.thermalMonitor = ThermalMonitor.getInstance();
         this.executorService = Executors.newSingleThreadExecutor();
+        this.context = OmniAIApplication.getInstance();
+        this.simulatedEngine = SimulatedVisionEngine.getInstance(context);
+        loadSimulationModePreference();
     }
 
     public static VisionInferenceEngine getInstance() {
@@ -66,7 +78,32 @@ public class VisionInferenceEngine {
         engine.context = context.getApplicationContext();
     }
 
+    private void loadSimulationModePreference() {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE);
+        this.useSimulationMode = prefs.getBoolean(Constants.PREF_KEY_USE_SIMULATION, true);
+    }
+
+    public void setUseSimulationMode(boolean enabled) {
+        this.useSimulationMode = enabled;
+        SharedPreferences.Editor editor = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE).edit();
+        editor.putBoolean(Constants.PREF_KEY_USE_SIMULATION, enabled);
+        editor.apply();
+        unloadVisionModel();
+    }
+
+    public boolean isUsingSimulationMode() {
+        return useSimulationMode;
+    }
+
     public void loadVisionModel(AIModel model, LoadCallback callback) {
+        if (useSimulationMode) {
+            loadVisionModelSimulation(model, callback);
+        } else {
+            loadVisionModelNative(model, callback);
+        }
+    }
+
+    private void loadVisionModelNative(AIModel model, LoadCallback callback) {
         executorService.execute(() -> {
             try {
                 if (visionModelHandle != 0L) {
@@ -113,10 +150,34 @@ public class VisionInferenceEngine {
         });
     }
 
+    private void loadVisionModelSimulation(AIModel model, LoadCallback callback) {
+        simulatedEngine.loadModel(model, new SimulatedVisionEngine.LoadCallback() {
+            @Override
+            public void onProgress(int current, int total, String message) {}
+
+            @Override
+            public void onSuccess() {
+                currentVisionModel = model;
+                currentVisionModel.setLoaded(true);
+                isVisionModelLoaded = true;
+                if (callback != null) callback.onLoaded(model);
+            }
+
+            @Override
+            public void onError(String error) {
+                if (callback != null) callback.onError(error);
+            }
+        });
+    }
+
     public void unloadVisionModel() {
-        if (visionModelHandle != 0L) {
-            bridge.releaseVisionModel(visionModelHandle);
-            visionModelHandle = 0L;
+        if (useSimulationMode) {
+            simulatedEngine.unloadModel();
+        } else {
+            if (visionModelHandle != 0L) {
+                bridge.releaseVisionModel(visionModelHandle);
+                visionModelHandle = 0L;
+            }
         }
         if (currentVisionModel != null) {
             currentVisionModel.setLoaded(false);
@@ -127,6 +188,14 @@ public class VisionInferenceEngine {
     }
 
     public void visionChat(String imagePath, String prompt, VisionCallback callback) {
+        if (useSimulationMode) {
+            visionChatSimulation(imagePath, prompt, callback);
+        } else {
+            visionChatNative(imagePath, prompt, callback);
+        }
+    }
+
+    private void visionChatNative(String imagePath, String prompt, VisionCallback callback) {
         if (!isVisionModelLoaded || visionModelHandle == 0L) {
             if (callback != null) callback.onError("Vision model not loaded");
             return;
@@ -146,7 +215,40 @@ public class VisionInferenceEngine {
         });
     }
 
+    private void visionChatSimulation(String imagePath, String prompt, VisionCallback callback) {
+        if (!isVisionModelLoaded) {
+            if (callback != null) callback.onError("Vision model not loaded");
+            return;
+        }
+        InferenceParams params = getVisionModeParams();
+        simulatedEngine.visionChat(imagePath, prompt, params.getNPredict(), params.getTemperature(),
+                new SimulatedVisionEngine.VisionCallback() {
+                    @Override
+                    public void onPartialResult(String text) {
+                        if (callback != null) callback.onProgress(text);
+                    }
+
+                    @Override
+                    public void onComplete(String text) {
+                        if (callback != null) callback.onSuccess(text);
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        if (callback != null) callback.onError(error);
+                    }
+                });
+    }
+
     public void imageOcr(String imagePath, OcrCallback callback) {
+        if (useSimulationMode) {
+            imageOcrSimulation(imagePath, callback);
+        } else {
+            imageOcrNative(imagePath, callback);
+        }
+    }
+
+    private void imageOcrNative(String imagePath, OcrCallback callback) {
         if (!isVisionModelLoaded || visionModelHandle == 0L) {
             if (callback != null) callback.onError("Vision model not loaded");
             return;
@@ -165,6 +267,29 @@ public class VisionInferenceEngine {
         });
     }
 
+    private void imageOcrSimulation(String imagePath, OcrCallback callback) {
+        if (!isVisionModelLoaded) {
+            if (callback != null) callback.onError("Vision model not loaded");
+            return;
+        }
+        simulatedEngine.imageOcr(imagePath, new SimulatedVisionEngine.OcrCallback() {
+            @Override
+            public void onProgress(int percent, String message) {
+                if (callback != null) callback.onProgress(percent, message);
+            }
+
+            @Override
+            public void onComplete(String text) {
+                if (callback != null) callback.onSuccess(text);
+            }
+
+            @Override
+            public void onError(String error) {
+                if (callback != null) callback.onError(error);
+            }
+        });
+    }
+
     public void switchVisionModel(AIModel newModel, LoadCallback callback) {
         executorService.execute(() -> {
             try {
@@ -177,6 +302,9 @@ public class VisionInferenceEngine {
     }
 
     public boolean isVisionModelLoaded() {
+        if (useSimulationMode) {
+            return simulatedEngine.isModelLoaded();
+        }
         return isVisionModelLoaded && visionModelHandle != 0L;
     }
 
@@ -219,6 +347,9 @@ public class VisionInferenceEngine {
     }
 
     public boolean isQwenVisionModel() {
+        if (useSimulationMode) {
+            return simulatedEngine.isQwenVisionModel();
+        }
         if (!isVisionModelLoaded || visionModelHandle == 0L) {
             return false;
         }
@@ -226,6 +357,9 @@ public class VisionInferenceEngine {
     }
 
     public List<AIModel> getAvailableVisionModels() {
+        if (useSimulationMode) {
+            return simulatedEngine.getAvailableModels();
+        }
         List<AIModel> models = new ArrayList<>();
 
         AIModel qwen3vl2b = new AIModel();
@@ -259,6 +393,9 @@ public class VisionInferenceEngine {
     }
 
     public AIModel getDefaultVisionModel() {
+        if (useSimulationMode) {
+            return simulatedEngine.getDefaultModel();
+        }
         AIModel model = new AIModel();
         model.setId("qwen3-vl-2b");
         model.setName("Qwen3-VL-2B");
@@ -270,6 +407,7 @@ public class VisionInferenceEngine {
     }
 
     public boolean checkHardwareCompatibility(AIModel model) {
+        if (useSimulationMode) return true;
         if (context == null) return false;
 
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
