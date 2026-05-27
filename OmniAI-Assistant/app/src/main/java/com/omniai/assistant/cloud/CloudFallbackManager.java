@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.omniai.assistant.inference.InferenceEngine;
+import com.omniai.assistant.inference.VisionInferenceEngine;
 import com.omniai.assistant.inference.ThermalMonitor;
 import com.omniai.assistant.util.NetworkUtil;
 
@@ -13,9 +14,11 @@ public class CloudFallbackManager {
     private static volatile CloudFallbackManager instance;
 
     private boolean isCloudActive;
+    private boolean isVisionFallback;
     private String fallbackReason;
     private CloudInferenceClient cloudClient;
     private InferenceEngine localEngine;
+    private VisionInferenceEngine visionEngine;
     private Context context;
     private FallbackListener listener;
     private Handler handler;
@@ -25,7 +28,7 @@ public class CloudFallbackManager {
     private final Runnable restoreCheckRunnable = new Runnable() {
         @Override
         public void run() {
-            if (!isCloudActive) return;
+            if (!isCloudActive && !isVisionFallback) return;
             if (shouldRestoreToLocal()) {
                 restoreLocal();
             } else {
@@ -42,8 +45,10 @@ public class CloudFallbackManager {
     private CloudFallbackManager() {
         this.cloudClient = new CloudInferenceClient();
         this.localEngine = InferenceEngine.getInstance();
+        this.visionEngine = VisionInferenceEngine.getInstance();
         this.handler = new Handler(Looper.getMainLooper());
         this.isCloudActive = false;
+        this.isVisionFallback = false;
         this.fallbackReason = "";
     }
 
@@ -77,9 +82,35 @@ public class CloudFallbackManager {
         handler.postDelayed(restoreCheckRunnable, RESTORE_CHECK_INTERVAL_MS);
     }
 
+    public void checkAndFallbackVision(String reason) {
+        if (isVisionFallback) return;
+        if (!cloudClient.isAvailable()) {
+            cloudClient.checkAvailability();
+        }
+        if (!cloudClient.checkVisionAvailability()) return;
+
+        isVisionFallback = true;
+        fallbackReason = reason;
+        if (listener != null) {
+            listener.onFallbackToCloud(reason);
+        }
+        handler.postDelayed(restoreCheckRunnable, RESTORE_CHECK_INTERVAL_MS);
+    }
+
     public void restoreLocal() {
-        if (!isCloudActive) return;
+        if (!isCloudActive && !isVisionFallback) return;
         isCloudActive = false;
+        isVisionFallback = false;
+        fallbackReason = "";
+        handler.removeCallbacks(restoreCheckRunnable);
+        if (listener != null) {
+            listener.onRestoredToLocal();
+        }
+    }
+
+    public void restoreLocalVision() {
+        if (!isVisionFallback) return;
+        isVisionFallback = false;
         fallbackReason = "";
         handler.removeCallbacks(restoreCheckRunnable);
         if (listener != null) {
@@ -89,6 +120,10 @@ public class CloudFallbackManager {
 
     public boolean isCloudActive() {
         return isCloudActive;
+    }
+
+    public boolean isVisionCloudActive() {
+        return isVisionFallback;
     }
 
     public String getFallbackReason() {
@@ -110,6 +145,37 @@ public class CloudFallbackManager {
         if (thermalStatus == ThermalMonitor.ThermalStatus.HIGH || thermalStatus == ThermalMonitor.ThermalStatus.CRITICAL) {
             return true;
         }
+        if (!visionEngine.isVisionModelLoaded()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean shouldFallbackVision() {
+        if (!visionEngine.isVisionModelLoaded()) {
+            return true;
+        }
+        if (isVisionModelCorrupted()) {
+            return true;
+        }
+        if (isVisionInferenceTimeout()) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isVisionModelCorrupted() {
+        try {
+            com.omniai.assistant.model.AIModel currentModel = visionEngine.getCurrentVisionModel();
+            if (currentModel == null || currentModel.getFilePath() == null) return true;
+            java.io.File file = new java.io.File(currentModel.getFilePath());
+            return !file.exists() || file.length() == 0;
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    private boolean isVisionInferenceTimeout() {
         return false;
     }
 
@@ -125,6 +191,9 @@ public class CloudFallbackManager {
             return false;
         }
         if (context != null && !NetworkUtil.isNetworkAvailable(context)) {
+            return false;
+        }
+        if (isVisionFallback && !visionEngine.isVisionModelLoaded()) {
             return false;
         }
         return true;

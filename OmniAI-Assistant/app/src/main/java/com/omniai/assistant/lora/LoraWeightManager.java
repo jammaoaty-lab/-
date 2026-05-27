@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.omniai.assistant.common.Constants;
 import com.omniai.assistant.model.LoraWeight;
+import com.omniai.assistant.nativebridge.LlamaBridge;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,6 +24,7 @@ public class LoraWeightManager {
     private List<LoraWeight> weights;
     private SharedPreferences prefs;
     private Gson gson;
+    private LlamaBridge bridge;
 
     private static final String PREFS_NAME = "omniai_lora_weights";
     private static final String KEY_WEIGHTS = "lora_weights";
@@ -30,6 +32,7 @@ public class LoraWeightManager {
     public LoraWeightManager(Context context) {
         this.prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         this.gson = new Gson();
+        this.bridge = LlamaBridge.getInstance();
         this.weights = loadWeightsFromPrefs();
     }
 
@@ -55,6 +58,67 @@ public class LoraWeightManager {
         weight.setCreatedAt(System.currentTimeMillis());
         weights.add(weight);
         saveWeightsToPrefs();
+    }
+
+    public void importVisionLora(String filePath, String name, String parentVisionModelId) {
+        File srcFile = new File(filePath);
+        if (!srcFile.exists()) {
+            throw new RuntimeException("Vision LoRA file not found: " + filePath);
+        }
+        String loraId = UUID.randomUUID().toString();
+        File loraDir = new File(Constants.LORA_DIR, loraId);
+        if (!loraDir.exists()) {
+            loraDir.mkdirs();
+        }
+        File dstFile = new File(loraDir, srcFile.getName());
+        copyFile(srcFile, dstFile);
+
+        LoraWeight weight = new LoraWeight();
+        weight.setId(loraId);
+        weight.setName(name);
+        weight.setFilePath(loraDir.getAbsolutePath());
+        weight.setFileSize(calculateSize(loraDir));
+        weight.setEnabled(false);
+        weight.setParentModelId(parentVisionModelId);
+        weight.setCreatedAt(System.currentTimeMillis());
+        weights.add(weight);
+        saveWeightsToPrefs();
+    }
+
+    public List<LoraWeight> getVisionLoraWeights(String visionModelId) {
+        List<LoraWeight> visionWeights = new ArrayList<>();
+        for (LoraWeight w : weights) {
+            if (visionModelId != null && visionModelId.equals(w.getParentModelId())) {
+                visionWeights.add(w);
+            }
+        }
+        return visionWeights;
+    }
+
+    public boolean enableVisionLora(String loraId, long visionModelHandle) {
+        LoraWeight target = getLoraById(loraId);
+        if (target == null) {
+            return false;
+        }
+        boolean result = bridge.applyLora(visionModelHandle, target.getFilePath(), 1.0f);
+        if (result) {
+            target.setEnabled(true);
+            saveWeightsToPrefs();
+        }
+        return result;
+    }
+
+    public boolean disableVisionLora(String loraId) {
+        LoraWeight target = getLoraById(loraId);
+        if (target == null) {
+            return false;
+        }
+        boolean result = bridge.removeLora(0);
+        if (result) {
+            target.setEnabled(false);
+            saveWeightsToPrefs();
+        }
+        return result;
     }
 
     public boolean deleteLora(String loraId) {

@@ -1,10 +1,17 @@
 package com.omniai.assistant.multimodal;
 
+import android.app.ActivityManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.omniai.assistant.inference.VisionInferenceEngine;
+import com.omniai.assistant.model.AIModel;
+
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MultimodalManager {
@@ -15,8 +22,12 @@ public class MultimodalManager {
     private SpeechRecognizer speechRecognizer;
     private TtsEngine ttsEngine;
     private ImageAnalyzer imageAnalyzer;
+    private VisionInferenceEngine visionEngine;
     private Context context;
     private Handler handler;
+
+    private static final long MAX_IMAGE_SIZE = 20 * 1024 * 1024;
+    private static final List<String> SUPPORTED_FORMATS = Arrays.asList("jpg", "jpeg", "png", "webp");
 
     private MultimodalManager(Context context) {
         this.context = context.getApplicationContext();
@@ -25,6 +36,7 @@ public class MultimodalManager {
         this.speechRecognizer = new SpeechRecognizer(context);
         this.ttsEngine = new TtsEngine();
         this.imageAnalyzer = new ImageAnalyzer();
+        this.visionEngine = VisionInferenceEngine.getInstance();
     }
 
     public static synchronized MultimodalManager getInstance(Context context) {
@@ -35,53 +47,45 @@ public class MultimodalManager {
     }
 
     public void recognizeImage(String imagePath, ImageCallback callback) {
-        if (imageAnalyzer == null || !imageAnalyzer.isInitialized()) {
-            if (callback != null) {
-                callback.onError("Image analyzer not initialized");
-            }
+        if (callback == null) return;
+        if (!hasStoragePermission()) {
+            callback.onError("Storage permission not granted");
             return;
         }
-        new Thread(() -> {
-            try {
-                String description = imageAnalyzer.describe(imagePath);
-                handler.post(() -> {
-                    if (callback != null) {
-                        callback.onSuccess(description);
-                    }
-                });
-            } catch (Exception e) {
-                handler.post(() -> {
-                    if (callback != null) {
-                        callback.onError(e.getMessage());
-                    }
-                });
+        if (!validateImageFile(imagePath, callback)) return;
+        if (!checkHardwareReady(callback)) return;
+        visionEngine.visionChat(imagePath, "Describe this image in detail.", new VisionInferenceEngine.VisionCallback() {
+            @Override
+            public void onSuccess(String result) {
+                handler.post(() -> callback.onSuccess(result));
             }
-        }).start();
+
+            @Override
+            public void onError(String error) {
+                handler.post(() -> callback.onError(error));
+            }
+        });
     }
 
     public void extractOcr(String imagePath, OcrCallback callback) {
-        if (ocrEngine == null || !ocrEngine.isInitialized()) {
-            if (callback != null) {
-                callback.onError("OCR engine not initialized");
-            }
+        if (callback == null) return;
+        if (!hasStoragePermission()) {
+            callback.onError("Storage permission not granted");
             return;
         }
-        new Thread(() -> {
-            try {
-                String text = ocrEngine.recognize(imagePath);
-                handler.post(() -> {
-                    if (callback != null) {
-                        callback.onSuccess(text);
-                    }
-                });
-            } catch (Exception e) {
-                handler.post(() -> {
-                    if (callback != null) {
-                        callback.onError(e.getMessage());
-                    }
-                });
+        if (!validateImageFile(imagePath, callback)) return;
+        if (!checkHardwareReady(callback)) return;
+        visionEngine.imageOcr(imagePath, new VisionInferenceEngine.OcrCallback() {
+            @Override
+            public void onSuccess(String text) {
+                handler.post(() -> callback.onSuccess(text));
             }
-        }).start();
+
+            @Override
+            public void onError(String error) {
+                handler.post(() -> callback.onError(error));
+            }
+        });
     }
 
     public void startVoiceRecognition(VoiceCallback callback) {
@@ -138,28 +142,48 @@ public class MultimodalManager {
     }
 
     public void analyzeImage(String imagePath, String question, ImageCallback callback) {
-        if (imageAnalyzer == null || !imageAnalyzer.isInitialized()) {
-            if (callback != null) {
-                callback.onError("Image analyzer not initialized");
-            }
+        if (callback == null) return;
+        if (!hasStoragePermission()) {
+            callback.onError("Storage permission not granted");
             return;
         }
-        new Thread(() -> {
-            try {
-                String result = imageAnalyzer.analyze(imagePath, question);
-                handler.post(() -> {
-                    if (callback != null) {
-                        callback.onSuccess(result);
-                    }
-                });
-            } catch (Exception e) {
-                handler.post(() -> {
-                    if (callback != null) {
-                        callback.onError(e.getMessage());
-                    }
-                });
+        if (!hasCameraPermission()) {
+            callback.onError("Camera permission not granted");
+            return;
+        }
+        if (!validateImageFile(imagePath, callback)) return;
+        if (!checkHardwareReady(callback)) return;
+        visionEngine.visionChat(imagePath, question, new VisionInferenceEngine.VisionCallback() {
+            @Override
+            public void onSuccess(String result) {
+                handler.post(() -> callback.onSuccess(result));
             }
-        }).start();
+
+            @Override
+            public void onError(String error) {
+                handler.post(() -> callback.onError(error));
+            }
+        });
+    }
+
+    public void loadVisionModel(AIModel model, VisionInferenceEngine.LoadCallback callback) {
+        visionEngine.loadVisionModel(model, callback);
+    }
+
+    public void switchVisionModel(AIModel newModel, VisionInferenceEngine.LoadCallback callback) {
+        visionEngine.switchVisionModel(newModel, callback);
+    }
+
+    public boolean isVisionModelLoaded() {
+        return visionEngine.isVisionModelLoaded();
+    }
+
+    public AIModel getCurrentVisionModel() {
+        return visionEngine.getCurrentVisionModel();
+    }
+
+    public boolean checkHardwareCompatibility(AIModel model) {
+        return visionEngine.checkHardwareCompatibility(model);
     }
 
     public List<String> getAvailableVoices() {
@@ -195,6 +219,128 @@ public class MultimodalManager {
         if (ttsEngine != null) {
             ttsEngine.shutdown();
         }
+        if (visionEngine != null) {
+            visionEngine.unloadVisionModel();
+        }
+    }
+
+    private boolean validateImageFile(String imagePath, ImageCallback callback) {
+        if (imagePath == null || imagePath.isEmpty()) {
+            callback.onError("Image path is empty");
+            return false;
+        }
+        File file = new File(imagePath);
+        if (!file.exists()) {
+            callback.onError("Image file does not exist");
+            return false;
+        }
+        if (file.length() > MAX_IMAGE_SIZE) {
+            callback.onError("Image file exceeds 20MB limit");
+            return false;
+        }
+        String extension = getImageExtension(imagePath);
+        if (extension.isEmpty() || !SUPPORTED_FORMATS.contains(extension.toLowerCase())) {
+            callback.onError("Unsupported image format. Supported: jpg, png, webp");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateImageFile(String imagePath, OcrCallback callback) {
+        if (imagePath == null || imagePath.isEmpty()) {
+            callback.onError("Image path is empty");
+            return false;
+        }
+        File file = new File(imagePath);
+        if (!file.exists()) {
+            callback.onError("Image file does not exist");
+            return false;
+        }
+        if (file.length() > MAX_IMAGE_SIZE) {
+            callback.onError("Image file exceeds 20MB limit");
+            return false;
+        }
+        String extension = getImageExtension(imagePath);
+        if (extension.isEmpty() || !SUPPORTED_FORMATS.contains(extension.toLowerCase())) {
+            callback.onError("Unsupported image format. Supported: jpg, png, webp");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkHardwareReady(ImageCallback callback) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (am != null) {
+            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+            am.getMemoryInfo(mi);
+            if (mi.availMem < 512L * 1024 * 1024) {
+                callback.onError("Insufficient memory for vision operation");
+                return false;
+            }
+        }
+        float temperature = getDeviceTemperature();
+        if (temperature > 45.0f) {
+            callback.onError("Device temperature too high for vision operation");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkHardwareReady(OcrCallback callback) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (am != null) {
+            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+            am.getMemoryInfo(mi);
+            if (mi.availMem < 512L * 1024 * 1024) {
+                callback.onError("Insufficient memory for OCR operation");
+                return false;
+            }
+        }
+        float temperature = getDeviceTemperature();
+        if (temperature > 45.0f) {
+            callback.onError("Device temperature too high for OCR operation");
+            return false;
+        }
+        return true;
+    }
+
+    private String getImageExtension(String path) {
+        int dotIndex = path.lastIndexOf('.');
+        if (dotIndex >= 0 && dotIndex < path.length() - 1) {
+            return path.substring(dotIndex + 1).toLowerCase();
+        }
+        return "";
+    }
+
+    private float getDeviceTemperature() {
+        try {
+            com.omniai.assistant.inference.ThermalMonitor thermalMonitor =
+                    com.omniai.assistant.inference.ThermalMonitor.getInstance();
+            com.omniai.assistant.inference.ThermalMonitor.ThermalStatus status =
+                    thermalMonitor.checkThermalStatus();
+            switch (status) {
+                case CRITICAL: return 50.0f;
+                case HIGH: return 46.0f;
+                case MODERATE: return 40.0f;
+                default: return 35.0f;
+            }
+        } catch (Exception e) {
+            return 35.0f;
+        }
+    }
+
+    private boolean hasStoragePermission() {
+        if (context == null) return false;
+        return context.checkCallingOrSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED
+                || context.checkCallingOrSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean hasCameraPermission() {
+        if (context == null) return false;
+        return context.checkCallingOrSelfPermission(android.Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED;
     }
 
     public interface ImageCallback {

@@ -11,6 +11,7 @@ public class SettingsManager {
 
     public static class AiSettings {
         public String defaultModel;
+        public String defaultVisionModel;
         public String systemPrompt;
         public float temperature;
         public float topP;
@@ -19,6 +20,7 @@ public class SettingsManager {
 
         public AiSettings() {
             this.defaultModel = "llama-3-8b";
+            this.defaultVisionModel = "qwen3-vl-2b";
             this.systemPrompt = "";
             this.temperature = 0.7f;
             this.topP = 0.9f;
@@ -29,6 +31,7 @@ public class SettingsManager {
         public AiSettings copy() {
             AiSettings copy = new AiSettings();
             copy.defaultModel = this.defaultModel;
+            copy.defaultVisionModel = this.defaultVisionModel;
             copy.systemPrompt = this.systemPrompt;
             copy.temperature = this.temperature;
             copy.topP = this.topP;
@@ -70,6 +73,9 @@ public class SettingsManager {
         public boolean incognitoMode;
         public boolean encryptData;
         public boolean filterSensitive;
+        public boolean visionGpuAcceleration;
+        public boolean autoOcr;
+        public boolean autoCleanImageCache;
 
         public PrivacySettings() {
             this.appLockEnabled = false;
@@ -77,6 +83,9 @@ public class SettingsManager {
             this.incognitoMode = false;
             this.encryptData = false;
             this.filterSensitive = true;
+            this.visionGpuAcceleration = false;
+            this.autoOcr = false;
+            this.autoCleanImageCache = false;
         }
 
         public PrivacySettings copy() {
@@ -86,6 +95,9 @@ public class SettingsManager {
             copy.incognitoMode = this.incognitoMode;
             copy.encryptData = this.encryptData;
             copy.filterSensitive = this.filterSensitive;
+            copy.visionGpuAcceleration = this.visionGpuAcceleration;
+            copy.autoOcr = this.autoOcr;
+            copy.autoCleanImageCache = this.autoCleanImageCache;
             return copy;
         }
     }
@@ -223,6 +235,39 @@ public class SettingsManager {
 
     public void setCloudFallbackEnabled(boolean enabled) {
         prefs.edit().putBoolean("cloud_fallback", enabled).apply();
+    }
+
+    public boolean isVisionGpuEnabled() {
+        PrivacySettings settings = getPrivacySettings();
+        return settings.visionGpuAcceleration;
+    }
+
+    public void setVisionGpuEnabled(boolean enabled) {
+        PrivacySettings settings = getPrivacySettings();
+        settings.visionGpuAcceleration = enabled;
+        updatePrivacySettings(settings);
+    }
+
+    public boolean isAutoOcr() {
+        PrivacySettings settings = getPrivacySettings();
+        return settings.autoOcr;
+    }
+
+    public void setAutoOcr(boolean enabled) {
+        PrivacySettings settings = getPrivacySettings();
+        settings.autoOcr = enabled;
+        updatePrivacySettings(settings);
+    }
+
+    public String getDefaultVisionModel() {
+        AiSettings settings = getAiSettings();
+        return settings.defaultVisionModel;
+    }
+
+    public void setDefaultVisionModel(String modelId) {
+        AiSettings settings = getAiSettings();
+        settings.defaultVisionModel = modelId;
+        updateAiSettings(settings);
     }
 
     public void resetToDefaults() {

@@ -3,6 +3,15 @@ package com.omniai.assistant;
 import android.app.Application;
 import com.omniai.assistant.common.Constants;
 import com.omniai.assistant.common.EventBus;
+import com.omniai.assistant.credits.CreditsManager;
+import com.omniai.assistant.inference.InferenceEngine;
+import com.omniai.assistant.inference.VisionInferenceEngine;
+import com.omniai.assistant.cache.CacheManager;
+import com.omniai.assistant.cloud.CloudFallbackManager;
+import com.omniai.assistant.inference.ThermalMonitor;
+import com.omniai.assistant.knowledge.KnowledgeBaseManager;
+import com.omniai.assistant.security.SecurityManager;
+import com.omniai.assistant.user.UserManager;
 import com.omniai.assistant.util.FileUtil;
 
 public class OmniAIApplication extends Application {
@@ -11,10 +20,11 @@ public class OmniAIApplication extends Application {
 
     private UserManager userManager;
     private InferenceEngine inferenceEngine;
+    private VisionInferenceEngine visionInferenceEngine;
     private CloudFallbackManager cloudFallbackManager;
     private SecurityManager securityManager;
     private CacheManager cacheManager;
-    private VipManager vipManager;
+    private CreditsManager creditsManager;
     private ThermalMonitor thermalMonitor;
     private KnowledgeBaseManager knowledgeBaseManager;
 
@@ -25,19 +35,22 @@ public class OmniAIApplication extends Application {
 
         FileUtil.ensureDirs(this);
 
+        CreditsManager.init(this);
+        VisionInferenceEngine.init(this);
+
         userManager = new UserManager(this);
         securityManager = new SecurityManager(this);
         cacheManager = new CacheManager(this);
-        vipManager = new VipManager(this);
+        creditsManager = CreditsManager.getInstance();
         thermalMonitor = new ThermalMonitor(this);
         knowledgeBaseManager = new KnowledgeBaseManager(this);
         inferenceEngine = new InferenceEngine(this);
+        visionInferenceEngine = VisionInferenceEngine.getInstance();
         cloudFallbackManager = new CloudFallbackManager(this);
 
         userManager.initialize();
         securityManager.initialize();
         cacheManager.initialize();
-        vipManager.initialize();
         thermalMonitor.start();
         knowledgeBaseManager.initialize();
         inferenceEngine.initialize();
@@ -56,6 +69,10 @@ public class OmniAIApplication extends Application {
         return inferenceEngine;
     }
 
+    public VisionInferenceEngine getVisionInferenceEngine() {
+        return visionInferenceEngine;
+    }
+
     public CloudFallbackManager getCloudFallbackManager() {
         return cloudFallbackManager;
     }
@@ -68,8 +85,8 @@ public class OmniAIApplication extends Application {
         return cacheManager;
     }
 
-    public VipManager getVipManager() {
-        return vipManager;
+    public CreditsManager getCreditsManager() {
+        return creditsManager;
     }
 
     public ThermalMonitor getThermalMonitor() {
@@ -89,6 +106,9 @@ public class OmniAIApplication extends Application {
         if (inferenceEngine != null) {
             inferenceEngine.shutdown();
         }
+        if (visionInferenceEngine != null) {
+            visionInferenceEngine.unloadVisionModel();
+        }
         if (cloudFallbackManager != null) {
             cloudFallbackManager.shutdown();
         }
@@ -107,6 +127,9 @@ public class OmniAIApplication extends Application {
         if (inferenceEngine != null) {
             inferenceEngine.onLowMemory();
         }
+        if (visionInferenceEngine != null && visionInferenceEngine.isVisionModelLoaded()) {
+            visionInferenceEngine.unloadVisionModel();
+        }
     }
 
     @Override
@@ -117,6 +140,9 @@ public class OmniAIApplication extends Application {
         }
         if (level >= TRIM_MEMORY_COMPLETE && inferenceEngine != null) {
             inferenceEngine.onLowMemory();
+        }
+        if (level >= TRIM_MEMORY_RUNNING_LOW && visionInferenceEngine != null && visionInferenceEngine.isVisionModelLoaded()) {
+            visionInferenceEngine.unloadVisionModel();
         }
     }
 }

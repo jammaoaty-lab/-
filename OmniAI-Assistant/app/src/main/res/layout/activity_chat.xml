@@ -34,7 +34,7 @@
                     android:layout_gravity="start|center_vertical"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/tab_chat"
-                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    android:src="@drawable/ic_menu"
                     android:tint="@color/text_primary" />
 
                 <LinearLayout
@@ -53,13 +53,36 @@
                         android:textSize="@dimen/text_size_subtitle"
                         tools:text="OmniAI-7B" />
 
-                    <TextView
-                        android:id="@+id/tv_model_status"
+                    <LinearLayout
+                        android:id="@+id/vision_chip"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="@dimen/text_size_caption"
-                        tools:text="本地推理" />
+                        android:layout_marginTop="2dp"
+                        android:background="@drawable/bg_vision_chip"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="@dimen/spacing_sm"
+                        android:paddingVertical="2dp"
+                        android:visibility="gone"
+                        tools:visibility="visible">
+
+                        <View
+                            android:id="@+id/view_vision_dot"
+                            android:layout_width="6dp"
+                            android:layout_height="6dp"
+                            android:background="@drawable/bg_dot_indicator" />
+
+                        <TextView
+                            android:id="@+id/tv_vision_chip_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="4dp"
+                            android:fontFamily="sans-serif-medium"
+                            android:textColor="@color/primary"
+                            android:textSize="10sp"
+                            tools:text="本地视觉推理" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -71,7 +94,7 @@
                     android:layout_marginEnd="@dimen/spacing_sm"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/tab_chat"
-                    android:src="@android:drawable/ic_menu_add"
+                    android:src="@drawable/ic_add"
                     android:tint="@color/text_primary" />
 
                 <ImageButton
@@ -81,7 +104,7 @@
                     android:layout_gravity="end|center_vertical"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="@string/tab_chat"
-                    android:src="@android:drawable/ic_menu_moreoverflow"
+                    android:src="@drawable/ic_more"
                     android:tint="@color/text_primary" />
 
             </com.google.android.material.appbar.MaterialToolbar>
@@ -92,6 +115,35 @@
                 android:background="@color/border" />
 
             <include layout="@layout/view_status_bar" />
+
+            <LinearLayout
+                android:id="@+id/layout_vision_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/background"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/spacing_lg"
+                android:paddingVertical="@dimen/spacing_xs"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <View
+                    android:id="@+id/view_vision_status_dot"
+                    android:layout_width="@dimen/spacing_sm"
+                    android:layout_height="@dimen/spacing_sm"
+                    android:background="@drawable/bg_dot_indicator" />
+
+                <TextView
+                    android:id="@+id/tv_vision_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_xs"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/text_size_caption"
+                    tools:text="视觉模型: OmniAI-Vision-2B · 就绪" />
+
+            </LinearLayout>
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -162,7 +214,16 @@
                         android:layout_height="@dimen/icon_xl"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/tab_chat"
-                        android:src="@android:drawable/ic_menu_add"
+                        android:src="@drawable/ic_attach"
+                        android:tint="@color/text_secondary" />
+
+                    <ImageButton
+                        android:id="@+id/btn_camera"
+                        android:layout_width="@dimen/icon_xl"
+                        android:layout_height="@dimen/icon_xl"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/vision_recognizing"
+                        android:src="@drawable/ic_camera"
                         android:tint="@color/text_secondary" />
 
                     <EditText
@@ -179,12 +240,21 @@
                         android:textColorHint="@color/text_tertiary" />
 
                     <ImageButton
+                        android:id="@+id/btn_ocr"
+                        android:layout_width="@dimen/icon_xl"
+                        android:layout_height="@dimen/icon_xl"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/quick_ocr"
+                        android:src="@drawable/ic_ocr"
+                        android:tint="@color/text_secondary" />
+
+                    <ImageButton
                         android:id="@+id/btn_voice"
                         android:layout_width="@dimen/icon_xl"
                         android:layout_height="@dimen/icon_xl"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="@string/quick_voice"
-                        android:src="@android:drawable/ic_btn_speak_now"
+                        android:src="@drawable/ic_mic"
                         android:tint="@color/text_secondary" />
 
                     <ImageButton
@@ -197,7 +267,7 @@
                         android:elevation="2dp"
                         android:enabled="false"
                         android:padding="@dimen/spacing_sm"
-                        android:src="@android:drawable/ic_menu_send"
+                        android:src="@drawable/ic_send"
                         android:tint="@color/surface" />
 
                 </LinearLayout>

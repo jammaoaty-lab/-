@@ -1,8 +1,12 @@
 package com.omniai.assistant.cloud;
 
+import android.util.Base64;
+
 import com.omniai.assistant.scheduler.InferenceParams;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -30,6 +34,7 @@ public class CloudInferenceClient {
     private String apiBaseUrl;
     private String apiKey;
     private boolean isAvailable;
+    private boolean isVisionAvailable;
 
     public interface CloudCallback {
         void onSuccess(String result);
@@ -51,6 +56,7 @@ public class CloudInferenceClient {
         this.apiBaseUrl = "";
         this.apiKey = "";
         this.isAvailable = false;
+        this.isVisionAvailable = false;
     }
 
     public void complete(String prompt, InferenceParams params, CloudCallback callback) {
@@ -148,6 +154,147 @@ public class CloudInferenceClient {
         }
     }
 
+    public void visionChat(String imagePath, String prompt, CloudCallback callback) {
+        if (callback == null) return;
+        try {
+            File imageFile = new File(imagePath);
+            if (!imageFile.exists()) {
+                callback.onError("Image file not found");
+                return;
+            }
+            String base64Image = encodeImageToBase64(imagePath);
+            if (base64Image == null || base64Image.isEmpty()) {
+                callback.onError("Failed to encode image");
+                return;
+            }
+
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("model", "qwen-vl");
+            requestBody.put("prompt", prompt);
+            requestBody.put("image", base64Image);
+
+            RequestBody body = RequestBody.create(requestBody.toString(), JSON_MEDIA_TYPE);
+            Request request = new Request.Builder()
+                    .url(apiBaseUrl + "/v1/vision/chat")
+                    .addHeader("Authorization", "Bearer " + apiKey)
+                    .addHeader("Content-Type", "application/json")
+                    .post(body)
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    isVisionAvailable = false;
+                    callback.onError(e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) {
+                    try {
+                        if (!response.isSuccessful()) {
+                            callback.onError("HTTP " + response.code());
+                            return;
+                        }
+                        String responseBody = response.body().string();
+                        JSONObject json = new JSONObject(responseBody);
+                        JSONArray choices = json.getJSONArray("choices");
+                        String text = choices.getJSONObject(0).getString("text");
+                        isVisionAvailable = true;
+                        callback.onSuccess(text);
+                    } catch (Exception e) {
+                        callback.onError(e.getMessage());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            callback.onError(e.getMessage());
+        }
+    }
+
+    public void imageOcr(String imagePath, CloudCallback callback) {
+        if (callback == null) return;
+        try {
+            File imageFile = new File(imagePath);
+            if (!imageFile.exists()) {
+                callback.onError("Image file not found");
+                return;
+            }
+            String base64Image = encodeImageToBase64(imagePath);
+            if (base64Image == null || base64Image.isEmpty()) {
+                callback.onError("Failed to encode image");
+                return;
+            }
+
+            JSONObject requestBody = new JSONObject();
+            requestBody.put("model", "qwen-vl");
+            requestBody.put("image", base64Image);
+            requestBody.put("task", "ocr");
+
+            RequestBody body = RequestBody.create(requestBody.toString(), JSON_MEDIA_TYPE);
+            Request request = new Request.Builder()
+                    .url(apiBaseUrl + "/v1/vision/ocr")
+                    .addHeader("Authorization", "Bearer " + apiKey)
+                    .addHeader("Content-Type", "application/json")
+                    .post(body)
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    isVisionAvailable = false;
+                    callback.onError(e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) {
+                    try {
+                        if (!response.isSuccessful()) {
+                            callback.onError("HTTP " + response.code());
+                            return;
+                        }
+                        String responseBody = response.body().string();
+                        JSONObject json = new JSONObject(responseBody);
+                        String text = json.getString("text");
+                        isVisionAvailable = true;
+                        callback.onSuccess(text);
+                    } catch (Exception e) {
+                        callback.onError(e.getMessage());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            callback.onError(e.getMessage());
+        }
+    }
+
+    public boolean checkVisionAvailability() {
+        if (apiBaseUrl.isEmpty() || apiKey.isEmpty()) {
+            isVisionAvailable = false;
+            return false;
+        }
+        try {
+            Request request = new Request.Builder()
+                    .url(apiBaseUrl + "/v1/vision/models")
+                    .addHeader("Authorization", "Bearer " + apiKey)
+                    .get()
+                    .build();
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    isVisionAvailable = false;
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) {
+                    isVisionAvailable = response.isSuccessful();
+                }
+            });
+        } catch (Exception e) {
+            isVisionAvailable = false;
+        }
+        return isVisionAvailable;
+    }
+
     public void checkAvailability() {
         if (apiBaseUrl.isEmpty() || apiKey.isEmpty()) {
             isAvailable = false;
@@ -185,6 +332,19 @@ public class CloudInferenceClient {
 
     public boolean isAvailable() {
         return isAvailable;
+    }
+
+    private String encodeImageToBase64(String imagePath) {
+        try {
+            File file = new File(imagePath);
+            FileInputStream fis = new FileInputStream(file);
+            byte[] bytes = new byte[(int) file.length()];
+            fis.read(bytes);
+            fis.close();
+            return Base64.encodeToString(bytes, Base64.NO_WRAP);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     private JSONObject buildRequestJson(String prompt, InferenceParams params) throws Exception {

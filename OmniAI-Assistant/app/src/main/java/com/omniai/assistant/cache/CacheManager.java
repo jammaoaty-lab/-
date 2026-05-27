@@ -72,6 +72,76 @@ public class CacheManager {
         recalculateCacheSize();
     }
 
+    public long cleanVisionCache() {
+        long cleaned = 0;
+        File visionCacheDir = new File(context.getCacheDir(), "vision");
+        if (visionCacheDir.exists()) {
+            cleaned += calculateDirectorySize(visionCacheDir);
+            deleteDirectory(visionCacheDir, true);
+        }
+        File visionInferenceDir = new File(context.getCacheDir(), "vision_inference");
+        if (visionInferenceDir.exists()) {
+            cleaned += calculateDirectorySize(visionInferenceDir);
+            deleteDirectory(visionInferenceDir, true);
+        }
+        recalculateCacheSize();
+        return cleaned;
+    }
+
+    public long cleanTempImages() {
+        long cleaned = 0;
+        File tempImageDir = new File(context.getCacheDir(), "temp_images");
+        if (tempImageDir.exists()) {
+            cleaned += calculateDirectorySize(tempImageDir);
+            deleteDirectory(tempImageDir, true);
+        }
+        File[] files = context.getCacheDir().listFiles();
+        if (files != null) {
+            for (File file : files) {
+                String name = file.getName().toLowerCase();
+                if ((name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png")
+                        || name.endsWith(".webp")) && name.contains("temp")) {
+                    cleaned += file.length();
+                    file.delete();
+                }
+            }
+        }
+        recalculateCacheSize();
+        return cleaned;
+    }
+
+    public long getVisionCacheSize() {
+        long size = 0;
+        File visionCacheDir = new File(context.getCacheDir(), "vision");
+        if (visionCacheDir.exists()) {
+            size += calculateDirectorySize(visionCacheDir);
+        }
+        File visionInferenceDir = new File(context.getCacheDir(), "vision_inference");
+        if (visionInferenceDir.exists()) {
+            size += calculateDirectorySize(visionInferenceDir);
+        }
+        return size;
+    }
+
+    public long getTempImagesSize() {
+        long size = 0;
+        File tempImageDir = new File(context.getCacheDir(), "temp_images");
+        if (tempImageDir.exists()) {
+            size += calculateDirectorySize(tempImageDir);
+        }
+        File[] files = context.getCacheDir().listFiles();
+        if (files != null) {
+            for (File file : files) {
+                String name = file.getName().toLowerCase();
+                if ((name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png")
+                        || name.endsWith(".webp")) && name.contains("temp")) {
+                    size += file.length();
+                }
+            }
+        }
+        return size;
+    }
+
     public long getCacheSize() {
         recalculateCacheSize();
         return currentCacheSize;
@@ -119,6 +189,8 @@ public class CacheManager {
     public void reclaimMemory() {
         trimCache();
         cleanTempFiles();
+        cleanVisionCache();
+        cleanTempImages();
         forceGc();
     }
 
@@ -134,6 +206,8 @@ public class CacheManager {
                     return;
                 }
                 removeOldFiles();
+                cleanVisionCache();
+                cleanTempImages();
                 cleanupHandler.postDelayed(this, intervalMs);
             }
         };

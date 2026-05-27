@@ -1,5 +1,6 @@
 package com.omniai.assistant.ui.agent;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.View;
 
@@ -9,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.omniai.assistant.R;
 import com.omniai.assistant.adapter.AgentAdapter;
+import com.omniai.assistant.credits.CreditsFeatureGate;
+import com.omniai.assistant.credits.CreditsManager;
 import com.omniai.assistant.model.Agent;
 
 import java.util.ArrayList;
@@ -16,17 +19,22 @@ import java.util.List;
 
 public class AgentActivity extends AppCompatActivity {
 
+    private static final int ADVANCED_AGENT_CREDITS_COST = 10;
+
     private RecyclerView agentList;
     private View fabCreate;
     private View emptyState;
 
     private AgentAdapter adapter;
     private List<Agent> agents = new ArrayList<>();
+    private CreditsFeatureGate creditsFeatureGate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_agent);
+
+        creditsFeatureGate = CreditsFeatureGate.getInstance();
 
         agentList = findViewById(R.id.rv_agent_list);
         fabCreate = findViewById(R.id.fab_create);
@@ -74,6 +82,35 @@ public class AgentActivity extends AppCompatActivity {
     }
 
     private void openAgentDetail(Agent agent) {
+    }
+
+    private void executeAdvancedAgentTask(Agent agent) {
+        if (!creditsFeatureGate.canUseAdvancedAgent()) {
+            creditsFeatureGate.showInsufficientCreditsDialog(this);
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.advanced_agent_confirm_title)
+                .setMessage(getString(R.string.advanced_agent_cost_message, ADVANCED_AGENT_CREDITS_COST))
+                .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                    performAdvancedTask(agent);
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void performAdvancedTask(Agent agent) {
+        boolean deducted = creditsFeatureGate.deductIfNeeded(CreditsManager.CreditsFeature.ADVANCED_AGENT);
+        if (!deducted) {
+            creditsFeatureGate.showInsufficientCreditsDialog(this);
+            return;
+        }
+
+        runAdvancedAgentLogic(agent);
+    }
+
+    private void runAdvancedAgentLogic(Agent agent) {
     }
 
     private void deleteAgent(Agent agent) {

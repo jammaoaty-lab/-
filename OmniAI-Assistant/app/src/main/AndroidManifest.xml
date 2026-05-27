@@ -51,6 +51,7 @@
         <activity android:name=".ui.knowledge.KnowledgeBaseActivity" android:exported="false" />
         <activity android:name=".ui.settings.SettingsActivity" android:exported="false" />
         <activity android:name=".ui.agent.AgentActivity" android:exported="false" />
+        <activity android:name=".ui.credits.CreditsCenterActivity" android:exported="false" />
 
         <service
             android:name=".service.InferenceService"

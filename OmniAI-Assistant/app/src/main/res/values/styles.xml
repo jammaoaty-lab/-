@@ -146,4 +146,36 @@
         <item name="android:paddingEnd">16dp</item>
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
+
+    <style name="OmniAI.Credits.GhostButton" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:minHeight">36dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingHorizontal">12dp</item>
+        <item name="cornerRadius">10dp</item>
+        <item name="backgroundTint">#4DFFFFFF</item>
+        <item name="strokeColor">@android:color/white</item>
+        <item name="strokeWidth">0.5dp</item>
+    </style>
+
+    <style name="OmniAI.VisionChip" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:minHeight">24dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingHorizontal">10dp</item>
+        <item name="cornerRadius">999dp</item>
+        <item name="backgroundTint">#33FFFFFF</item>
+    </style>
+
+    <style name="OmniAI.CreditsBalance" parent="Widget.Material3.TextView">
+        <item name="android:textSize">40sp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
 </resources>

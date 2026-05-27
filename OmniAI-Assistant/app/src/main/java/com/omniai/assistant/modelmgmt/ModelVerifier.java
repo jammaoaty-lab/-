@@ -20,6 +20,7 @@ public class ModelVerifier {
         private int contextLength;
         private int layerCount;
         private String hash;
+        private String visionCapability;
 
         public String getName() { return name; }
         public void setName(String name) { this.name = name; }
@@ -33,6 +34,8 @@ public class ModelVerifier {
         public void setLayerCount(int layerCount) { this.layerCount = layerCount; }
         public String getHash() { return hash; }
         public void setHash(String hash) { this.hash = hash; }
+        public String getVisionCapability() { return visionCapability; }
+        public void setVisionCapability(String visionCapability) { this.visionCapability = visionCapability; }
     }
 
     public boolean verifyGguf(String filePath) {
@@ -77,6 +80,11 @@ public class ModelVerifier {
         return actualHash.equalsIgnoreCase(expectedHash);
     }
 
+    public boolean verifyModelHash(String filePath, String expectedHash) {
+        String actualHash = calculateHash(filePath);
+        return actualHash.equalsIgnoreCase(expectedHash);
+    }
+
     public ModelInfo getModelInfo(String filePath) {
         File file = new File(filePath);
         ModelInfo info = new ModelInfo();
@@ -103,6 +111,44 @@ public class ModelVerifier {
             info.setQuantType(detectQuantType(filePath));
         }
         return info;
+    }
+
+    public ModelInfo getVisionModelInfo(String filePath) {
+        ModelInfo info = getModelInfo(filePath);
+        if (isVisionModel(filePath)) {
+            info.setVisionCapability(detectVisionCapability(filePath));
+        } else {
+            info.setVisionCapability("NONE");
+        }
+        return info;
+    }
+
+    public boolean isVisionModel(String filePath) {
+        if (!verifyGguf(filePath)) return false;
+        String name = new File(filePath).getName().toLowerCase();
+        if (name.contains("vl") || name.contains("vision") || name.contains("qwen3-vl")
+                || name.contains("qwen2.5-vl") || name.contains("smolvlm")) {
+            return true;
+        }
+        try (FileInputStream fis = new FileInputStream(filePath)) {
+            byte[] header = new byte[256];
+            int read = fis.read(header);
+            if (read > 0) {
+                String headerStr = new String(header, 0, Math.min(read, 256)).toLowerCase();
+                if (headerStr.contains("vision") || headerStr.contains("vl") || headerStr.contains("clip")) {
+                    return true;
+                }
+            }
+        } catch (IOException e) {
+            return false;
+        }
+        return false;
+    }
+
+    private String detectVisionCapability(String filePath) {
+        String name = new File(filePath).getName().toLowerCase();
+        if (name.contains("smolvlm")) return "IMAGE_UNDERSTANDING";
+        return "FULL";
     }
 
     public boolean isModelCompatible(String filePath) {

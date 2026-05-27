@@ -1,5 +1,12 @@
 package com.omniai.assistant.lora;
 
+import android.os.Handler;
+import android.os.Looper;
+
+import com.omniai.assistant.credits.CreditsFeatureGate;
+import com.omniai.assistant.credits.CreditsManager;
+import com.omniai.assistant.inference.ThermalMonitor;
+import com.omniai.assistant.model.AIModel;
 import com.omniai.assistant.model.LoraWeight;
 import com.omniai.assistant.nativebridge.LlamaBridge;
 
@@ -22,6 +29,17 @@ public class LoraTrainManager {
     private ExecutorService trainExecutor;
     private boolean isAborted;
 
+    private boolean isVisionTraining;
+    private AIModel targetVisionModel;
+
+    private Handler monitorHandler;
+    private Runnable monitorRunnable;
+    private boolean isMonitoring;
+
+    private static final long MONITOR_INTERVAL_MS = 3000L;
+    private static final float TEMP_THRESHOLD = 45.0f;
+    private static final int MEMORY_THRESHOLD_MB = 500;
+
     private static volatile LoraTrainManager instance;
 
     private LoraTrainManager() {
@@ -30,6 +48,9 @@ public class LoraTrainManager {
         logEntries = Collections.synchronizedList(new ArrayList<>());
         progress = 0f;
         isAborted = false;
+        isVisionTraining = false;
+        isMonitoring = false;
+        monitorHandler = new Handler(Looper.getMainLooper());
         trainExecutor = Executors.newSingleThreadExecutor(r -> {
             Thread t = new Thread(r, "LoraTrainThread");
             t.setPriority(Thread.NORM_PRIORITY - 1);
@@ -48,10 +69,53 @@ public class LoraTrainManager {
         return instance;
     }
 
+    public void startVisionTraining(TrainConfig config, AIModel visionModel, LoraTrainListener listener) {
+        if (currentState != TrainState.IDLE && currentState != TrainState.COMPLETED && currentState != TrainState.ERROR) {
+            throw new IllegalStateException("Training is already in progress. Current state: " + currentState);
+        }
+
+        if (!CreditsFeatureGate.getInstance().canTrainLora()) {
+            if (listener != null) {
+                listener.onError("Insufficient credits for LoRA training");
+            }
+            return;
+        }
+        CreditsManager.CreditsFeature feature = CreditsManager.CreditsFeature.UNLIMITED_LORA;
+        CreditsManager.getInstance().deductCredits(feature.getCost(), "CONSUME", feature.name());
+
+        this.isVisionTraining = true;
+        this.targetVisionModel = visionModel;
+        this.currentConfig = config;
+        this.listener = listener;
+        this.progress = 0f;
+        this.isAborted = false;
+        this.logEntries.clear();
+        trainExecutor.submit(this::runTraining);
+    }
+
     public void startTraining(TrainConfig config, LoraTrainListener listener) {
         if (currentState != TrainState.IDLE && currentState != TrainState.COMPLETED && currentState != TrainState.ERROR) {
             throw new IllegalStateException("Training is already in progress. Current state: " + currentState);
         }
+
+        if (!CreditsFeatureGate.getInstance().canTrainLora()) {
+            if (listener != null) {
+                listener.onError("Insufficient credits for LoRA training");
+            }
+            return;
+        }
+        CreditsManager.CreditsFeature feature = CreditsManager.CreditsFeature.UNLIMITED_LORA;
+        CreditsManager.getInstance().deductCredits(feature.getCost(), "CONSUME", feature.name());
+
+        this.isVisionTraining = false;
+        this.targetVisionModel = null;
+
+        if (config != null && config.getTargetModel() != null
+                && "vision".equalsIgnoreCase(config.getTargetModel().getModelType())) {
+            this.isVisionTraining = true;
+            this.targetVisionModel = config.getTargetModel();
+        }
+
         this.currentConfig = config;
         this.listener = listener;
         this.progress = 0f;
@@ -64,6 +128,8 @@ public class LoraTrainManager {
         try {
             setState(TrainState.PREPARING);
             addLog(TrainState.PREPARING, "Preparing training data...", 0f);
+
+            startMonitoring();
 
             File dataFile = new File(currentConfig.dataPath);
             if (!dataFile.exists()) {
@@ -79,21 +145,46 @@ public class LoraTrainManager {
             addLog(TrainState.TOKENIZING, "Tokenizing training data...", 0f);
 
             setState(TrainState.TRAINING);
-            addLog(TrainState.TRAINING, "Starting LoRA training...", 0f);
+            addLog(TrainState.TRAINING, isVisionTraining ? "Starting vision LoRA training..." : "Starting LoRA training...", 0f);
 
-            boolean success = bridge.trainLora(
-                    0,
-                    currentConfig.dataPath,
-                    currentConfig.outputPath,
-                    currentConfig.loraRank,
-                    currentConfig.loraAlpha,
-                    currentConfig.learningRate,
-                    currentConfig.epochs,
-                    currentConfig.batchSize,
-                    currentConfig.dropout
-            );
+            boolean success;
+            if (isVisionTraining && targetVisionModel != null) {
+                long visionHandle = bridge.initVisionModel(
+                        targetVisionModel.getFilePath(),
+                        currentConfig.contextLength,
+                        Runtime.getRuntime().availableProcessors(),
+                        bridge.isGpuAvailable() ? 1 : 0
+                );
+                if (visionHandle == 0) {
+                    throw new RuntimeException("Failed to load vision model for training");
+                }
+                success = bridge.trainLora(
+                        visionHandle,
+                        currentConfig.dataPath,
+                        currentConfig.outputPath,
+                        currentConfig.loraRank,
+                        currentConfig.loraAlpha,
+                        currentConfig.learningRate * 0.5f,
+                        currentConfig.epochs,
+                        Math.max(1, currentConfig.batchSize / 2),
+                        currentConfig.dropout
+                );
+            } else {
+                success = bridge.trainLora(
+                        0,
+                        currentConfig.dataPath,
+                        currentConfig.outputPath,
+                        currentConfig.loraRank,
+                        currentConfig.loraAlpha,
+                        currentConfig.learningRate,
+                        currentConfig.epochs,
+                        currentConfig.batchSize,
+                        currentConfig.dropout
+                );
+            }
 
             if (isAborted) {
+                stopMonitoring();
                 setState(TrainState.IDLE);
                 addLog(TrainState.IDLE, "Training aborted", 0f);
                 return;
@@ -119,11 +210,14 @@ public class LoraTrainManager {
             }
 
             if (isAborted) {
+                stopMonitoring();
                 bridge.abortTraining();
                 setState(TrainState.IDLE);
                 addLog(TrainState.IDLE, "Training aborted", 0f);
                 return;
             }
+
+            stopMonitoring();
 
             setState(TrainState.SAVING);
             addLog(TrainState.SAVING, "Saving LoRA weights...", 0f);
@@ -140,6 +234,7 @@ public class LoraTrainManager {
             }
 
         } catch (Exception e) {
+            stopMonitoring();
             setState(TrainState.ERROR);
             addLog(TrainState.ERROR, e.getMessage(), 0f);
             if (listener != null) {
@@ -148,10 +243,70 @@ public class LoraTrainManager {
         }
     }
 
+    private void startMonitoring() {
+        if (isMonitoring) return;
+        isMonitoring = true;
+        monitorRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!isMonitoring) return;
+                checkDeviceStatus();
+                monitorHandler.postDelayed(this, MONITOR_INTERVAL_MS);
+            }
+        };
+        monitorHandler.post(monitorRunnable);
+    }
+
+    private void stopMonitoring() {
+        isMonitoring = false;
+        if (monitorRunnable != null) {
+            monitorHandler.removeCallbacks(monitorRunnable);
+        }
+    }
+
+    private void checkDeviceStatus() {
+        float temp = bridge.getDeviceTemperature();
+        int memoryMb = bridge.getDeviceMemory();
+
+        if (temp > TEMP_THRESHOLD) {
+            if (currentState == TrainState.TRAINING && !isAborted) {
+                isAborted = true;
+                bridge.abortTraining();
+                setState(TrainState.PAUSED);
+                addLog(TrainState.PAUSED, "Auto-paused: device temperature too high (" + String.format("%.1f", temp) + "°C)", 0f);
+                if (listener != null) {
+                    listener.onError("Training auto-paused: device temperature exceeded " + TEMP_THRESHOLD + "°C");
+                }
+            }
+            return;
+        }
+
+        if (memoryMb < MEMORY_THRESHOLD_MB && memoryMb > 0) {
+            if (currentState == TrainState.TRAINING && !isAborted) {
+                isAborted = true;
+                bridge.abortTraining();
+                setState(TrainState.PAUSED);
+                addLog(TrainState.PAUSED, "Auto-paused: low memory (" + memoryMb + "MB available)", 0f);
+                if (listener != null) {
+                    listener.onError("Training auto-paused: available memory below " + MEMORY_THRESHOLD_MB + "MB");
+                }
+            }
+        }
+    }
+
+    public boolean isVisionTraining() {
+        return isVisionTraining;
+    }
+
+    public AIModel getTargetVisionModel() {
+        return targetVisionModel;
+    }
+
     public void pauseTraining() {
         if (currentState == TrainState.TRAINING) {
             isAborted = true;
             bridge.abortTraining();
+            stopMonitoring();
             setState(TrainState.PAUSED);
             addLog(TrainState.PAUSED, "Training paused", 0f);
         }
@@ -169,6 +324,7 @@ public class LoraTrainManager {
                 currentState == TrainState.PREPARING || currentState == TrainState.TOKENIZING) {
             isAborted = true;
             bridge.abortTraining();
+            stopMonitoring();
             setState(TrainState.IDLE);
             addLog(TrainState.IDLE, "Training stopped", 0f);
         }
@@ -317,6 +473,9 @@ public class LoraTrainManager {
         progress = 0f;
         logEntries.clear();
         isAborted = false;
+        isVisionTraining = false;
+        targetVisionModel = null;
+        stopMonitoring();
     }
 
     private void setState(TrainState state) {
@@ -357,6 +516,7 @@ public class LoraTrainManager {
         private int batchSize;
         private float dropout;
         private int contextLength;
+        private AIModel targetModel;
 
         public TrainConfig() {
             this.loraRank = 8;
@@ -438,6 +598,14 @@ public class LoraTrainManager {
 
         public void setContextLength(int contextLength) {
             this.contextLength = contextLength;
+        }
+
+        public AIModel getTargetModel() {
+            return targetModel;
+        }
+
+        public void setTargetModel(AIModel targetModel) {
+            this.targetModel = targetModel;
         }
     }
 

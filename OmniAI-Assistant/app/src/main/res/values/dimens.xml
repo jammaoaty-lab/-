@@ -61,4 +61,7 @@
     <dimen name="action_btn_size">38dp</dimen>
     <dimen name="fab_size">48dp</dimen>
     <dimen name="fab_radius">16dp</dimen>
+
+    <dimen name="recharge_card_width">140dp</dimen>
+    <dimen name="credits_record_item_height">56dp</dimen>
 </resources>

@@ -7,6 +7,7 @@ import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import java.io.File;
 import java.util.concurrent.Executor;
 
 public class SecurityManager {
@@ -21,6 +22,8 @@ public class SecurityManager {
     private BiometricPrompt biometricPrompt;
     private DataEncryptor dataEncryptor;
     private SensitiveFilter sensitiveFilter;
+
+    private static final String IMAGE_ENCRYPT_SUFFIX = ".imgenc";
 
     private SecurityManager(Context context) {
         this.context = context.getApplicationContext();
@@ -147,16 +150,145 @@ public class SecurityManager {
         return dataEncryptor.decryptFile(filePath, outputPath);
     }
 
+    public boolean encryptImageFile(String filePath) {
+        if (filePath == null || filePath.isEmpty()) return false;
+        File file = new File(filePath);
+        if (!file.exists()) return false;
+        String outputPath = filePath + IMAGE_ENCRYPT_SUFFIX;
+        boolean result = dataEncryptor.encryptFile(filePath, outputPath);
+        if (result) {
+            file.delete();
+            new File(outputPath).renameTo(new File(filePath));
+        }
+        return result;
+    }
+
+    public boolean decryptImageFile(String filePath) {
+        if (filePath == null || filePath.isEmpty()) return false;
+        File file = new File(filePath);
+        if (!file.exists()) return false;
+        if (!isImageFileEncrypted(filePath)) return false;
+        String tempOutput = filePath + ".dec";
+        boolean result = dataEncryptor.decryptFile(filePath, tempOutput);
+        if (result) {
+            file.delete();
+            new File(tempOutput).renameTo(new File(filePath));
+        }
+        return result;
+    }
+
+    public boolean isImageFileEncrypted(String filePath) {
+        if (filePath == null || filePath.isEmpty()) return false;
+        File file = new File(filePath);
+        if (!file.exists()) return false;
+        if (filePath.endsWith(IMAGE_ENCRYPT_SUFFIX)) return true;
+        String name = file.getName().toLowerCase();
+        if (!name.endsWith(".jpg") && !name.endsWith(".jpeg") && !name.endsWith(".png") && !name.endsWith(".webp")) {
+            return false;
+        }
+        try {
+            java.io.FileInputStream fis = new java.io.FileInputStream(file);
+            byte[] header = new byte[4];
+            int read = fis.read(header);
+            fis.close();
+            if (read < 4) return false;
+            int magic = ((header[0] & 0xFF) << 24) | ((header[1] & 0xFF) << 16) |
+                    ((header[2] & 0xFF) << 8) | (header[3] & 0xFF);
+            if (magic == 0xFFD8FF00 || magic == 0x89504E47 || magic == 0x52494646) {
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public boolean isSensitiveContent(String text) {
         return sensitiveFilter.containsSensitive(text);
     }
 
     public String sanitizePrompt(String prompt) {
-        return sensitiveFilter.filterText(prompt);
+        if (prompt == null) return "";
+        String sanitized = sensitiveFilter.filterText(prompt);
+        sanitized = sanitizeImagePrompt(sanitized);
+        return sanitized;
+    }
+
+    private String sanitizeImagePrompt(String prompt) {
+        String result = prompt;
+        String[] visionPatterns = {
+                "ignore previous instructions",
+                "ignore all previous",
+                "disregard safety",
+                "bypass filter",
+                "jailbreak",
+                "system prompt",
+                "you are now",
+                "new instructions"
+        };
+        String lower = result.toLowerCase();
+        for (String pattern : visionPatterns) {
+            if (lower.contains(pattern)) {
+                result = result.replaceAll("(?i)" + java.util.regex.Pattern.quote(pattern), "[filtered]");
+            }
+        }
+        return result;
     }
 
     public boolean checkPromptInjection(String prompt) {
-        return sensitiveFilter.detectInjection(prompt);
+        if (sensitiveFilter.detectInjection(prompt)) return true;
+        String lower = prompt.toLowerCase();
+        String[] visionInjectionPatterns = {
+                "ignore image analysis",
+                "skip image validation",
+                "bypass vision",
+                "override vision model"
+        };
+        for (String pattern : visionInjectionPatterns) {
+            if (lower.contains(pattern)) return true;
+        }
+        return false;
+    }
+
+    public boolean cleanVisionCache() {
+        boolean success = true;
+        File cacheDir = context.getCacheDir();
+        File visionCacheDir = new File(cacheDir, "vision");
+        if (visionCacheDir.exists()) {
+            success = deleteDirectory(visionCacheDir) && success;
+        }
+        File tempImageDir = new File(cacheDir, "temp_images");
+        if (tempImageDir.exists()) {
+            success = deleteDirectory(tempImageDir) && success;
+        }
+        if (cacheDir.exists()) {
+            File[] files = cacheDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    String name = file.getName().toLowerCase();
+                    if ((name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png")
+                            || name.endsWith(".webp")) && name.contains("temp")) {
+                        success = file.delete() && success;
+                    }
+                }
+            }
+        }
+        return success;
+    }
+
+    private boolean deleteDirectory(File directory) {
+        if (directory == null || !directory.exists()) return true;
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        return directory.delete();
     }
 
     public interface AuthCallback {

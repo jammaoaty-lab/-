@@ -1,5 +1,8 @@
 package com.omniai.assistant.ui.settings;
 
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,7 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.omniai.assistant.R;
-import com.omniai.assistant.manager.SettingsManager;
+import com.omniai.assistant.credits.CreditsFeatureGate;
+import com.omniai.assistant.credits.CreditsManager;
+import com.omniai.assistant.inference.VisionInferenceEngine;
+import com.omniai.assistant.settings.SettingsManager;
+import com.omniai.assistant.ui.credits.CreditsCenterActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +29,8 @@ public class SettingsActivity extends AppCompatActivity {
     private RecyclerView settingsList;
     private SettingsAdapter adapter;
     private SettingsManager settingsManager;
+    private CreditsManager creditsManager;
+    private CreditsFeatureGate creditsFeatureGate;
 
     private int versionTapCount = 0;
     private Handler tapResetHandler;
@@ -32,12 +41,21 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         settingsManager = SettingsManager.getInstance(this);
+        creditsManager = CreditsManager.getInstance();
+        creditsFeatureGate = CreditsFeatureGate.getInstance();
         tapResetHandler = new Handler(Looper.getMainLooper());
 
         settingsList = findViewById(R.id.rv_settings);
         adapter = new SettingsAdapter(buildSettingItems(), new SettingsAdapter.OnSettingChangeListener() {
             @Override
             public void onSwitchChanged(String key, boolean value) {
+                if (isPremiumSwitch(key) && value) {
+                    if (!checkCreditsForPremiumFeature(key)) {
+                        creditsFeatureGate.showInsufficientCreditsDialog(SettingsActivity.this);
+                        adapter.updateData(buildSettingItems());
+                        return;
+                    }
+                }
                 settingsManager.putBoolean(key, value);
                 handleSwitchChange(key, value);
             }
@@ -55,6 +73,20 @@ public class SettingsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(R.string.settings);
         }
+    }
+
+    private boolean isPremiumSwitch(String key) {
+        return "云端GPU加速".equals(key) || "超长上下文".equals(key);
+    }
+
+    private boolean checkCreditsForPremiumFeature(String key) {
+        if ("云端GPU加速".equals(key)) {
+            return creditsFeatureGate.canUseCloudGpu();
+        }
+        if ("超长上下文".equals(key)) {
+            return creditsFeatureGate.canUseLongContext();
+        }
+        return false;
     }
 
     private List<SettingsAdapter.SettingItem> buildSettingItems() {
@@ -118,6 +150,74 @@ public class SettingsActivity extends AppCompatActivity {
         ));
 
         items.add(new SettingsAdapter.SettingItem(
+                "云端GPU加速",
+                null,
+                R.drawable.ic_gpu,
+                null, true, settingsManager.isCloudGpuEnabled(), false, "ai"
+        ));
+
+        items.add(new SettingsAdapter.SettingItem(
+                "超长上下文",
+                null,
+                R.drawable.ic_context,
+                null, true, settingsManager.isLongContextEnabled(), false, "ai"
+        ));
+
+        items.add(new SettingsAdapter.SettingItem(
+                "视觉", null, 0, null, false, false, false, "vision"
+        ));
+
+        items.add(new SettingsAdapter.SettingItem(
+                "视觉GPU加速",
+                null,
+                R.drawable.ic_gpu,
+                null, true, settingsManager.isVisionGpuEnabled(), false, "vision"
+        ));
+
+        items.add(new SettingsAdapter.SettingItem(
+                "图像自动OCR",
+                null,
+                R.drawable.ic_ocr,
+                null, true, settingsManager.isAutoOcrEnabled(), false, "vision"
+        ));
+
+        String visionMode = settingsManager.getVisionInferenceMode();
+        if (visionMode == null || visionMode.isEmpty()) {
+            visionMode = "均衡";
+        }
+        items.add(new SettingsAdapter.SettingItem(
+                "视觉推理模式",
+                visionMode,
+                R.drawable.ic_inference,
+                null, false, false, true, "vision"
+        ));
+
+        items.add(new SettingsAdapter.SettingItem(
+                "图片缓存自动清理",
+                null,
+                R.drawable.ic_cache,
+                null, true, settingsManager.isImageCacheAutoClean(), false, "vision"
+        ));
+
+        items.add(new SettingsAdapter.SettingItem(
+                "积分", null, 0, null, false, false, false, "credits"
+        ));
+
+        items.add(new SettingsAdapter.SettingItem(
+                "积分余额",
+                creditsManager.getCredits() + "积分",
+                R.drawable.ic_credits,
+                null, false, false, true, "credits"
+        ));
+
+        items.add(new SettingsAdapter.SettingItem(
+                "积分消耗提醒",
+                null,
+                R.drawable.ic_warning,
+                null, true, settingsManager.isCreditsConsumeWarning(), false, "credits"
+        ));
+
+        items.add(new SettingsAdapter.SettingItem(
                 getString(R.string.settings_group_privacy), null, 0, null, false, false, false, "privacy"
         ));
 
@@ -167,6 +267,13 @@ public class SettingsActivity extends AppCompatActivity {
                 null, false, false, true, "about"
         ));
 
+        items.add(new SettingsAdapter.SettingItem(
+                "关于我们",
+                null,
+                R.drawable.ic_info,
+                null, false, false, true, "about"
+        ));
+
         if (settingsManager.isDeveloperMode()) {
             items.add(new SettingsAdapter.SettingItem(
                     getString(R.string.settings_group_developer), null, 0, null, false, false, false, "developer"
@@ -194,6 +301,13 @@ public class SettingsActivity extends AppCompatActivity {
             ));
         }
 
+        items.add(new SettingsAdapter.SettingItem(
+                "恢复默认设置",
+                null,
+                R.drawable.ic_reset,
+                null, false, false, true, "reset"
+        ));
+
         return items;
     }
 
@@ -216,6 +330,24 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
             case "settings_debug_log":
                 settingsManager.setDebugLogEnabled(value);
+                break;
+            case "视觉GPU加速":
+                settingsManager.setVisionGpuEnabled(value);
+                break;
+            case "图像自动OCR":
+                settingsManager.setAutoOcrEnabled(value);
+                break;
+            case "图片缓存自动清理":
+                settingsManager.setImageCacheAutoClean(value);
+                break;
+            case "积分消耗提醒":
+                settingsManager.setCreditsConsumeWarning(value);
+                break;
+            case "云端GPU加速":
+                settingsManager.setCloudGpuEnabled(value);
+                break;
+            case "超长上下文":
+                settingsManager.setLongContextEnabled(value);
                 break;
         }
     }
@@ -251,6 +383,18 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
             case "settings_api_endpoint":
                 showApiEndpointDialog();
+                break;
+            case "视觉推理模式":
+                showVisionInferenceModePicker();
+                break;
+            case "积分余额":
+                navigateToCreditsCenter();
+                break;
+            case "关于我们":
+                showAboutDialog();
+                break;
+            case "恢复默认设置":
+                showResetToDefaultsDialog();
                 break;
         }
     }
@@ -382,6 +526,73 @@ public class SettingsActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.confirm, (dialog, which) -> {
                     String endpoint = input.getText().toString().trim();
                     settingsManager.setApiEndpoint(endpoint);
+                    adapter.updateData(buildSettingItems());
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void showVisionInferenceModePicker() {
+        String[] modes = {"极速", "均衡", "高精度"};
+        String currentMode = settingsManager.getVisionInferenceMode();
+        int selectedIndex = 1;
+        if ("极速".equals(currentMode)) {
+            selectedIndex = 0;
+        } else if ("均衡".equals(currentMode)) {
+            selectedIndex = 1;
+        } else if ("高精度".equals(currentMode)) {
+            selectedIndex = 2;
+        }
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("视觉推理模式")
+                .setSingleChoiceItems(modes, selectedIndex, (dialog, which) -> {
+                    settingsManager.setVisionInferenceMode(modes[which]);
+                    dialog.dismiss();
+                    adapter.updateData(buildSettingItems());
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void navigateToCreditsCenter() {
+        Intent intent = new Intent(this, CreditsCenterActivity.class);
+        startActivity(intent);
+    }
+
+    private void showAboutDialog() {
+        String appName = getString(R.string.app_name);
+        String versionName = "";
+        int versionCode = 0;
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+            versionName = info.versionName;
+            versionCode = info.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            versionName = "Unknown";
+        }
+
+        String message = "应用名称：" + appName + "\n"
+                + "版本号：" + versionName + "\n"
+                + "版本代码：" + versionCode + "\n"
+                + "推理架构：llama.cpp + JNI\n\n"
+                + "OmniAI 是一款基于 llama.cpp 的本地 AI 助手，\n"
+                + "支持多模态视觉推理、LoRA 微调、\n"
+                + "知识库构建、云端加速等高级功能。";
+
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("关于我们")
+                .setMessage(message)
+                .setPositiveButton(R.string.ok, null)
+                .show();
+    }
+
+    private void showResetToDefaultsDialog() {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("恢复默认设置")
+                .setMessage("确定要恢复所有设置为默认值吗？此操作不可撤销。")
+                .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                    settingsManager.resetToDefaults();
+                    Toast.makeText(this, "已恢复默认设置", Toast.LENGTH_SHORT).show();
                     adapter.updateData(buildSettingItems());
                 })
                 .setNegativeButton(R.string.cancel, null)

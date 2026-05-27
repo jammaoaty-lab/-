@@ -284,6 +284,50 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_lg"
             android:layout_marginTop="@dimen/spacing_lg"
+            android:text="训练目标" />
+
+        <Spinner
+            android:id="@+id/train_target_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/input_height"
+            android:layout_marginHorizontal="@dimen/spacing_lg"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:background="@drawable/bg_input"
+            android:entries="@array/train_target_options"
+            android:paddingHorizontal="@dimen/spacing_md" />
+
+        <LinearLayout
+            android:id="@+id/vision_model_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_lg"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/OmniAI.TextView.Label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="视觉模型" />
+
+            <Spinner
+                android:id="@+id/vision_model_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/input_height"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:background="@drawable/bg_input"
+                android:entries="@array/vision_model_options"
+                android:paddingHorizontal="@dimen/spacing_md" />
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/OmniAI.TextView.Label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_lg"
+            android:layout_marginTop="@dimen/spacing_lg"
             android:text="训练进度" />
 
         <androidx.cardview.widget.CardView

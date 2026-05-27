@@ -214,7 +214,72 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeGetDeviceTemperature(JN
 
 JNIEXPORT jboolean JNICALL
 Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeIsGpuAvailable(JNIEnv *env, jobject thiz) {
-    // TODO: Check GPU (Vulkan/OpenCL) availability
+    return JNI_FALSE;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeInitVisionModel(JNIEnv *env, jobject thiz,
+                                                                          jstring modelPath,
+                                                                          jint ctxSize,
+                                                                          jint threads,
+                                                                          jint gpuLayers) {
+    const char *path = env->GetStringUTFChars(modelPath, nullptr);
+    LOGI("Loading vision model: %s, ctx=%d, threads=%d, gpu=%d", path, ctxSize, threads, gpuLayers);
+
+    jlong handle = 0;
+
+    env->ReleaseStringUTFChars(modelPath, path);
+    return handle;
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeVisionChat(JNIEnv *env, jobject thiz,
+                                                                     jlong visionCtx,
+                                                                     jstring imagePath,
+                                                                     jstring textPrompt,
+                                                                     jint maxTokens,
+                                                                     jfloat temp) {
+    if (visionCtx == 0) return env->NewStringUTF("");
+
+    const char *img_path = env->GetStringUTFChars(imagePath, nullptr);
+    const char *prompt_str = env->GetStringUTFChars(textPrompt, nullptr);
+    LOGI("Vision chat: temp=%.2f, maxTokens=%d", temp, maxTokens);
+
+    std::string chat_prompt = "<|im_start|>user\n<image>\n" + std::string(prompt_str) + "<|im_end|>\n<|im_start|>assistant\n";
+    std::string result = "";
+
+    env->ReleaseStringUTFChars(imagePath, img_path);
+    env->ReleaseStringUTFChars(textPrompt, prompt_str);
+    return env->NewStringUTF(result.c_str());
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeImageOcr(JNIEnv *env, jobject thiz,
+                                                                    jlong visionCtx,
+                                                                    jstring imagePath) {
+    if (visionCtx == 0) return env->NewStringUTF("");
+
+    const char *img_path = env->GetStringUTFChars(imagePath, nullptr);
+    LOGI("OCR extraction for image");
+
+    std::string ocr_prompt = "<|im_start|>user\n<image>\n请提取图片中的所有文字内容，保持原始格式。<|im_end|>\n<|im_start|>assistant\n";
+    std::string result = "";
+
+    env->ReleaseStringUTFChars(imagePath, img_path);
+    return env->NewStringUTF(result.c_str());
+}
+
+JNIEXPORT void JNICALL
+Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeReleaseVisionModel(JNIEnv *env, jobject thiz,
+                                                                             jlong visionCtx) {
+    if (visionCtx == 0) return;
+    LOGI("Releasing vision model: %lld", (long long)visionCtx);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeIsQwenVisionModel(JNIEnv *env, jobject thiz,
+                                                                             jlong visionCtx) {
+    LOGI("Checking Qwen vision model");
     return JNI_FALSE;
 }
 

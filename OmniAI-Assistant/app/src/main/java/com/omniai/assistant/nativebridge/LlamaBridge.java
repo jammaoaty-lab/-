@@ -40,6 +40,16 @@ public class LlamaBridge {
 
     public native boolean nativeIsGpuAvailable();
 
+    public native long nativeInitVisionModel(String modelPath, int ctxSize, int threads, int gpuLayers);
+
+    public native String nativeVisionChat(long visionCtx, String imagePath, String textPrompt, int maxTokens, float temp);
+
+    public native String nativeImageOcr(long visionCtx, String imagePath);
+
+    public native void nativeReleaseVisionModel(long visionCtx);
+
+    public native boolean nativeIsQwenVisionModel(long visionCtx);
+
     private static volatile LlamaBridge instance;
 
     private LlamaBridge() {}
@@ -121,5 +131,44 @@ public class LlamaBridge {
 
     public boolean isGpuAvailable() {
         return nativeIsGpuAvailable();
+    }
+
+    public long initVisionModel(String modelPath, int ctxSize, int threads, int gpuLayers) {
+        try {
+            return nativeInitVisionModel(modelPath, ctxSize, threads, gpuLayers);
+        } catch (Exception e) {
+            return 0L;
+        }
+    }
+
+    public String visionChat(long visionCtx, String imagePath, String prompt, int maxTokens, float temp) {
+        try {
+            return nativeVisionChat(visionCtx, imagePath, prompt, maxTokens, temp);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public String imageOcr(long visionCtx, String imagePath) {
+        try {
+            return nativeImageOcr(visionCtx, imagePath);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void releaseVisionModel(long visionCtx) {
+        try {
+            nativeReleaseVisionModel(visionCtx);
+        } catch (Exception ignored) {
+        }
+    }
+
+    public boolean isQwenVisionModel(long visionCtx) {
+        try {
+            return nativeIsQwenVisionModel(visionCtx);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

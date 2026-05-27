@@ -5,65 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OmniAI — Premium UI Preview</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --p:#2563EB;--p-light:#EFF6FF;--p-dark:#1D4ED8;
   --bg:#F8F9FB;--s:#FFFFFF;--s2:#F1F3F5;
   --t1:#111318;--t2:#6B7280;--t3:#B0B7C3;
   --d:#E5E7EB;--b:#E5E7EB;
-  --bu:#EFF6FF;--ba:#FFFFFF;
   --red:#EF4444;--red-l:#FEF2F2;
-  --green:#22C55E;--orange:#F59E0B;--purple:#8B5CF6;
+  --green:#22C55E;--orange:#F59E0B;--purple:#8B5CF6;--cyan:#06B6D4;
   --r:14px;--rs:10px;--rl:18px;--rf:999px;
   --font:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
+  --grad:linear-gradient(135deg,#2563EB 0%,#7C3AED 50%,#EC4899 100%);
+  --grad2:linear-gradient(135deg,#2563EB,#7C3AED);
 }
 html,body{height:100%;overflow:hidden}
-body{font-family:var(--font);background:#0F0F1A;display:flex;justify-content:center;align-items:center;color:var(--t1)}
-
-/* Phone */
-.device{position:relative;width:393px;height:852px;border-radius:48px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,0.08),0 0 0 10px #1a1a2e,0 0 0 11px rgba(255,255,255,0.05),0 40px 100px rgba(0,0,0,0.6)}
+body{font-family:var(--font);background:#08080F;display:flex;justify-content:center;align-items:center;color:var(--t1)}
+.device{position:relative;width:393px;height:852px;border-radius:48px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,0.06),0 0 0 10px #14141f,0 0 0 11px rgba(255,255,255,0.04),0 50px 120px rgba(0,0,0,0.7)}
 .device::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:130px;height:32px;background:#000;border-radius:0 0 18px 18px;z-index:999}
 .device::after{content:'';position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:130px;height:5px;background:rgba(0,0,0,0.15);border-radius:3px;z-index:999}
 .screen{width:100%;height:100%;position:relative;overflow:hidden;background:var(--bg)}
-
-/* Pages */
-.P{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;transform:translateX(16px);will-change:opacity,transform}
+.P{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .28s ease,transform .28s ease;transform:translateX(20px);will-change:opacity,transform}
 .P.on{opacity:1;pointer-events:auto;transform:translateX(0)}
-
-/* Icons */
-.ic{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
-.ic svg{width:100%;height:100%}
-
-/* Nav pill */
-.navpill{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:90;background:rgba(17,19,24,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:6px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08)}
-.navpill button{width:32px;height:32px;border:none;border-radius:10px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;background:transparent;color:rgba(255,255,255,0.4)}
+.navpill{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:90;background:rgba(17,19,24,0.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:6px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.08)}
+.navpill button{width:34px;height:34px;border:none;border-radius:10px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;background:transparent;color:rgba(255,255,255,0.4);font-weight:500}
 .navpill button:hover{color:rgba(255,255,255,0.7)}
-.navpill button:active{transform:scale(.92)}
-.navpill .pn{color:rgba(255,255,255,0.25);font-size:10px;font-weight:600;letter-spacing:.5px}
-
-/* Toast */
-.toast{position:absolute;top:52px;left:50%;transform:translateX(-50%) translateY(-12px);background:var(--t1);color:#fff;padding:8px 18px;border-radius:12px;font-size:13px;font-weight:500;opacity:0;transition:all .2s;z-index:500;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+.navpill button:active{transform:scale(.9)}
+.navpill .pn{color:rgba(255,255,255,0.25);font-size:10px;font-weight:600;letter-spacing:.5px;display:flex;align-items:center}
+.toast{position:absolute;top:52px;left:50%;transform:translateX(-50%) translateY(-14px);background:var(--t1);color:#fff;padding:8px 20px;border-radius:12px;font-size:13px;font-weight:500;opacity:0;transition:all .22s;z-index:500;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.25)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* === SPLASH === */
 .splash{justify-content:center;align-items:center;background:var(--bg)}
-.splash-brand{display:flex;flex-direction:column;align-items:center;animation:splashIn .8s ease both}
-@keyframes splashIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.splash-mark{width:80px;height:80px;border-radius:22px;background:linear-gradient(135deg,#2563EB,#7C3AED);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 32px rgba(37,99,235,0.25)}
-.splash-mark svg{width:40px;height:40px}
-.splash-name{font-size:28px;font-weight:700;color:var(--t1);letter-spacing:-.8px}
-.splash-tag{font-size:14px;color:var(--t2);margin-top:6px;font-weight:400}
+.splash-brand{display:flex;flex-direction:column;align-items:center;animation:splashIn .9s ease both}
+@keyframes splashIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.splash-mark{width:84px;height:84px;border-radius:24px;background:var(--grad2);display:flex;align-items:center;justify-content:center;margin-bottom:22px;box-shadow:0 8px 36px rgba(37,99,235,0.28)}
+.splash-mark svg{width:42px;height:42px}
+.splash-name{font-size:30px;font-weight:800;color:var(--t1);letter-spacing:-1px}
+.splash-tag{font-size:14px;color:var(--t2);margin-top:6px;font-weight:400;letter-spacing:-.1px}
 .splash-ver{position:absolute;bottom:52px;font-size:11px;color:var(--t3);letter-spacing:.5px}
-
-/* === LOGIN === */
 .auth{background:var(--bg)}
 .auth-head{padding:60px 28px 28px}
 .auth-head h1{font-size:26px;font-weight:700;color:var(--t1);letter-spacing:-.6px;line-height:1.2}
 .auth-head p{font-size:14px;color:var(--t2);margin-top:6px}
 .auth-body{padding:0 28px;flex:1;overflow-y:auto}
 .field{margin-bottom:14px}
-.field label{display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px;letter-spacing:.5px;text-transform:uppercase}
 .field input{width:100%;height:50px;background:var(--s);border:1.5px solid var(--d);border-radius:var(--r);padding:0 16px;font-size:15px;color:var(--t1);font-family:var(--font);outline:none;transition:border-color .2s}
 .field input:focus{border-color:var(--p)}
 .field input::placeholder{color:var(--t3)}
@@ -82,18 +67,18 @@ body{font-family:var(--font);background:#0F0F1A;display:flex;justify-content:cen
 .social-btn svg{width:22px;height:22px}
 .auth-link{text-align:center;font-size:14px;color:var(--t2);padding:8px 0 40px}
 .auth-link a{color:var(--p);text-decoration:none;font-weight:600}
-
-/* === CHAT === */
 .chat{background:var(--bg)}
 .chat-bar{height:56px;background:var(--s);border-bottom:1px solid var(--d);display:flex;align-items:center;padding:0 10px;flex-shrink:0}
 .chat-bar .ib{width:38px;height:38px;border:none;background:transparent;cursor:pointer;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;transition:background .15s}
 .chat-bar .ib:active{background:var(--s2)}
 .chat-bar .ib svg{width:20px;height:20px;color:var(--t1)}
 .chat-bar .mid{flex:1;text-align:center}
-.chat-bar .model{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.3px}
+.chat-bar .model{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.3px;display:flex;align-items:center;justify-content:center;gap:6px}
 .chat-bar .status{font-size:11px;color:var(--green);font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px;margin-top:1px}
 .chat-bar .status .sd{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s ease infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.vision-ind{display:inline-flex;align-items:center;gap:3px;background:var(--grad2);padding:2px 7px;border-radius:6px;font-size:9px;font-weight:700;color:#fff;letter-spacing:.3px}
+.vision-ind svg{width:8px;height:8px}
 .msgs{flex:1;overflow-y:auto;padding:10px 16px 10px;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
 .msg{max-width:82%;display:flex;flex-direction:column;animation:msgIn .25s ease both}
 @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -127,26 +112,23 @@ body{font-family:var(--font);background:#0F0F1A;display:flex;justify-content:cen
 .iarea .sb{width:36px;height:36px;border:none;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .12s;box-shadow:0 2px 8px rgba(37,99,235,0.25)}
 .iarea .sb:active{transform:scale(.92)}
 .iarea .sb svg{width:16px;height:16px;color:#fff}
-
-/* Bottom Nav */
 .bnav{height:52px;background:var(--s);border-top:1px solid var(--d);display:flex;flex-shrink:0}
-.bnav .ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;transition:color .15s}
+.bnav .ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;transition:color .15s;position:relative}
 .bnav .ni svg{width:22px;height:22px;transition:color .15s}
 .bnav .ni span{font-size:10px;font-weight:600;letter-spacing:.2px}
 .bnav .ni.on{color:var(--p)}
 .bnav .ni:not(.on){color:var(--t3)}
-
-/* Sidebar */
+.bnav .ni .cred-dot{position:absolute;top:5px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:var(--orange);border:2px solid var(--s)}
 .sov{position:absolute;inset:0;background:rgba(0,0,0,0.35);z-index:50;opacity:0;pointer-events:none;transition:opacity .25s}
 .sov.on{opacity:1;pointer-events:auto}
 .sbar{position:absolute;top:0;left:0;width:280px;height:100%;background:var(--s);z-index:51;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
 .sbar.on{transform:translateX(0)}
 .sbar-user{padding:52px 18px 16px;border-bottom:1px solid var(--d)}
 .sbar-user .ur{display:flex;align-items:center;gap:12px}
-.sbar-user .av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#7C3AED);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;flex-shrink:0}
+.sbar-user .av{width:44px;height:44px;border-radius:50%;background:var(--grad2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;flex-shrink:0}
 .sbar-user .ui{flex:1;min-width:0}
 .sbar-user .un{font-size:15px;font-weight:600;color:var(--t1)}
-.sbar-user .uv{font-size:11px;font-weight:600;color:var(--orange);margin-top:2px;display:flex;align-items:center;gap:3px}
+.sbar-user .uv{font-size:11px;font-weight:600;color:var(--p);margin-top:2px;display:flex;align-items:center;gap:3px}
 .sbar-user .uv svg{width:12px;height:12px}
 .sbar-user .um{font-size:11px;color:var(--t2);margin-top:2px;display:flex;align-items:center;gap:3px}
 .sbar-user .um svg{width:10px;height:10px}
@@ -164,24 +146,23 @@ body{font-family:var(--font);background:#0F0F1A;display:flex;justify-content:cen
 .sbar-ft .sbf{font-size:13px;color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:500}
 .sbar-ft .sbf svg{width:16px;height:16px}
 .sbar-ft .sv{font-size:11px;color:var(--t3)}
-
-/* === PROFILE === */
 .prof{background:var(--bg)}
 .prof-scroll{flex:1;overflow-y:auto;padding:16px}
 .prof-card{background:var(--s);border-radius:var(--rl);padding:24px 20px;text-align:center;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
-.prof-card .av-lg{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#7C3AED);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:28px;margin:0 auto 14px;box-shadow:0 4px 20px rgba(37,99,235,0.2)}
+.prof-card .av-lg{width:76px;height:76px;border-radius:50%;background:var(--grad2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:28px;margin:0 auto 14px;box-shadow:0 4px 20px rgba(37,99,235,0.2)}
 .prof-card .pn{font-size:19px;font-weight:700;color:var(--t1);letter-spacing:-.4px}
 .prof-card .puid{font-size:12px;color:var(--t2);margin-top:4px;font-family:'SF Mono',Menlo,monospace;letter-spacing:.5px}
-.prof-card .pvip{display:inline-flex;align-items:center;gap:4px;margin-top:10px;padding:5px 14px;background:linear-gradient(135deg,#F59E0B,#EF4444);border-radius:var(--rf);font-size:12px;font-weight:700;color:#fff;letter-spacing:.3px}
-.prof-card .pvip svg{width:12px;height:12px}
+.prof-card .pcred{display:inline-flex;align-items:center;gap:4px;margin-top:10px;padding:5px 14px;background:var(--grad2);border-radius:var(--rf);font-size:12px;font-weight:700;color:#fff;letter-spacing:.3px}
+.prof-card .pcred svg{width:12px;height:12px}
 .prof-card .pdev{font-size:12px;color:var(--t2);margin-top:8px}
-.vip-card{background:linear-gradient(135deg,#2563EB 0%,#7C3AED 50%,#EC4899 100%);border-radius:var(--rl);padding:18px 20px;margin-bottom:14px;color:#fff;position:relative;overflow:hidden}
-.vip-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:rgba(255,255,255,0.08);border-radius:50%}
-.vip-card .vl{font-size:11px;font-weight:600;opacity:.7;letter-spacing:.5px;text-transform:uppercase}
-.vip-card .vp{font-size:19px;font-weight:700;margin-top:4px;letter-spacing:-.3px}
-.vip-card .ve{font-size:12px;opacity:.65;margin-top:4px}
-.vip-card .vub{margin-top:14px;padding:8px 18px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.2);border-radius:var(--rs);color:#fff;font-size:13px;font-weight:600;cursor:pointer;display:inline-block;transition:all .12s;font-family:var(--font)}
-.vip-card .vub:active{background:rgba(255,255,255,0.28)}
+.cred-card{background:var(--grad);border-radius:var(--rl);padding:18px 20px;margin-bottom:14px;color:#fff;position:relative;overflow:hidden}
+.cred-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:rgba(255,255,255,0.08);border-radius:50%}
+.cred-card .cl{font-size:11px;font-weight:600;opacity:.7;letter-spacing:.5px;text-transform:uppercase}
+.cred-card .cb{font-size:28px;font-weight:700;margin-top:4px;letter-spacing:-.5px}
+.cred-card .cb span{font-size:14px;font-weight:500;opacity:.7;margin-left:2px}
+.cred-card .ce{font-size:12px;opacity:.65;margin-top:4px}
+.cred-card .cub{margin-top:14px;padding:8px 18px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.2);border-radius:var(--rs);color:#fff;font-size:13px;font-weight:600;cursor:pointer;display:inline-block;transition:all .12s;font-family:var(--font)}
+.cred-card .cub:active{background:rgba(255,255,255,0.28)}
 .mg{background:var(--s);border-radius:var(--rl);margin-bottom:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
 .mi{display:flex;align-items:center;padding:14px 16px;cursor:pointer;transition:background .1s;gap:12px}
 .mi:active{background:var(--s2)}
@@ -194,13 +175,12 @@ body{font-family:var(--font);background:#0F0F1A;display:flex;justify-content:cen
 .mi .mi-ic.orange{background:#FEF3C7;color:var(--orange)}
 .mi .mi-ic.red{background:var(--red-l);color:var(--red)}
 .mi .mi-ic.gray{background:var(--s2);color:var(--t2)}
+.mi .mi-ic.cyan{background:#ECFEFF;color:var(--cyan)}
 .mi .mi-t{flex:1;font-size:15px;font-weight:500;color:var(--t1)}
 .mi .mi-ar{color:var(--t3)}
 .mi .mi-ar svg{width:16px;height:16px}
 .logout{width:100%;height:48px;background:var(--red-l);color:var(--red);border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);margin-top:4px;transition:all .12s}
 .logout:active{opacity:.8}
-
-/* === MODEL === */
 .mtabs{display:flex;background:var(--s);border-bottom:1px solid var(--d);flex-shrink:0}
 .mtab{flex:1;height:44px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:-.1px}
 .mtab.on{color:var(--p);border-bottom-color:var(--p)}
@@ -209,7 +189,7 @@ body{font-family:var(--font);background:#0F0F1A;display:flex;justify-content:cen
 .mcard:active{transform:scale(.985)}
 .mcard .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .mcard .mn{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.2px}
-.mcard .mtags{display:flex;gap:4px}
+.mcard .mtags{display:flex;gap:4px;flex-wrap:wrap}
 .mcard .mtag{font-size:9px;padding:2px 7px;border-radius:5px;color:#fff;font-weight:700;letter-spacing:.3px}
 .mcard .minfo{display:flex;gap:10px;font-size:12px;color:var(--t2);margin-bottom:10px;font-weight:500}
 .mcard .minfo span{display:flex;align-items:center;gap:3px}
@@ -223,8 +203,9 @@ body{font-family:var(--font);background:#0F0F1A;display:flex;justify-content:cen
 .sw.off::after{left:2px}
 .del-btn{font-size:12px;color:var(--red);cursor:pointer;background:none;border:none;font-weight:600;font-family:var(--font);display:flex;align-items:center;gap:3px}
 .del-btn svg{width:14px;height:14px}
-
-/* === LORA === */
+.dl-btn{height:32px;padding:0 14px;background:var(--p);border:none;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;color:#fff;font-family:var(--font);display:flex;align-items:center;gap:4px;transition:all .12s}
+.dl-btn:active{background:var(--p-dark);transform:scale(.96)}
+.dl-btn svg{width:14px;height:14px}
 .lora-scroll{flex:1;overflow-y:auto;padding:16px}
 .stitle{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;margin-top:16px}
 .stitle:first-child{margin-top:0}
@@ -257,8 +238,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .tb.pri{background:var(--p);color:#fff}
 .tb.sec{background:var(--s);color:var(--t1);border:1.5px solid var(--d)}
 .tb.dan{background:var(--red-l);color:var(--red)}
-
-/* === KB === */
 .kb-list{flex:1;overflow-y:auto;padding:10px 16px}
 .kb-card{background:var(--s);border-radius:var(--rl);padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.03);cursor:pointer;transition:transform .1s}
 .kb-card:active{transform:scale(.985)}
@@ -267,8 +246,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .kb-card .kc{font-size:12px;color:var(--t2);font-weight:500}
 .kb-card .kd{font-size:13px;color:var(--t2);line-height:1.45;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .kb-card .kf{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t3);font-weight:500}
-
-/* === SETTINGS === */
 .set-scroll{flex:1;overflow-y:auto;padding:0 16px 40px}
 .sg-title{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;padding:18px 0 6px}
 .sg{background:var(--s);border-radius:var(--rl);overflow:hidden;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
@@ -282,13 +259,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .si .si-ic.orange{background:#FEF3C7;color:var(--orange)}
 .si .si-ic.red{background:var(--red-l);color:var(--red)}
 .si .si-ic.gray{background:var(--s2);color:var(--t2)}
+.si .si-ic.cyan{background:#ECFEFF;color:var(--cyan)}
 .si .si-txt{flex:1;min-width:0}
 .si .si-t{font-size:14px;font-weight:500;color:var(--t1)}
 .si .si-sub{font-size:11px;color:var(--t2);margin-top:1px}
 .si .si-val{font-size:13px;color:var(--t2);font-weight:500}
 .si .si-arr svg{width:14px;height:14px;color:var(--t3)}
-
-/* === AGENT === */
 .ag-list{flex:1;overflow-y:auto;padding:10px 16px}
 .ag-card{background:var(--s);border-radius:var(--rl);padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.03);cursor:pointer;transition:transform .1s;display:flex;align-items:center;gap:12px}
 .ag-card:active{transform:scale(.985)}
@@ -301,45 +277,115 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .fab{position:absolute;bottom:64px;right:16px;width:48px;height:48px;background:var(--p);border-radius:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,0.3);z-index:10;transition:all .12s}
 .fab:active{transform:scale(.92)}
 .fab svg{width:22px;height:22px;color:#fff}
-
 .search{margin:10px 16px;height:40px;background:var(--s);border-radius:var(--rf);display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0;border:1.5px solid var(--d);transition:border-color .2s}
 .search:focus-within{border-color:var(--p)}
 .search svg{width:16px;height:16px;color:var(--t3);flex-shrink:0}
 .search input{flex:1;border:none;background:none;font-size:14px;color:var(--t1);outline:none;font-family:var(--font)}
 .search input::placeholder{color:var(--t3)}
+.cred-scroll{flex:1;overflow-y:auto;padding:0 16px 16px}
+.cred-hero{background:var(--grad);border-radius:var(--rl);padding:28px 22px 22px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden}
+.cred-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:140px;height:140px;background:rgba(255,255,255,0.06);border-radius:50%}
+.cred-hero::after{content:'';position:absolute;bottom:-40px;left:-30px;width:100px;height:100px;background:rgba(255,255,255,0.04);border-radius:50%}
+.cred-hero .ch-label{font-size:11px;font-weight:600;opacity:.65;letter-spacing:.8px;text-transform:uppercase;position:relative;z-index:1}
+.cred-hero .ch-bal{font-size:42px;font-weight:800;margin-top:4px;letter-spacing:-1.2px;position:relative;z-index:1}
+.cred-hero .ch-bal span{font-size:15px;font-weight:500;opacity:.6;margin-left:4px;letter-spacing:0}
+.cred-hero .ch-inv-row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:20px;position:relative;z-index:1}
+.cred-hero .ch-inv-left .ch-inv-label{font-size:10px;opacity:.55;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.cred-hero .ch-inv-left .ch-inv-code{font-size:16px;font-weight:700;letter-spacing:1.2px;margin-top:2px;font-family:'SF Mono',Menlo,monospace}
+.cred-hero .ch-inv-left .ch-inv-count{font-size:11px;opacity:.5;margin-top:2px}
+.cred-hero .ch-inv-btns{display:flex;gap:6px}
+.cred-hero .ch-ghost-btn{height:34px;padding:0 14px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.22);border-radius:var(--rs);color:#fff;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:all .12s;font-family:var(--font)}
+.cred-hero .ch-ghost-btn:active{background:rgba(255,255,255,0.28)}
+.cred-hero .ch-ghost-btn svg{width:13px;height:13px}
+.plan-scroll{display:flex;gap:10px;overflow-x:auto;padding:0 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.plan-scroll::-webkit-scrollbar{display:none}
+.plan-card{min-width:130px;background:var(--s);border-radius:var(--rl);padding:16px 14px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,0.03);flex-shrink:0;border:2px solid transparent;transition:all .15s;cursor:pointer;position:relative}
+.plan-card:active{transform:scale(.97)}
+.plan-card.pop{border-color:var(--p);background:var(--p-light)}
+.plan-card.pop .plan-badge{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--p);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.3px}
+.plan-card .plan-name{font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px}
+.plan-card .plan-price{font-size:22px;font-weight:700;color:var(--p);letter-spacing:-.5px}
+.plan-card .plan-price span{font-size:13px;font-weight:500}
+.plan-card .plan-cred{font-size:12px;color:var(--t2);margin-top:2px;font-weight:500}
+.plan-card .plan-unit{font-size:11px;color:var(--t3);margin-top:4px}
+.rec-list{background:var(--s);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.rec-item{display:flex;align-items:center;padding:13px 16px;gap:10px}
+.rec-item+.rec-item{border-top:1px solid var(--d)}
+.rec-item .rec-ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rec-item .rec-ic svg{width:14px;height:14px}
+.rec-item .rec-ic.green{background:#DCFCE7;color:var(--green)}
+.rec-item .rec-ic.red{background:var(--red-l);color:var(--red)}
+.rec-item .rec-info{flex:1;min-width:0}
+.rec-item .rec-title{font-size:14px;font-weight:500;color:var(--t1)}
+.rec-item .rec-date{font-size:11px;color:var(--t3);margin-top:1px}
+.rec-item .rec-amt{font-size:14px;font-weight:700}
+.rec-item .rec-amt.pos{color:var(--green)}
+.rec-item .rec-amt.neg{color:var(--red)}
+.vtabs{display:flex;background:var(--s);border-bottom:1px solid var(--d);flex-shrink:0}
+.vtab{flex:1;height:44px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:-.1px}
+.vtab.on{color:var(--p);border-bottom-color:var(--p)}
+.vlist{flex:1;overflow-y:auto;padding:10px 16px}
+.vcard{background:var(--s);border-radius:var(--rl);padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.03);transition:transform .1s}
+.vcard:active{transform:scale(.985)}
+.vcard .vh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.vcard .vn{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.2px}
+.vcard .vtags{display:flex;gap:4px;flex-wrap:wrap}
+.vcard .vtag{font-size:9px;padding:2px 7px;border-radius:5px;color:#fff;font-weight:700;letter-spacing:.3px}
+.vcard .vinfo{display:flex;gap:10px;font-size:12px;color:var(--t2);margin-bottom:10px;font-weight:500}
+.vcard .vinfo span{display:flex;align-items:center;gap:3px}
+.vcard .vinfo svg{width:12px;height:12px}
+.vcard .vact{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--d);padding-top:10px}
+.mm-scroll{flex:1;overflow-y:auto;padding:16px}
+.mm-hero{background:var(--grad2);border-radius:var(--rl);padding:22px 20px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden}
+.mm-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:rgba(255,255,255,0.08);border-radius:50%}
+.mm-hero .mm-title{font-size:18px;font-weight:700;letter-spacing:-.4px;position:relative;z-index:1}
+.mm-hero .mm-desc{font-size:13px;opacity:.7;margin-top:4px;position:relative;z-index:1}
+.mm-hero .mm-status{display:flex;align-items:center;gap:6px;margin-top:12px;position:relative;z-index:1}
+.mm-hero .mm-status .sd{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s ease infinite}
+.mm-hero .mm-status span{font-size:12px;font-weight:500;opacity:.8}
+.mm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.mm-cell{background:var(--s);border-radius:var(--rl);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.03);cursor:pointer;transition:transform .1s;display:flex;flex-direction:column;align-items:center;gap:8px}
+.mm-cell:active{transform:scale(.97)}
+.mm-cell .mm-ic{width:44px;height:44px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center}
+.mm-cell .mm-ic svg{width:22px;height:22px}
+.mm-cell .mm-ic.cam{background:#EFF6FF;color:var(--p)}
+.mm-cell .mm-ic.img{background:#F3E8FF;color:var(--purple)}
+.mm-cell .mm-ic.mic{background:#FEF3C7;color:var(--orange)}
+.mm-cell .mm-ic.doc{background:#DCFCE7;color:var(--green)}
+.mm-cell .mm-label{font-size:13px;font-weight:600;color:var(--t1)}
+.mm-cell .mm-sub{font-size:11px;color:var(--t2)}
+.mm-recent{background:var(--s);border-radius:var(--rl);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.mm-ri{display:flex;align-items:center;padding:13px 16px;gap:10px;cursor:pointer;transition:background .1s}
+.mm-ri:active{background:var(--s2)}
+.mm-ri+.mm-ri{border-top:1px solid var(--d)}
+.mm-ri .mm-ri-ic{width:36px;height:36px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mm-ri .mm-ri-ic svg{width:18px;height:18px}
+.mm-ri .mm-ri-ic.cam{background:#EFF6FF;color:var(--p)}
+.mm-ri .mm-ri-ic.img{background:#F3E8FF;color:var(--purple)}
+.mm-ri .mm-ri-ic.mic{background:#FEF3C7;color:var(--orange)}
+.mm-ri .mm-ri-info{flex:1;min-width:0}
+.mm-ri .mm-ri-title{font-size:14px;font-weight:500;color:var(--t1)}
+.mm-ri .mm-ri-time{font-size:11px;color:var(--t3);margin-top:1px}
+.mm-ri .mm-ri-badge{font-size:9px;padding:2px 7px;border-radius:5px;color:#fff;font-weight:700}
 </style>
 </head>
 <body>
-
 <div class="device">
 <div class="screen">
-
 <div class="toast" id="toast"></div>
-
 <div class="navpill">
   <button onclick="prev()">‹</button>
-  <span class="pn" id="pn">1/10</span>
+  <span class="pn" id="pn">1/13</span>
   <button onclick="next()">›</button>
 </div>
 
-<!-- ====== SPLASH ====== -->
-<div class="P splash on" id="p0">
-  <div class="splash-brand">
-    <div class="splash-mark">
-      <svg viewBox="0 0 40 40" fill="none"><path d="M20 4L8 12v16l12 8 12-8V12L20 4z" stroke="#fff" stroke-width="2" fill="none"/><circle cx="20" cy="18" r="5" fill="#fff" opacity=".9"/><path d="M14 28c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-    </div>
-    <div class="splash-name">OmniAI</div>
-    <div class="splash-tag">本地AI，无限可能</div>
-  </div>
+<!-- SPLASH --><div class="P splash on" id="p0">
+  <div class="splash-brand"><div class="splash-mark"><svg viewBox="0 0 40 40" fill="none"><path d="M20 4L8 12v16l12 8 12-8V12L20 4z" stroke="#fff" stroke-width="2" fill="none"/><circle cx="20" cy="18" r="5" fill="#fff" opacity=".9"/><path d="M14 28c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><div class="splash-name">OmniAI</div><div class="splash-tag">本地AI，无限可能</div></div>
   <div class="splash-ver">v1.0.0</div>
 </div>
 
-<!-- ====== LOGIN ====== -->
-<div class="P auth" id="p1">
-  <div class="auth-head">
-    <h1>欢迎使用 OmniAI</h1>
-    <p>登录以继续</p>
-  </div>
+<!-- LOGIN --><div class="P auth" id="p1">
+  <div class="auth-head"><h1>欢迎使用 OmniAI</h1><p>登录以继续</p></div>
   <div class="auth-body">
     <div class="field"><label>手机号或邮箱</label><input placeholder="请输入手机号或邮箱" value="user@omniai.com"></div>
     <div class="field"><label>登录密码</label><input type="password" placeholder="请输入登录密码" value="••••••••"></div>
@@ -355,15 +401,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 </div>
 
-<!-- ====== REGISTER ====== -->
-<div class="P auth" id="p2">
-  <div class="auth-head" style="padding-top:20px">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-      <button style="border:none;background:none;cursor:pointer;padding:4px" onclick="go('p1')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
-    </div>
-    <h1>创建你的AI空间</h1>
-    <p>注册 OmniAI 账号</p>
-  </div>
+<!-- REGISTER --><div class="P auth" id="p2">
+  <div class="auth-head" style="padding-top:20px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><button style="border:none;background:none;cursor:pointer;padding:4px" onclick="go('p1')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button></div><h1>创建你的AI空间</h1><p>注册 OmniAI 账号</p></div>
   <div class="auth-body">
     <div class="field"><label>手机号或邮箱</label><input placeholder="请输入手机号或邮箱"></div>
     <div class="field"><label>验证码</label><div class="field-row"><input placeholder="请输入验证码"><button class="code-btn">获取验证码</button></div></div>
@@ -374,50 +413,37 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 </div>
 
-<!-- ====== CHAT ====== -->
-<div class="P chat" id="p3">
+<!-- CHAT --><div class="P chat" id="p3">
   <div class="sov" id="sov" onclick="SB(false)"></div>
   <div class="sbar" id="sbar">
-    <div class="sbar-user">
-      <div class="ur">
-        <div class="av">O</div>
-        <div class="ui">
-          <div class="un">OmniAI 用户</div>
-          <div class="uv"><svg viewBox="0 0 12 12"><path d="M6 1l1.5 3 3.5.5-2.5 2.5.5 3.5L6 9l-3 1.5.5-3.5L1 4.5l3.5-.5z" fill="currentColor"/></svg>Pro 会员</div>
-          <div class="um"><svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#22C55E"/></svg>OmniAI 3B · 本地运行中</div>
-        </div>
-      </div>
-    </div>
+    <div class="sbar-user"><div class="ur"><div class="av">O</div><div class="ui"><div class="un">OmniAI 用户</div><div class="uv"><svg viewBox="0 0 12 12"><path d="M6 1l1.2 2.4 2.8.4-2 2 .5 2.8L6 7.2 3.5 8.6l.5-2.8-2-2 2.8-.4z" fill="currentColor"/></svg>2,580 积分</div><div class="um"><svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#22C55E"/></svg>Qwen3-VL-2B · 本地运行中</div></div></div></div>
     <div class="sbar-list">
       <div class="ci sel"><div class="ct">关于量子计算的讨论</div><div class="cm"><span class="ctime">刚刚</span><span class="ctag tl">本地</span></div></div>
       <div class="ci"><div class="ct">Python 代码优化建议</div><div class="cm"><span class="ctime">2小时前</span><span class="ctag tg">GPU</span></div></div>
       <div class="ci"><div class="ct">AI 写作助手 — 项目方案</div><div class="cm"><span class="ctime">昨天</span><span class="ctag tc">云端</span></div></div>
       <div class="ci"><div class="ct">机器学习入门笔记</div><div class="cm"><span class="ctime">3天前</span><span class="ctag tlr">LoRA</span></div></div>
-      <div class="ci"><div class="ct">翻译：技术文档中译英</div><div class="cm"><span class="ctime">上周</span><span class="ctag tl">本地</span></div></div>
     </div>
     <div class="sbar-ft"><div class="sbf" onclick="go('p8')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3M8 10.5v.5"/></svg>设置</div><div class="sv">v1.0.0</div></div>
   </div>
   <div class="chat-bar">
     <button class="ib" onclick="SB(true)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
-    <div class="mid"><div class="model">OmniAI 3B</div><div class="status"><span class="sd"></span>本地推理中</div></div>
+    <div class="mid"><div class="model">Qwen3-VL-2B<span class="vision-ind"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.2"><circle cx="5" cy="5" r="3"/><circle cx="5" cy="5" r="1"/></svg>视觉</span></div><div class="status"><span class="sd"></span>本地推理中</div></div>
     <button class="ib" onclick="T('新建对话')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button>
     <button class="ib" onclick="T('更多选项')"><svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="5" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="15" r="1.5"/></svg></button>
   </div>
   <div class="msgs">
     <div class="msg u"><div class="bub">请解释一下量子计算的基本原理，以及它与传统计算有什么区别？</div><div class="mt">14:32</div></div>
-    <div class="msg a"><div class="bub"><strong>量子计算</strong>是利用量子力学原理进行信息处理的计算模式。与经典计算的核心区别在于：<br><br><strong>1. 量子比特 (Qubit)</strong><br>经典计算使用比特（0或1），量子计算使用量子比特，可以同时处于0和1的叠加态。<br><br><strong>2. 量子叠加</strong><br>n个量子比特可以同时表示2ⁿ个状态，实现并行计算。<br><br><strong>3. 量子纠缠</strong><br>两个量子比特可以产生关联，改变其中一个会瞬间影响另一个。</div><div class="mt">14:32 · OmniAI 3B</div></div>
-    <div class="msg a"><div class="bub"><pre>from qiskit import QuantumCircuit\n\nqc = QuantumCircuit(2, 2)\nqc.h(0)       # Hadamard gate\nqc.cx(0, 1)   # CNOT gate\nqc.measure([0,1], [0,1])</pre>这段代码创建了一个贝尔态，展示了量子叠加和纠缠的基本应用。</div><div class="mt">14:33 · OmniAI 3B</div></div>
+    <div class="msg a"><div class="bub"><strong>量子计算</strong>是利用量子力学原理进行信息处理的计算模式。与经典计算的核心区别在于：<br><br><strong>1. 量子比特 (Qubit)</strong><br>经典计算使用比特（0或1），量子计算使用量子比特，可以同时处于0和1的叠加态。<br><br><strong>2. 量子叠加</strong><br>n个量子比特可以同时表示2ⁿ个状态，实现并行计算。</div><div class="mt">14:32 · Qwen3-VL-2B</div></div>
+    <div class="msg a"><div class="bub"><pre>from qiskit import QuantumCircuit\n\nqc = QuantumCircuit(2, 2)\nqc.h(0)\nqc.cx(0, 1)\nqc.measure([0,1], [0,1])</pre>这段代码创建了一个贝尔态，展示了量子叠加和纠缠的基本应用。</div><div class="mt">14:33 · Qwen3-VL-2B</div></div>
     <div class="msg u"><div class="bub">能详细解释一下Hadamard门的作用吗？</div><div class="mt">14:35</div></div>
     <div class="msg a"><div class="bub"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>
   </div>
   <div class="qbar">
     <div class="qpill" onclick="T('AI写作')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M9 2l3 3L5 12H2V9z"/></svg>AI写作</div>
     <div class="qpill" onclick="T('代码生成')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M5 3L2 7l3 4M9 3l3 4-3 4"/></svg>代码生成</div>
-    <div class="qpill" onclick="T('翻译')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 7h10M7 2c-2 3-2 7 0 10M7 2c2 3 2 7 0 10"/><circle cx="7" cy="7" r="5"/></svg>翻译</div>
+    <div class="qpill" onclick="T('拍照识图')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M5 2H3a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1V5a1 1 0 00-1-1H9L8 2H5z"/><circle cx="7" cy="7.5" r="2"/></svg>拍照识图</div>
     <div class="qpill" onclick="T('OCR识图')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="2" y="2" width="10" height="10" rx="2"/><circle cx="5" cy="5.5" r="1.2"/><path d="M2 10l3-3 2 2 2-2.5 3 3.5"/></svg>OCR识图</div>
     <div class="qpill" onclick="T('语音助手')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="5" y="2" width="4" height="6" rx="2"/><path d="M3 7a4 4 0 008 0M7 11v2"/></svg>语音助手</div>
-    <div class="qpill" onclick="T('知识库')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 3h4v9H2zM8 3h4v9H8z"/></svg>知识库</div>
-    <div class="qpill" onclick="T('Agent')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="7" cy="5" r="3"/><path d="M2 13c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg>Agent</div>
   </div>
   <div class="iarea">
     <button class="ab" onclick="T('上传文件')"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 4v10M4 9l5-5 5 5"/></svg></button>
@@ -427,79 +453,57 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
   <div class="bnav">
     <div class="ni on" onclick="go('p3')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h14M4 11h14M4 15h10"/><circle cx="19" cy="15" r="2" fill="currentColor" stroke="none"/></svg><span>聊天</span></div>
-    <div class="ni" onclick="go('p9')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="3.5"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7"/><path d="M17 7l2 2 3-4"/></svg><span>Agent</span></div>
-    <div class="ni" onclick="go('p7')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 4h6v14H4zM12 4h6v14h-6z"/><path d="M6 8h2M14 8h2M6 12h2M14 12h2"/></svg><span>知识库</span></div>
+    <div class="ni" onclick="go('p9')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="3.5"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 19"/><path d="M17 7l2 2 3-4"/></svg><span>Agent</span></div>
+    <div class="ni" onclick="go('p7')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 4h6v14H4zM12 4h6v14h-6z"/></svg><span>知识库</span></div>
     <div class="ni" onclick="go('p5')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M11 3l8 5v8l-8 3-8-3V8z"/><path d="M11 3v16M3 8l8 5 8-5"/></svg><span>模型</span></div>
-    <div class="ni" onclick="go('p4')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="4"/><path d="M4 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg><span>我的</span></div>
+    <div class="ni" onclick="go('p4')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="4"/><path d="M4 20c0-3.9 3.1-7 7-7s7 3.1 7 20"/></svg><span class="cred-dot"></span><span>我的</span></div>
   </div>
 </div>
 
-<!-- ====== PROFILE ====== -->
-<div class="P" id="p4" style="background:var(--bg);display:flex;flex-direction:column">
-  <div class="chat-bar">
-    <button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
-    <div class="mid"><div class="model">我的</div></div>
-    <div style="width:38px"></div>
-  </div>
+<!-- PROFILE --><div class="P" id="p4" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar"><button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button><div class="mid"><div class="model">我的</div></div><div style="width:38px"></div></div>
   <div class="prof-scroll">
-    <div class="prof-card">
-      <div class="av-lg">O</div>
-      <div class="pn">OmniAI 用户</div>
-      <div class="puid">UID: OAI-2024-8866</div>
-      <div class="pvip"><svg viewBox="0 0 12 12"><path d="M6 1l1.5 3 3.5.5-2.5 2.5.5 3.5L6 9l-3 1.5.5-3.5L1 4.5l3.5-.5z" fill="currentColor"/></svg>Pro 会员</div>
-      <div class="pdev">已绑定 2 台设备</div>
-    </div>
-    <div class="vip-card">
-      <div class="vl">当前方案</div>
-      <div class="vp">OmniAI Pro 年付</div>
-      <div class="ve">有效期至 2026.12.31</div>
-      <div class="vub" onclick="T('续费 / 升级')">续费 / 升级</div>
-    </div>
+    <div class="prof-card"><div class="av-lg">O</div><div class="pn">OmniAI 用户</div><div class="puid">UID: OAI-2024-8866</div><div class="pcred"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-width="1"/><path d="M6 3.5v2.5l1.5 1" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>2,580 积分</div><div class="pdev">已绑定 2 台设备</div></div>
+    <div class="cred-card"><div class="cl">积分余额</div><div class="cb">2,580<span>积分</span></div><div class="ce">邀请码: OAI-X8K9M2 · 已邀请 12 人</div><div class="cub" onclick="go('p10')">充值</div></div>
     <div class="mg">
+      <div class="mi" onclick="go('p10')"><div class="mi-ic cyan"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="9" cy="9" r="6.5"/><path d="M9 5.5v3.5l2 1.5"/></svg></div><span class="mi-t">积分中心</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
       <div class="mi" onclick="go('p5')"><div class="mi-ic blue"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11 3l8 5v8l-8 3-8-3V8z"/><path d="M11 3v16M3 8l8 5 8-5"/></svg></div><span class="mi-t">模型中心</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
       <div class="mi" onclick="go('p6')"><div class="mi-ic purple"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 2v14M5 5l4-3 4 3"/><path d="M3 9h12"/></svg></div><span class="mi-t">LoRA训练</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
       <div class="mi" onclick="go('p7')"><div class="mi-ic green"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h6v14H4zM12 4h6v14h-6z"/></svg></div><span class="mi-t">知识库</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
-      <div class="mi" onclick="T('语音助手')"><div class="mi-ic orange"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="3" width="6" height="8" rx="3"/><path d="M3 11a6 6 0 0012 0M9 17v2"/></svg></div><span class="mi-t">语音助手</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
+      <div class="mi" onclick="go('p12')"><div class="mi-ic orange"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="3" width="6" height="8" rx="3"/><path d="M3 11a6 6 0 0012 0M9 17v2"/></svg></div><span class="mi-t">多模态</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
     </div>
     <div class="mg">
       <div class="mi" onclick="T('缓存管理')"><div class="mi-ic gray"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="9" cy="9" r="7"/><path d="M9 5v4l3 2"/></svg></div><span class="mi-t">缓存管理</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
-      <div class="mi" onclick="T('下载管理')"><div class="mi-ic gray"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 3v10M5 9l4 4 4-4"/><path d="M3 15h12"/></svg></div><span class="mi-t">下载管理</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
       <div class="mi" onclick="go('p8')"><div class="mi-ic red"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="12" height="10" rx="2"/><path d="M6 6V4a3 3 0 016 0v2"/></svg></div><span class="mi-t">隐私与安全</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
-      <div class="mi" onclick="T('开发者模式')"><div class="mi-ic gray"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 5L2 9l4 4M12 5l4 4-4 4"/></svg></div><span class="mi-t">开发者模式</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
     </div>
     <button class="logout" onclick="T('已退出登录');go('p1')">退出登录</button>
   </div>
 </div>
 
-<!-- ====== MODEL ====== -->
-<div class="P" id="p5" style="background:var(--bg);display:flex;flex-direction:column">
-  <div class="chat-bar">
-    <button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
-    <div class="mid"><div class="model">模型中心</div></div>
-    <button class="ib" onclick="T('导入模型')"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="2" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button>
-  </div>
-  <div class="mtabs"><div class="mtab on">本地模型</div><div class="mtab">下载模型</div></div>
-  <div class="mlist">
+<!-- MODEL --><div class="P" id="p5" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar"><button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button><div class="mid"><div class="model">模型中心</div></div><button class="ib" onclick="T('导入模型')"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="2" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button></div>
+  <div class="mtabs"><div class="mtab on" onclick="switchMTab(this,0)">本地模型</div><div class="mtab" onclick="switchMTab(this,1)">下载模型</div><div class="mtab" onclick="switchMTab(this,2)">视觉模型</div></div>
+  <div class="mlist" id="mlist0">
     <div class="mcard"><div class="mh"><div class="mn">OmniAI-3B-Q4_K</div><div class="mtags"><span class="mtag" style="background:var(--green)">已加载</span><span class="mtag" style="background:var(--p)">GPU</span></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>1.8 GB</span><span>Q4_K_M</span><span>4096 ctx</span></div><div class="mact"><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div><button class="del-btn" onclick="T('确认删除？')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M3 4h8M5 4V3a1 1 0 012 0v1M4 4l.5 7h5L10 4"/></svg>删除</button></div></div>
     <div class="mcard"><div class="mh"><div class="mn">OmniAI-7B-Q5_K</div><div class="mtags"><span class="mtag" style="background:var(--purple)">LoRA</span></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>4.2 GB</span><span>Q5_K_M</span><span>8192 ctx</span></div><div class="mact"><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div><button class="del-btn" onclick="T('确认删除？')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M3 4h8M5 4V3a1 1 0 012 0v1M4 4l.5 7h5L10 4"/></svg>删除</button></div></div>
     <div class="mcard"><div class="mh"><div class="mn">Llama-3-8B-Q4_K</div><div class="mtags"></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>4.7 GB</span><span>Q4_K_M</span><span>4096 ctx</span></div><div class="mact"><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div><button class="del-btn" onclick="T('确认删除？')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M3 4h8M5 4V3a1 1 0 012 0v1M4 4l.5 7h5L10 4"/></svg>删除</button></div></div>
-    <div class="mcard"><div class="mh"><div class="mn">Qwen2-1.5B-Q8_0</div><div class="mtags"><span class="mtag" style="background:var(--orange)">云端</span></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>1.6 GB</span><span>Q8_0</span><span>2048 ctx</span></div><div class="mact"><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div><button class="del-btn" onclick="T('确认删除？')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M3 4h8M5 4V3a1 1 0 012 0v1M4 4l.5 7h5L10 4"/></svg>删除</button></div></div>
+  </div>
+  <div class="mlist" id="mlist1" style="display:none">
+    <div class="mcard"><div class="mh"><div class="mn">Mistral-7B-Q4_K</div><div class="mtags"><span class="mtag" style="background:var(--p)">推荐</span></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>4.1 GB</span><span>Q4_K_M</span><span>8192 ctx</span></div><div class="mact"><button class="dl-btn" onclick="T('开始下载')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 2v8M4 7l3 3 3-3"/><path d="M2 11h10"/></svg>下载</button></div></div>
+    <div class="mcard"><div class="mh"><div class="mn">Phi-3-mini-Q5_K</div><div class="mtags"></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>2.4 GB</span><span>Q5_K_M</span><span>4096 ctx</span></div><div class="mact"><button class="dl-btn" onclick="T('开始下载')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 2v8M4 7l3 3 3-3"/><path d="M2 11h10"/></svg>下载</button></div></div>
+  </div>
+  <div class="mlist" id="mlist2" style="display:none">
+    <div class="mcard"><div class="mh"><div class="mn">Qwen3-VL-2B Q4_K_M</div><div class="mtags"><span class="mtag" style="background:var(--green)">已加载</span><span class="mtag" style="background:var(--p)">GPU</span><span class="mtag" style="background:var(--purple)">OCR</span><span class="mtag" style="background:var(--cyan)">识图</span></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>1.2 GB</span><span>Q4_K_M</span><span>OCR+识图</span></div><div class="mact"><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div><button class="del-btn" onclick="T('确认删除？')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M3 4h8M5 4V3a1 1 0 012 0v1M4 4l.5 7h5L10 4"/></svg>删除</button></div></div>
+    <div class="mcard"><div class="mh"><div class="mn">Qwen2.5-VL-7B Q4_K_M</div><div class="mtags"><span class="mtag" style="background:var(--cyan)">识图</span><span class="mtag" style="background:var(--purple)">OCR</span></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>4.1 GB</span><span>Q4_K_M</span><span>高精度识图</span></div><div class="mact"><button class="dl-btn" onclick="T('开始下载')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 2v8M4 7l3 3 3-3"/><path d="M2 11h10"/></svg>下载</button></div></div>
+    <div class="mcard"><div class="mh"><div class="mn">SmolVLM2-256M Q4_K_M</div><div class="mtags"><span class="mtag" style="background:var(--orange)">轻量</span></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>0.3 GB</span><span>Q4_K_M</span><span>低配设备</span></div><div class="mact"><button class="dl-btn" onclick="T('开始下载')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 2v8M4 7l3 3 3-3"/><path d="M2 11h10"/></svg>下载</button></div></div>
   </div>
 </div>
 
-<!-- ====== LORA ====== -->
-<div class="P" id="p6" style="background:var(--bg);display:flex;flex-direction:column">
-  <div class="chat-bar">
-    <button class="ib" onclick="go('p4')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
-    <div class="mid"><div class="model">LoRA训练</div></div>
-    <div style="width:38px"></div>
-  </div>
+<!-- LORA --><div class="P" id="p6" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar"><button class="ib" onclick="go('p4')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button><div class="mid"><div class="model">LoRA训练</div></div><div style="width:38px"></div></div>
   <div class="lora-scroll">
     <div class="stitle">数据集</div>
-    <div class="ds-card">
-      <div class="ds-info"><div class="ds-name">training_data.txt</div><div class="ds-meta"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>2.3 MB · 1,247 条</div></div>
-      <button class="imp-btn" onclick="T('选择文件')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M9 2l3 3L5 12H2V9z"/></svg>导入</button>
-    </div>
+    <div class="ds-card"><div class="ds-info"><div class="ds-name">training_data.txt</div><div class="ds-meta"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>2.3 MB · 1,247 条</div></div><button class="imp-btn" onclick="T('选择文件')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M9 2l3 3L5 12H2V9z"/></svg>导入</button></div>
     <div class="stitle">训练参数</div>
     <div class="param-card">
       <div class="pr"><span class="pl">LoRA Rank</span><span class="pv" id="rv">8</span></div><input type="range" min="1" max="64" value="8" oninput="document.getElementById('rv').textContent=this.value">
@@ -507,7 +511,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="pr"><span class="pl">学习率</span><span class="pv">1e-4</span></div>
       <div class="pr"><span class="pl">Epochs</span><span class="pv" id="ev">3</span></div><input type="range" min="1" max="20" value="3" oninput="document.getElementById('ev').textContent=this.value">
       <div class="pr"><span class="pl">Batch Size</span><span class="pv" id="bv">4</span></div><input type="range" min="1" max="16" value="4" oninput="document.getElementById('bv').textContent=this.value">
-      <div class="pr"><span class="pl">Dropout</span><span class="pv" id="dv">0.05</span></div><input type="range" min="0" max="50" value="5" oninput="document.getElementById('dv').textContent=(this.value/100).toFixed(2)">
     </div>
     <div class="stitle">训练进度</div>
     <div class="prog-card">
@@ -524,13 +527,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 </div>
 
-<!-- ====== KB ====== -->
-<div class="P" id="p7" style="background:var(--bg);display:flex;flex-direction:column">
-  <div class="chat-bar">
-    <button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
-    <div class="mid"><div class="model">知识库</div></div>
-    <button class="ib" onclick="T('新建知识库')"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="2" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button>
-  </div>
+<!-- KB --><div class="P" id="p7" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar"><button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button><div class="mid"><div class="model">知识库</div></div><button class="ib" onclick="T('新建知识库')"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="2" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button></div>
   <div class="search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg><input placeholder="搜索知识库..."></div>
   <div class="kb-list">
     <div class="kb-card" onclick="T('打开知识库')"><div class="kh"><div class="kn">AI 技术文档库</div><div class="kc">23 篇</div></div><div class="kd">包含大模型原理、训练技术、推理优化等技术文档，支持语义检索和智能问答。</div><div class="kf"><span class="ctag tl" style="font-size:9px;padding:1px 6px;border-radius:4px;color:#fff;font-weight:700">就绪</span><span>45.2 MB</span><span>2小时前</span></div></div>
@@ -541,54 +539,47 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="fab" onclick="T('新建知识库')"><svg viewBox="0 0 22 22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M11 5v12M5 11h12"/></svg></div>
 </div>
 
-<!-- ====== SETTINGS ====== -->
-<div class="P" id="p8" style="background:var(--bg);display:flex;flex-direction:column">
-  <div class="chat-bar">
-    <button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
-    <div class="mid"><div class="model">设置</div></div>
-    <div style="width:38px"></div>
-  </div>
+<!-- SETTINGS --><div class="P" id="p8" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar"><button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button><div class="mid"><div class="model">设置</div></div><div style="width:38px"></div></div>
   <div class="set-scroll">
     <div class="sg-title">AI 设置</div>
     <div class="sg">
-      <div class="si"><div class="si-ic blue"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M11 3l8 5v8l-8 3-8-3V8z"/></svg></div><div class="si-txt"><div class="si-t">默认模型</div></div><span class="si-val">OmniAI 3B</span><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
-      <div class="si"><div class="si-ic blue"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 3h10v10H3z"/><path d="M3 6h10"/></svg></div><div class="si-txt"><div class="si-t">系统提示词</div></div><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
+      <div class="si"><div class="si-ic blue"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M11 3l8 5v8l-8 3-8-3V8z"/></svg></div><div class="si-txt"><div class="si-t">默认模型</div></div><span class="si-val">Qwen3-VL-2B</span><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
       <div class="si"><div class="si-ic blue"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="5"/><path d="M8 5v6M5 8h6"/></svg></div><div class="si-txt"><div class="si-t">温度</div></div><span class="si-val">0.7</span><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
     </div>
     <div class="sg-title">推理设置</div>
     <div class="sg">
       <div class="si"><div class="si-ic purple"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 2l6 3v6l-6 3-6-3V5z"/></svg></div><div class="si-txt"><div class="si-t">推理模式</div></div><span class="si-val">均衡模式</span><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
-      <div class="si"><div class="si-ic purple"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 2h12v12H2z"/><path d="M2 8h12"/></svg></div><div class="si-txt"><div class="si-t">上下文长度</div></div><span class="si-val">4096</span><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
       <div class="si"><div class="si-ic purple"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 12h8M8 4v8"/></svg></div><div class="si-txt"><div class="si-t">GPU 加速</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
-      <div class="si"><div class="si-ic purple"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M6 6l4 4M10 6l-4 4"/></svg></div><div class="si-txt"><div class="si-t">mmap 加速</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
+    </div>
+    <div class="sg-title">视觉设置</div>
+    <div class="sg">
+      <div class="si"><div class="si-ic cyan"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 11l4-4 3 3 5-6"/><path d="M11 4h3v3"/></svg></div><div class="si-txt"><div class="si-t">视觉GPU加速</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
+      <div class="si"><div class="si-ic cyan"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="2" y="2" width="12" height="9" rx="1.5"/><path d="M5 14h6"/><path d="M8 11v3"/></svg></div><div class="si-txt"><div class="si-t">图像自动OCR</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
+      <div class="si"><div class="si-ic cyan"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="3"/><path d="M8 2v2M8 12v2M2 8h2M12 8h2"/></svg></div><div class="si-txt"><div class="si-t">视觉推理模式</div></div><span class="si-val">均衡模式</span><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
+    </div>
+    <div class="sg-title">积分设置</div>
+    <div class="sg">
+      <div class="si"><div class="si-ic orange"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/></svg></div><div class="si-txt"><div class="si-t">积分余额</div></div><span class="si-val" style="color:var(--p);font-weight:700">2,580</span></div>
+      <div class="si" onclick="go('p10')"><div class="si-ic orange"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 2v4M8 10v4"/><path d="M4 6h8v4H4z"/></svg></div><div class="si-txt"><div class="si-t">充值中心</div></div><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
     </div>
     <div class="sg-title">隐私设置</div>
     <div class="sg">
       <div class="si"><div class="si-ic red"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="6" width="10" height="8" rx="1.5"/><path d="M5 6V4.5a3 3 0 016 0V6"/></svg></div><div class="si-txt"><div class="si-t">应用锁</div></div><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
-      <div class="si"><div class="si-ic red"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 2v3M8 11v3M4.5 4.5l2 2M9.5 9.5l2 2M2 8h3M11 8h3M4.5 11.5l2-2M9.5 6.5l2-2"/></svg></div><div class="si-txt"><div class="si-t">指纹解锁</div></div><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
-      <div class="si"><div class="si-ic red"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="5.5"/><path d="M6 8l1.5 1.5L10 7"/></svg></div><div class="si-txt"><div class="si-t">无痕模式</div></div><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
       <div class="si"><div class="si-ic red"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 2l6 3v5l-6 4-6-4V5z"/></svg></div><div class="si-txt"><div class="si-t">数据加密</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
-      <div class="si"><div class="si-ic red"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 4h12v8H2z"/><path d="M5 7h6"/></svg></div><div class="si-txt"><div class="si-t">敏感词过滤</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
-      <div class="si"><div class="si-ic orange"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></div><div class="si-txt"><div class="si-t">云端降级</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
     </div>
     <div class="sg-title">关于</div>
     <div class="sg">
       <div class="si"><div class="si-ic gray"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3M8 10.5v.5"/></svg></div><div class="si-txt"><div class="si-t">版本</div></div><span class="si-val">1.0.0</span></div>
-      <div class="si" onclick="T('已是最新版本')"><div class="si-ic gray"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 8a4 4 0 11-8 0 4 4 0 018 0z"/><path d="M8 5v3l2 1"/></svg></div><div class="si-txt"><div class="si-t">检查更新</div></div><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
     </div>
   </div>
 </div>
 
-<!-- ====== AGENT ====== -->
-<div class="P" id="p9" style="background:var(--bg);display:flex;flex-direction:column">
-  <div class="chat-bar">
-    <button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
-    <div class="mid"><div class="model">AI Agent</div></div>
-    <button class="ib" onclick="T('创建Agent')"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="2" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button>
-  </div>
+<!-- AGENT --><div class="P" id="p9" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar"><button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button><div class="mid"><div class="model">AI Agent</div></div><button class="ib" onclick="T('创建Agent')"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="2" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button></div>
   <div class="search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg><input placeholder="搜索 Agent..."></div>
   <div class="ag-list">
-    <div class="ag-card" onclick="T('打开Agent')"><div class="ag-ic" style="background:var(--p-light)"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="7" r="4"/><path d="M3 19c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></div><div class="ag-info"><div class="ag-name">研究助手</div><div class="ag-desc">深度搜索 · 分析总结</div></div><span class="ag-tag" style="background:var(--green)">活跃</span></div>
+    <div class="ag-card" onclick="T('打开Agent')"><div class="ag-ic" style="background:var(--p-light)"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="7" r="4"/><path d="M3 19c0-3.9 3.1-7 7-7s7 3.1 7 19"/></svg></div><div class="ag-info"><div class="ag-name">研究助手</div><div class="ag-desc">深度搜索 · 分析总结</div></div><span class="ag-tag" style="background:var(--green)">活跃</span></div>
     <div class="ag-card" onclick="T('打开Agent')"><div class="ag-ic" style="background:#F3E8FF"><svg viewBox="0 0 20 20" fill="none" stroke="var(--purple)" stroke-width="1.5" stroke-linecap="round"><path d="M5 5l3-3 3 3M8 2v12M12 8h4v8H4V8h4"/></svg></div><div class="ag-info"><div class="ag-name">编程助手</div><div class="ag-desc">代码生成 · Debug · 重构</div></div><span class="ag-tag" style="background:var(--p)">运行中</span></div>
     <div class="ag-card" onclick="T('打开Agent')"><div class="ag-ic" style="background:#FEF3C7"><svg viewBox="0 0 20 20" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h12v12H4z"/><path d="M8 8h4M8 12h4"/></svg></div><div class="ag-info"><div class="ag-name">写作助手</div><div class="ag-desc">文章撰写 · 润色 · 翻译</div></div></div>
     <div class="ag-card" onclick="T('打开Agent')"><div class="ag-ic" style="background:#DCFCE7"><svg viewBox="0 0 20 20" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"><path d="M4 14l4-4 3 3 5-6"/><path d="M14 7h3v3"/></svg></div><div class="ag-info"><div class="ag-name">数据分析师</div><div class="ag-desc">数据分析 · 可视化 · 报告</div></div><span class="ag-tag" style="background:var(--purple)">LoRA</span></div>
@@ -596,24 +587,96 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="fab" onclick="T('创建Agent')"><svg viewBox="0 0 22 22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M11 5v12M5 11h12"/></svg></div>
   <div class="bnav">
     <div class="ni" onclick="go('p3')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h14M4 11h14M4 15h10"/></svg><span>聊天</span></div>
-    <div class="ni on"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="3.5"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7"/><path d="M17 7l2 2 3-4"/></svg><span>Agent</span></div>
+    <div class="ni on"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="3.5"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 19"/></svg><span>Agent</span></div>
     <div class="ni" onclick="go('p7')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 4h6v14H4zM12 4h6v14h-6z"/></svg><span>知识库</span></div>
     <div class="ni" onclick="go('p5')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M11 3l8 5v8l-8 3-8-3V8z"/></svg><span>模型</span></div>
-    <div class="ni" onclick="go('p4')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="4"/><path d="M4 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg><span>我的</span></div>
+    <div class="ni" onclick="go('p4')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="4"/><path d="M4 20c0-3.9 3.1-7 7-7s7 3.1 7 20"/></svg><span class="cred-dot"></span><span>我的</span></div>
   </div>
 </div>
 
-</div>
+<!-- CREDITS CENTER --><div class="P" id="p10" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar"><button class="ib" onclick="go('p4')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button><div class="mid"><div class="model">积分中心</div></div><div style="width:38px"></div></div>
+  <div class="cred-scroll">
+    <div class="cred-hero">
+      <div class="ch-label">当前积分</div>
+      <div class="ch-bal">2,580<span>积分</span></div>
+      <div class="ch-inv-row">
+        <div class="ch-inv-left">
+          <div class="ch-inv-label">邀请码</div>
+          <div class="ch-inv-code">OAI-X8K9M2</div>
+          <div class="ch-inv-count">已邀请 12 人</div>
+        </div>
+        <div class="ch-inv-btns">
+          <button class="ch-ghost-btn" onclick="T('邀请码已复制')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="4" y="4" width="8" height="8" rx="1.5"/><path d="M2 10V3a1 1 0 011-1h7"/><path d="M5 8h4"/></svg>复制</button>
+          <button class="ch-ghost-btn" onclick="T('分享链接已复制')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M4 7a2.5 2.5 0 014-2l2 2a2.5 2.5 0 01-3.5 3.5"/><path d="M10 7a2.5 2.5 0 01-4 2l-2-2a2.5 2.5 0 013.5-3.5"/></svg>分享</button>
+        </div>
+      </div>
+    </div>
+    <div class="stitle">充值方案</div>
+    <div class="plan-scroll">
+      <div class="plan-card" onclick="T('选择 Starter')"><div class="plan-name">Starter</div><div class="plan-price"><span>¥</span>6</div><div class="plan-cred">60 积分</div><div class="plan-unit">¥0.10 / 积分</div></div>
+      <div class="plan-card pop" onclick="T('选择 Popular')"><div class="plan-badge">热门</div><div class="plan-name">Popular</div><div class="plan-price"><span>¥</span>30</div><div class="plan-cred">360 积分</div><div class="plan-unit">¥0.08 / 积分</div></div>
+      <div class="plan-card" onclick="T('选择 Pro')"><div class="plan-name">Pro</div><div class="plan-price"><span>¥</span>98</div><div class="plan-cred">1,200 积分</div><div class="plan-unit">¥0.08 / 积分</div></div>
+      <div class="plan-card" onclick="T('选择 Ultimate')"><div class="plan-name">Ultimate</div><div class="plan-price"><span>¥</span>298</div><div class="plan-cred">4,000 积分</div><div class="plan-unit">¥0.07 / 积分</div></div>
+    </div>
+    <div class="stitle">积分记录</div>
+    <div class="rec-list">
+      <div class="rec-item"><div class="rec-ic green"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M7 3v8M3 7l4 4 4-4"/></svg></div><div class="rec-info"><div class="rec-title">邀请奖励</div><div class="rec-date">2024-01-15</div></div><div class="rec-amt pos">+100</div></div>
+      <div class="rec-item"><div class="rec-ic green"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M7 3v8M3 7l4 4 4-4"/></svg></div><div class="rec-info"><div class="rec-title">充值到账</div><div class="rec-date">2024-01-14</div></div><div class="rec-amt pos">+360</div></div>
+      <div class="rec-item"><div class="rec-ic red"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M7 11V3M3 7l4-4 4 4"/></svg></div><div class="rec-info"><div class="rec-title">功能消耗</div><div class="rec-date">2024-01-13</div></div><div class="rec-amt neg">-20</div></div>
+      <div class="rec-item"><div class="rec-ic green"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M7 3v8M3 7l4 4 4-4"/></svg></div><div class="rec-info"><div class="rec-title">系统奖励</div><div class="rec-date">2024-01-12</div></div><div class="rec-amt pos">+10</div></div>
+      <div class="rec-item"><div class="rec-ic red"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M7 11V3M3 7l4-4 4 4"/></svg></div><div class="rec-info"><div class="rec-title">功能消耗</div><div class="rec-date">2024-01-11</div></div><div class="rec-amt neg">-15</div></div>
+    </div>
+  </div>
 </div>
 
+<!-- VISION MODELS --><div class="P" id="p11" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar"><button class="ib" onclick="go('p5')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button><div class="mid"><div class="model">视觉模型</div></div><div style="width:38px"></div></div>
+  <div class="vtabs"><div class="vtab on" onclick="switchVTab(this,0)">预装模型</div><div class="vtab" onclick="switchVTab(this,1)">可下载模型</div></div>
+  <div class="vlist" id="vlist0">
+    <div class="vcard"><div class="vh"><div class="vn">Qwen3-VL-2B Q4_K_M</div><div class="vtags"><span class="vtag" style="background:var(--green)">已加载</span><span class="vtag" style="background:var(--p)">GPU加速</span></div></div><div class="vinfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>1.2 GB</span><span>Q4_K_M</span><span>OCR + 识图</span></div><div class="vact"><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div><span style="font-size:12px;color:var(--green);font-weight:600">运行中</span></div></div>
+    <div class="vcard"><div class="vh"><div class="vn">Qwen2.5-0.5B Q4_K_M</div><div class="vtags"><span class="vtag" style="background:var(--green)">已加载</span><span class="vtag" style="background:var(--orange)">文本</span></div></div><div class="vinfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>0.4 GB</span><span>Q4_K_M</span><span>文本模型</span></div><div class="vact"><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div><span style="font-size:12px;color:var(--green);font-weight:600">运行中</span></div></div>
+  </div>
+  <div class="vlist" id="vlist1" style="display:none">
+    <div class="vcard"><div class="vh"><div class="vn">Qwen2.5-VL-7B Q4_K_M</div><div class="vtags"><span class="vtag" style="background:var(--cyan)">识图</span><span class="vtag" style="background:var(--purple)">OCR</span></div></div><div class="vinfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>4.1 GB</span><span>Q4_K_M</span><span>高精度识图</span></div><div class="vact"><button class="dl-btn" onclick="T('开始下载')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 2v8M4 7l3 3 3-3"/><path d="M2 11h10"/></svg>下载</button></div></div>
+    <div class="vcard"><div class="vh"><div class="vn">SmolVLM2-256M Q4_K_M</div><div class="vtags"><span class="vtag" style="background:var(--orange)">轻量</span></div></div><div class="vinfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>0.3 GB</span><span>Q4_K_M</span><span>低配设备</span></div><div class="vact"><button class="dl-btn" onclick="T('开始下载')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 2v8M4 7l3 3 3-3"/><path d="M2 11h10"/></svg>下载</button></div></div>
+  </div>
+</div>
+
+<!-- MULTIMODAL --><div class="P" id="p12" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar"><button class="ib" onclick="go('p4')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button><div class="mid"><div class="model">多模态</div></div><div style="width:38px"></div></div>
+  <div class="mm-scroll">
+    <div class="mm-hero">
+      <div class="mm-title">多模态感知</div>
+      <div class="mm-desc">视觉 · 语音 · 文档，全维度AI理解</div>
+      <div class="mm-status"><span class="sd"></span><span>Qwen3-VL-2B 运行中 · GPU加速</span></div>
+    </div>
+    <div class="mm-grid">
+      <div class="mm-cell" onclick="T('打开相机')"><div class="mm-ic cam"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 7H3a1 1 0 00-1 1v9a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1h-2"/><path d="M8 4h6l2 3H6z"/><circle cx="11" cy="12" r="3"/></svg></div><div class="mm-label">相机识别</div><div class="mm-sub">实时拍照分析</div></div>
+      <div class="mm-cell" onclick="T('选择图片')"><div class="mm-ic img"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="3" width="16" height="16" rx="2"/><circle cx="8" cy="8" r="2"/><path d="M3 15l4-4 3 3 4-5 5 6"/></svg></div><div class="mm-label">图片分析</div><div class="mm-sub">OCR + 识图</div></div>
+      <div class="mm-cell" onclick="T('语音输入')"><div class="mm-ic mic"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="8" y="3" width="6" height="10" rx="3"/><path d="M5 12a6 6 0 0012 0M11 18v3"/></svg></div><div class="mm-label">语音识别</div><div class="mm-sub">ASR + TTS</div></div>
+      <div class="mm-cell" onclick="T('选择文档')"><div class="mm-ic doc"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 3h7l5 5v11a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M13 3v5h5"/></svg></div><div class="mm-label">文档解析</div><div class="mm-sub">PDF · Word</div></div>
+    </div>
+    <div class="stitle">最近记录</div>
+    <div class="mm-recent">
+      <div class="mm-ri" onclick="T('查看结果')"><div class="mm-ri-ic cam"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M5 7H3a1 1 0 00-1 1v6a1 1 0 001 1h12a1 1 0 001-1V8a1 1 0 00-1-1h-2"/><path d="M7 4h4l1.5 2H5.5z"/><circle cx="9" cy="11" r="2"/></svg></div><div class="mm-ri-info"><div class="mm-ri-title">产品包装识别</div><div class="mm-ri-time">2分钟前</div></div><span class="mm-ri-badge" style="background:var(--green)">完成</span></div>
+      <div class="mm-ri" onclick="T('查看结果')"><div class="mm-ri-ic img"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3" y="3" width="12" height="12" rx="1.5"/><circle cx="7" cy="7" r="1.5"/><path d="M3 12l3-3 2 2 3-4 4 5"/></svg></div><div class="mm-ri-info"><div class="mm-ri-title">发票OCR提取</div><div class="mm-ri-time">1小时前</div></div><span class="mm-ri-badge" style="background:var(--p)">OCR</span></div>
+      <div class="mm-ri" onclick="T('查看结果')"><div class="mm-ri-ic mic"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="6.5" y="3" width="5" height="8" rx="2.5"/><path d="M4 11a5 5 0 0010 0M9 15v2"/></svg></div><div class="mm-ri-info"><div class="mm-ri-title">会议录音转文字</div><div class="mm-ri-time">昨天</div></div><span class="mm-ri-badge" style="background:var(--orange)">语音</span></div>
+      <div class="mm-ri" onclick="T('查看结果')"><div class="mm-ri-ic img"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3" y="3" width="12" height="12" rx="1.5"/><circle cx="7" cy="7" r="1.5"/><path d="M3 12l3-3 2 2 3-4 4 5"/></svg></div><div class="mm-ri-info"><div class="mm-ri-title">架构图分析</div><div class="mm-ri-time">3天前</div></div><span class="mm-ri-badge" style="background:var(--purple)">识图</span></div>
+    </div>
+  </div>
+</div>
+
+</div></div>
+
 <div style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.35);font-size:11px;font-family:var(--font);text-align:center;letter-spacing:.3px">
-  <div id="pl">1 / 10 · 启动页</div>
+  <div id="pl">1 / 13 · 启动页</div>
   <div style="margin-top:3px;opacity:.6">点击 ‹ › 或键盘 ← → 切换</div>
 </div>
 
 <script>
-const P=['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9'];
-const N=['启动页','登录','注册','AI对话','个人中心','模型管理','LoRA训练','知识库','设置','Agent'];
+const P=['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','p12'];
+const N=['启动页','登录','注册','AI对话','个人中心','模型管理','LoRA训练','知识库','设置','Agent','积分中心','视觉模型','多模态'];
 let ci=0;
 function go(id){const i=P.indexOf(id);if(i>=0){ci=i;show()}}
 function show(){document.querySelectorAll('.P').forEach(p=>p.classList.remove('on'));document.getElementById(P[ci]).classList.add('on');SB(false);document.getElementById('pl').textContent=`${ci+1} / ${P.length} · ${N[ci]}`;document.getElementById('pn').textContent=`${ci+1}/${P.length}`}
@@ -621,6 +684,8 @@ function next(){if(ci<P.length-1){ci++;show()}}
 function prev(){if(ci>0){ci--;show()}}
 function SB(o){document.getElementById('sbar').classList.toggle('on',o);document.getElementById('sov').classList.toggle('on',o)}
 let tt;function T(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1600)}
+function switchMTab(el,idx){el.parentElement.querySelectorAll('.mtab').forEach(t=>t.classList.remove('on'));el.classList.add('on');for(let i=0;i<3;i++){document.getElementById('mlist'+i).style.display=i===idx?'':'none'}}
+function switchVTab(el,idx){el.parentElement.querySelectorAll('.vtab').forEach(t=>t.classList.remove('on'));el.classList.add('on');for(let i=0;i<2;i++){document.getElementById('vlist'+i).style.display=i===idx?'':'none'}}
 document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev()});
 setTimeout(()=>{if(ci===0){ci=1;show()}},2200);
 </script>

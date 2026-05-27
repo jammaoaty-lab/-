@@ -15,6 +15,12 @@ public class AIModel {
     private float loraScale;
     private String category;
     private boolean encrypted;
+    private String modelType;
+    private String visionCapability;
+    private boolean isPreinstalled;
+    private String downloadUrl;
+    private String expectedHash;
+    private long downloadSize;
 
     public AIModel() {
         this.isLoaded = false;
@@ -141,5 +147,53 @@ public class AIModel {
 
     public void setEncrypted(boolean encrypted) {
         this.encrypted = encrypted;
+    }
+
+    public String getModelType() {
+        return modelType;
+    }
+
+    public void setModelType(String modelType) {
+        this.modelType = modelType;
+    }
+
+    public String getVisionCapability() {
+        return visionCapability;
+    }
+
+    public void setVisionCapability(String visionCapability) {
+        this.visionCapability = visionCapability;
+    }
+
+    public boolean isPreinstalled() {
+        return isPreinstalled;
+    }
+
+    public void setPreinstalled(boolean preinstalled) {
+        isPreinstalled = preinstalled;
+    }
+
+    public String getDownloadUrl() {
+        return downloadUrl;
+    }
+
+    public void setDownloadUrl(String downloadUrl) {
+        this.downloadUrl = downloadUrl;
+    }
+
+    public String getExpectedHash() {
+        return expectedHash;
+    }
+
+    public void setExpectedHash(String expectedHash) {
+        this.expectedHash = expectedHash;
+    }
+
+    public long getDownloadSize() {
+        return downloadSize;
+    }
+
+    public void setDownloadSize(long downloadSize) {
+        this.downloadSize = downloadSize;
     }
 }
