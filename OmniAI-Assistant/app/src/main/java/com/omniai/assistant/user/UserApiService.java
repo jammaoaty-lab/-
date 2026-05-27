@@ -157,6 +157,44 @@ public class UserApiService {
         }
     }
 
+    public Result<Void> sendVerificationCode(String phone) {
+        try {
+            JSONObject body = new JSONObject();
+            body.put("phone", phone);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "auth/send-code")
+                    .post(RequestBody.create(body.toString(), JSON_MEDIA_TYPE))
+                    .build();
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    return Result.error("发送验证码失败: " + response.code());
+                }
+                return Result.success(null);
+            }
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    public Result<Void> resetPassword(String email) {
+        try {
+            JSONObject body = new JSONObject();
+            body.put("email", email);
+            Request request = new Request.Builder()
+                    .url(BASE_URL + "auth/reset-password")
+                    .post(RequestBody.create(body.toString(), JSON_MEDIA_TYPE))
+                    .build();
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    return Result.error("重置密码失败: " + response.code());
+                }
+                return Result.success(null);
+            }
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
     public Result<Boolean> checkDevice(String deviceId) {
         try {
             JSONObject body = new JSONObject();

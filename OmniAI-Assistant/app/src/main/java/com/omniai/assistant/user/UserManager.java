@@ -180,6 +180,46 @@ public class UserManager {
         });
     }
 
+    public void sendVerificationCode(String phone, CodeCallback callback) {
+        executor.execute(() -> {
+            UserApiService.Result<Void> result = apiService.sendVerificationCode(phone);
+            if (result.isSuccess()) {
+                if (callback != null) {
+                    callback.onSuccess();
+                }
+            } else {
+                if (callback != null) {
+                    callback.onError(result.getError());
+                }
+            }
+        });
+    }
+
+    public void loginWeChat(android.app.Activity activity, LoginCallback callback) {
+        loginWithWechat("", callback);
+    }
+
+    public void loginQQ(android.app.Activity activity, LoginCallback callback) {
+        loginWithQQ("", callback);
+    }
+
+    public void loginApple(android.app.Activity activity, LoginCallback callback) {
+        loginWithApple("", callback);
+    }
+
+    public void handleGoogleSignInResult(Intent data, LoginCallback callback) {
+        try {
+            com.google.android.gms.auth.api.signin.GoogleSignInAccount account =
+                    com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(data)
+                            .getResult(com.google.android.gms.common.api.ApiException.class);
+            loginWithGoogle(account, callback);
+        } catch (com.google.android.gms.common.api.ApiException e) {
+            if (callback != null) {
+                callback.onError("Google登录失败: " + e.getStatusCode());
+            }
+        }
+    }
+
     public void logout() {
         currentUser = null;
         clearToken();
@@ -342,6 +382,11 @@ public class UserManager {
 
     public interface LoginCallback {
         void onSuccess(UserProfile profile);
+        void onError(String message);
+    }
+
+    public interface CodeCallback {
+        void onSuccess();
         void onError(String message);
     }
 

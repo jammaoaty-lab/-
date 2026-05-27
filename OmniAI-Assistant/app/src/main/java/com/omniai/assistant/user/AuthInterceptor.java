@@ -57,17 +57,26 @@ public class AuthInterceptor implements Interceptor {
             return false;
         }
         final boolean[] result = {false};
+        final java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
         userManager.refreshToken(new UserManager.RefreshCallback() {
             @Override
             public void onSuccess(String accessToken, String newRefreshToken, long expiry) {
                 result[0] = true;
+                latch.countDown();
             }
 
             @Override
             public void onError(String message) {
                 result[0] = false;
+                latch.countDown();
             }
         });
+        try {
+            latch.await(10, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
         return result[0];
     }
 }
