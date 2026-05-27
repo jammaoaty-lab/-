@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
 set(LLAMA_CPP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/llama.cpp)
-set(STB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/llama.cpp/vendor/stb)
+set(STB_DIR ${LLAMA_CPP_DIR}/vendor/stb)
 
 set(GGML_DIR ${LLAMA_CPP_DIR}/ggml)
 set(LLAMA_SRC_DIR ${LLAMA_CPP_DIR}/src)
@@ -22,6 +22,17 @@ option(GGML_METAL "Enable Metal" OFF)
 option(GGML_OPENCL "Enable OpenCL" OFF)
 option(GGML_BLAS "Enable BLAS" OFF)
 
+set(GGML_VERSION_MAJOR 0)
+set(GGML_VERSION_MINOR 13)
+set(GGML_VERSION_PATCH 0)
+set(GGML_VERSION "${GGML_VERSION_MAJOR}.${GGML_VERSION_MINOR}.${GGML_VERSION_PATCH}")
+set(GGML_BUILD_COMMIT "unknown")
+set(GGML_BUILD_NUMBER 0)
+set(LLAMA_BUILD_NUMBER 0)
+set(LLAMA_BUILD_COMMIT "unknown")
+set(BUILD_COMPILER "GNU")
+set(BUILD_TARGET "android-arm64")
+
 set(GGML_CPU_SOURCES
     ${GGML_SRC_DIR}/ggml.c
     ${GGML_SRC_DIR}/ggml-alloc.c
@@ -35,10 +46,15 @@ set(GGML_CPU_SOURCES
     ${GGML_SRC_DIR}/ggml-backend-dl.cpp
     ${GGML_SRC_DIR}/ggml-backend-meta.cpp
     ${GGML_SRC_DIR}/ggml-cpu/ggml-cpu.cpp
-    ${GGML_SRC_DIR}/ggml-cpu/ggml-cpu-aarch64.cpp
-    ${GGML_SRC_DIR}/ggml-cpu/ggml-cpu-quants.c
+    ${GGML_SRC_DIR}/ggml-cpu/ggml-cpu.c
+    ${GGML_SRC_DIR}/ggml-cpu/quants.c
     ${GGML_SRC_DIR}/ggml-cpu/ops.cpp
     ${GGML_SRC_DIR}/ggml-cpu/hbm.cpp
+    ${GGML_SRC_DIR}/ggml-cpu/traits.cpp
+    ${GGML_SRC_DIR}/ggml-cpu/vec.cpp
+    ${GGML_SRC_DIR}/ggml-cpu/repack.cpp
+    ${GGML_SRC_DIR}/ggml-cpu/binary-ops.cpp
+    ${GGML_SRC_DIR}/ggml-cpu/unary-ops.cpp
 )
 
 set(LLAMA_SOURCES
@@ -74,9 +90,10 @@ set(LLAMA_SOURCES
 set(MTMD_SOURCES
     ${MTMD_DIR}/mtmd.cpp
     ${MTMD_DIR}/mtmd-image.cpp
+    ${MTMD_DIR}/mtmd-audio.cpp
+    ${MTMD_DIR}/mtmd-helper.cpp
     ${MTMD_DIR}/clip.cpp
-    ${MTMD_DIR}/clip-model.cpp
-    ${MTMD_DIR}/clip-graph.cpp
+    ${MTMD_DIR}/deprecation-warning.cpp
 )
 
 set(COMMON_SOURCES
@@ -84,14 +101,39 @@ set(COMMON_SOURCES
     ${COMMON_DIR}/arg.cpp
     ${COMMON_DIR}/log.cpp
     ${COMMON_DIR}/sampling.cpp
-    ${COMMON_DIR}/json.cpp
+    ${COMMON_DIR}/chat.cpp
     ${COMMON_DIR}/console.cpp
     ${COMMON_DIR}/ngram-cache.cpp
-    ${COMMON_DIR}/base64.hpp
+    ${COMMON_DIR}/ngram-map.cpp
+    ${COMMON_DIR}/ngram-mod.cpp
+    ${COMMON_DIR}/json-partial.cpp
+    ${COMMON_DIR}/chat-auto-parser-generator.cpp
+    ${COMMON_DIR}/chat-auto-parser-helpers.cpp
+    ${COMMON_DIR}/chat-diff-analyzer.cpp
+    ${COMMON_DIR}/chat-peg-parser.cpp
+    ${COMMON_DIR}/peg-parser.cpp
+    ${COMMON_DIR}/regex-partial.cpp
+    ${COMMON_DIR}/debug.cpp
+    ${COMMON_DIR}/download.cpp
+    ${COMMON_DIR}/fit.cpp
+    ${COMMON_DIR}/hf-cache.cpp
+    ${COMMON_DIR}/json-schema-to-grammar.cpp
+    ${COMMON_DIR}/llguidance.cpp
+    ${COMMON_DIR}/preset.cpp
+    ${COMMON_DIR}/reasoning-budget.cpp
+    ${COMMON_DIR}/speculative.cpp
+    ${COMMON_DIR}/unicode.cpp
+)
+
+configure_file(
+    ${COMMON_DIR}/build-info.cpp.in
+    ${CMAKE_BINARY_DIR}/build-info.cpp
+    @ONLY
 )
 
 add_library(omniainative SHARED
     omniainative.cpp
+    ${CMAKE_BINARY_DIR}/build-info.cpp
     ${GGML_CPU_SOURCES}
     ${LLAMA_SOURCES}
     ${MTMD_SOURCES}
@@ -107,19 +149,23 @@ target_include_directories(omniainative PRIVATE
     ${COMMON_DIR}
     ${STB_DIR}
     ${LLAMA_CPP_DIR}
+    ${GGML_SRC_DIR}
+    ${GGML_SRC_DIR}/ggml-cpu
+    ${CMAKE_BINARY_DIR}
 )
 
 target_compile_definitions(omniainative PRIVATE
     GGML_USE_CPU
-    LLAMA_SHARED
     _GNU_SOURCE
     GGML_USE_CPU_AARCH64
+    GGML_VERSION="${GGML_VERSION}"
+    GGML_COMMIT="${GGML_BUILD_COMMIT}"
+    GGML_SHARED
 )
 
 if(ANDROID)
     target_compile_definitions(omniainative PRIVATE
         __ANDROID__
-        GGML_USE_CPU
     )
 endif()
 
@@ -129,6 +175,8 @@ target_compile_options(omniainative PRIVATE
     -Wno-unused-function
     -Wno-missing-field-initializers
     -Wno-sign-compare
+    -Wno-deprecated-declarations
+    -Wno-format-truncation
     -fvisibility=hidden
     -O3
 )

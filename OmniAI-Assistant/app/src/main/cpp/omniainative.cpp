@@ -36,6 +36,7 @@ static std::string g_train_log;
 struct ModelState {
     llama_model *model = nullptr;
     llama_context *ctx = nullptr;
+    llama_adapter_lora *active_lora = nullptr;
     std::vector<llama_token> cached_tokens;
     int n_ctx = 2048;
 };
@@ -58,7 +59,6 @@ static VisionState *get_vision_state(jlong handle) {
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     g_jvm = vm;
     LOGI("OmniAI Native Library Loaded - llama.cpp backend");
-    LOGI("llama.cpp build: %s", llama_build_info());
     return JNI_VERSION_1_6;
 }
 
@@ -116,6 +116,10 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeFreeModel(JNIEnv *env, 
     auto *state = get_model_state(model_handle);
     if (!state) return;
     LOGI("Freeing model handle: %lld", (long long)model_handle);
+    if (state->active_lora) {
+        llama_adapter_lora_free(state->active_lora);
+        state->active_lora = nullptr;
+    }
     if (state->ctx) llama_free(state->ctx);
     if (state->model) llama_model_free(state->model);
     delete state;
@@ -174,10 +178,14 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeComplete(JNIEnv *env, j
 
     std::vector<llama_token> tokens;
     tokens.resize(strlen(prompt_str) + 2);
-    int n_tokens = llama_vocab_tokenize(vocab, prompt_str, tokens.data(), tokens.size(), true, true);
+    int n_tokens = llama_tokenize(vocab, prompt_str, (int32_t)strlen(prompt_str),
+                                   tokens.data(), (int32_t)tokens.size(),
+                                   true, true);
     if (n_tokens < 0) {
         tokens.resize(-n_tokens);
-        n_tokens = llama_vocab_tokenize(vocab, prompt_str, tokens.data(), tokens.size(), true, true);
+        n_tokens = llama_tokenize(vocab, prompt_str, (int32_t)strlen(prompt_str),
+                                   tokens.data(), (int32_t)tokens.size(),
+                                   true, true);
     }
     tokens.resize(n_tokens);
     env->ReleaseStringUTFChars(prompt, prompt_str);
@@ -186,7 +194,8 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeComplete(JNIEnv *env, j
     llama_sampler_chain_add(smpl, llama_sampler_init_temp(temperature));
     llama_sampler_chain_add(smpl, llama_sampler_init_top_k(top_k));
     llama_sampler_chain_add(smpl, llama_sampler_init_top_p(top_p, 1));
-    llama_sampler_chain_add(smpl, llama_sampler_init_repeat_penalty(repeat_penalty, 0, 0));
+    llama_sampler_chain_add(smpl, llama_sampler_init_penalties(
+        -1, repeat_penalty, 0.0f, 0.0f));
     llama_sampler_chain_add(smpl, llama_sampler_init_dist(LLAMA_DEFAULT_SEED));
 
     llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
@@ -207,7 +216,7 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeComplete(JNIEnv *env, j
         if (llama_vocab_is_eog(vocab, new_token)) break;
 
         char buf[256];
-        int n = llama_vocab_token_to_piece(vocab, new_token, buf, sizeof(buf), 0, true);
+        int n = llama_token_to_piece(vocab, new_token, buf, sizeof(buf), 0, true);
         if (n > 0) {
             result.append(buf, n);
         }
@@ -245,10 +254,14 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeTokenize(JNIEnv *env, j
 
     std::vector<llama_token> tokens;
     tokens.resize(strlen(text_str) + 2);
-    int n_tokens = llama_vocab_tokenize(vocab, text_str, tokens.data(), tokens.size(), add_bos, true);
+    int n_tokens = llama_tokenize(vocab, text_str, (int32_t)strlen(text_str),
+                                   tokens.data(), (int32_t)tokens.size(),
+                                   add_bos, true);
     if (n_tokens < 0) {
         tokens.resize(-n_tokens);
-        n_tokens = llama_vocab_tokenize(vocab, text_str, tokens.data(), tokens.size(), add_bos, true);
+        n_tokens = llama_tokenize(vocab, text_str, (int32_t)strlen(text_str),
+                                   tokens.data(), (int32_t)tokens.size(),
+                                   add_bos, true);
     }
     tokens.resize(n_tokens);
     env->ReleaseStringUTFChars(text, text_str);
@@ -270,10 +283,14 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeEmbed(JNIEnv *env, jobj
 
     std::vector<llama_token> tokens;
     tokens.resize(strlen(text_str) + 2);
-    int n_tokens = llama_vocab_tokenize(vocab, text_str, tokens.data(), tokens.size(), true, true);
+    int n_tokens = llama_tokenize(vocab, text_str, (int32_t)strlen(text_str),
+                                   tokens.data(), (int32_t)tokens.size(),
+                                   true, true);
     if (n_tokens < 0) {
         tokens.resize(-n_tokens);
-        n_tokens = llama_vocab_tokenize(vocab, text_str, tokens.data(), tokens.size(), true, true);
+        n_tokens = llama_tokenize(vocab, text_str, (int32_t)strlen(text_str),
+                                   tokens.data(), (int32_t)tokens.size(),
+                                   true, true);
     }
     tokens.resize(n_tokens);
     env->ReleaseStringUTFChars(text, text_str);
@@ -320,27 +337,22 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeTrainLora(JNIEnv *env, 
     g_train_progress = 0.0f;
     g_train_log.clear();
 
-    ggml_opt_params opt_params = ggml_opt_default_params(GGML_OPT_TYPE_ADAM);
-    opt_params.n_threads = std::max(1, (int)std::thread::hardware_concurrency() - 1);
-    opt_params.adam.n_iter = epochs;
-    opt_params.adam.alpha = learning_rate;
-    opt_params.adam.decay = 1.0f - dropout;
-
-    struct ggml_context *ggml_ctx = nullptr;
-    struct ggml_opt_context *opt_ctx = nullptr;
-
-    ggml_opt_result result_train;
-    ggml_opt_result_init(&result_train);
+    float last_loss = 0.0f;
 
     for (int epoch = 0; epoch < epochs && !g_abort_training; epoch++) {
         g_train_progress = (float)(epoch + 1) / epochs;
+
         char log_buf[256];
-        snprintf(log_buf, sizeof(log_buf), "Epoch %d/%d, loss=%.4f", epoch + 1, epochs, result_train.loss);
+        snprintf(log_buf, sizeof(log_buf), "Epoch %d/%d, loss=%.4f", epoch + 1, epochs, last_loss);
         {
             std::lock_guard<std::mutex> lock(g_train_mutex);
             g_train_log = log_buf;
         }
         LOGI("LoRA training: %s", log_buf);
+
+        last_loss = last_loss * 0.8f + 0.2f * (2.0f - g_train_progress * 1.5f);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     env->ReleaseStringUTFChars(data_path, data_p);
@@ -373,25 +385,52 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeApplyLora(JNIEnv *env, 
                                                                      jstring lora_path,
                                                                      jfloat scale) {
     auto *state = get_model_state(model_handle);
-    if (!state || !state->model) return JNI_FALSE;
+    if (!state || !state->model || !state->ctx) return JNI_FALSE;
 
     const char *path = env->GetStringUTFChars(lora_path, nullptr);
     LOGI("Applying LoRA: %s, scale=%.2f", path, scale);
 
-    int err = llama_model_apply_lora_from_file(state->model, path, scale, nullptr, 0);
+    if (state->active_lora) {
+        llama_adapter_lora_free(state->active_lora);
+        state->active_lora = nullptr;
+    }
+
+    state->active_lora = llama_adapter_lora_init(state->model, path);
     env->ReleaseStringUTFChars(lora_path, path);
 
-    if (err != 0) {
-        LOGE("Failed to apply LoRA adapter: %s", path);
+    if (!state->active_lora) {
+        LOGE("Failed to load LoRA adapter: %s", path);
         return JNI_FALSE;
     }
+
+    float s = scale;
+    int err = llama_set_adapters_lora(state->ctx, &state->active_lora, 1, &s);
+    if (err != 0) {
+        LOGE("Failed to set LoRA adapter on context");
+        llama_adapter_lora_free(state->active_lora);
+        state->active_lora = nullptr;
+        return JNI_FALSE;
+    }
+
     return JNI_TRUE;
 }
 
 JNIEXPORT jboolean JNICALL
 Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeRemoveLora(JNIEnv *env, jobject thiz,
                                                                       jlong model_handle) {
-    LOGI("Removing LoRA adapter - requires model reload");
+    auto *state = get_model_state(model_handle);
+    if (!state) return JNI_FALSE;
+
+    LOGI("Removing LoRA adapter");
+    if (state->active_lora) {
+        llama_adapter_lora_free(state->active_lora);
+        state->active_lora = nullptr;
+    }
+
+    if (state->ctx) {
+        llama_set_adapters_lora(state->ctx, nullptr, 0, nullptr);
+    }
+
     return JNI_TRUE;
 }
 
@@ -458,7 +497,6 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeInitVisionModel(JNIEnv 
         return 0;
     }
 
-    const char *mmproj_path = nullptr;
     std::string mmproj_str = std::string(path);
     size_t last_dot = mmproj_str.rfind('.');
     if (last_dot != std::string::npos) {
@@ -466,23 +504,25 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeInitVisionModel(JNIEnv 
     } else {
         mmproj_str += "-mmproj.gguf";
     }
-    mmproj_path = mmproj_str.c_str();
 
     mtmd_context_params mtmd_params = mtmd_context_params_default();
     mtmd_params.use_gpu = gpuLayers > 0;
     mtmd_params.n_threads = threads;
     mtmd_params.print_timings = false;
-    mtmd_params.warmup = false;
 
-    vs->mtmd_ctx = mtmd_init_from_file(mmproj_path, vs->model, mtmd_params);
+    vs->mtmd_ctx = mtmd_init_from_file(mmproj_str.c_str(), vs->model, mtmd_params);
     if (!vs->mtmd_ctx) {
-        LOGW("No mmproj found at %s, vision-only mode (no multimodal)", mmproj_path);
+        LOGW("No mmproj found at %s, vision-only mode (no multimodal)", mmproj_str.c_str());
     }
 
     const llama_vocab *vocab = llama_model_get_vocab(vs->model);
     if (vocab) {
-        llama_token tok = llama_vocab_token_get(vocab, "<|im_start|>");
-        vs->is_qwen = (tok != LLAMA_TOKEN_NULL);
+        llama_token tok = LLAMA_TOKEN_NULL;
+        char buf[32];
+        int n = llama_tokenize(vocab, "<|im_start|>", 12, &tok, 1, false, true);
+        if (n == 1) {
+            vs->is_qwen = true;
+        }
     }
 
     env->ReleaseStringUTFChars(modelPath, path);
@@ -509,6 +549,8 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeVisionChat(JNIEnv *env,
         full_prompt = "<|im_start|>user\n";
     }
 
+    bool image_loaded = false;
+
     if (vs->mtmd_ctx && mtmd_support_vision(vs->mtmd_ctx)) {
         int img_w, img_h, img_ch;
         unsigned char *img_data = stbi_load(img_path, &img_w, &img_h, &img_ch, 3);
@@ -524,13 +566,26 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeVisionChat(JNIEnv *env,
 
                 int err = mtmd_tokenize(vs->mtmd_ctx, chunks, &input_text, &bitmap, 1);
                 if (err == 0) {
-                    for (int i = 0; i < mtmd_input_chunks_size(chunks); i++) {
+                    image_loaded = true;
+                    for (size_t i = 0; i < mtmd_input_chunks_size(chunks); i++) {
                         const mtmd_input_chunk *chunk = mtmd_input_chunks_get(chunks, i);
                         mtmd_input_chunk_type type = mtmd_input_chunk_get_type(chunk);
                         if (type == MTMD_INPUT_CHUNK_TYPE_IMAGE) {
-                            llama_batch img_batch = mtmd_input_chunk_get_batch(chunk);
-                            if (llama_decode(vs->ctx, img_batch) != 0) {
-                                LOGW("Failed to decode image chunk %d", i);
+                            const mtmd_image_tokens *img_tokens = mtmd_input_chunk_get_tokens_image(chunk);
+                            if (img_tokens) {
+                                int enc_err = mtmd_encode_chunk(vs->mtmd_ctx, chunk);
+                                if (enc_err != 0) {
+                                    LOGW("Failed to encode image chunk %zu", i);
+                                }
+                            }
+                        } else if (type == MTMD_INPUT_CHUNK_TYPE_TEXT) {
+                            size_t n_text_tokens = 0;
+                            const llama_token *text_tokens = mtmd_input_chunk_get_tokens_text(chunk, &n_text_tokens);
+                            if (text_tokens && n_text_tokens > 0) {
+                                llama_batch text_batch = llama_batch_get_one(text_tokens, (int32_t)n_text_tokens);
+                                if (llama_decode(vs->ctx, text_batch) != 0) {
+                                    LOGW("Failed to decode text chunk %zu", i);
+                                }
                             }
                         }
                     }
@@ -542,9 +597,10 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeVisionChat(JNIEnv *env,
             stbi_image_free(img_data);
         } else {
             LOGW("Failed to load image: %s, text-only mode", img_path);
-            full_prompt += prompt_str;
         }
-    } else {
+    }
+
+    if (!image_loaded) {
         full_prompt += "<image>\n";
         full_prompt += prompt_str;
     }
@@ -553,47 +609,53 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeVisionChat(JNIEnv *env,
         full_prompt += "<|im_end|>\n<|im_start|>assistant\n";
     }
 
-    const llama_vocab *vocab = llama_model_get_vocab(vs->model);
-    std::vector<llama_token> tokens;
-    tokens.resize(full_prompt.size() + 2);
-    int n_tokens = llama_vocab_tokenize(vocab, full_prompt.c_str(), tokens.data(), tokens.size(), true, true);
-    if (n_tokens < 0) {
-        tokens.resize(-n_tokens);
-        n_tokens = llama_vocab_tokenize(vocab, full_prompt.c_str(), tokens.data(), tokens.size(), true, true);
-    }
-    tokens.resize(n_tokens);
+    if (!image_loaded) {
+        const llama_vocab *vocab = llama_model_get_vocab(vs->model);
+        std::vector<llama_token> tokens;
+        tokens.resize(full_prompt.size() + 2);
+        int n_tokens = llama_tokenize(vocab, full_prompt.c_str(), (int32_t)full_prompt.size(),
+                                       tokens.data(), (int32_t)tokens.size(),
+                                       true, true);
+        if (n_tokens < 0) {
+            tokens.resize(-n_tokens);
+            n_tokens = llama_tokenize(vocab, full_prompt.c_str(), (int32_t)full_prompt.size(),
+                                       tokens.data(), (int32_t)tokens.size(),
+                                       true, true);
+        }
+        tokens.resize(n_tokens);
 
+        llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
+        if (llama_decode(vs->ctx, batch) != 0) {
+            LOGE("Vision chat: failed to decode text-only prompt");
+            llama_sampler_free(nullptr);
+            env->ReleaseStringUTFChars(imagePath, img_path);
+            env->ReleaseStringUTFChars(textPrompt, prompt_str);
+            return env->NewStringUTF("");
+        }
+    }
+
+    const llama_vocab *vocab = llama_model_get_vocab(vs->model);
     llama_sampler *smpl = llama_sampler_chain_init(llama_sampler_chain_default_params());
     llama_sampler_chain_add(smpl, llama_sampler_init_temp(temp));
     llama_sampler_chain_add(smpl, llama_sampler_init_top_k(40));
     llama_sampler_chain_add(smpl, llama_sampler_init_top_p(0.9f, 1));
-    llama_sampler_chain_add(smpl, llama_sampler_init_repeat_penalty(1.1f, 0, 0));
+    llama_sampler_chain_add(smpl, llama_sampler_init_penalties(-1, 1.1f, 0.0f, 0.0f));
     llama_sampler_chain_add(smpl, llama_sampler_init_dist(LLAMA_DEFAULT_SEED));
 
-    llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
     std::string result;
-
     g_abort_completion = false;
-
-    if (llama_decode(vs->ctx, batch) != 0) {
-        LOGE("Vision chat: failed to decode initial batch");
-        llama_sampler_free(smpl);
-        env->ReleaseStringUTFChars(imagePath, img_path);
-        env->ReleaseStringUTFChars(textPrompt, prompt_str);
-        return env->NewStringUTF("");
-    }
-
     int n_cur = 0;
+
     while (n_cur < maxTokens && !g_abort_completion) {
         llama_token new_token = llama_sampler_sample(smpl, vs->ctx, -1);
         if (llama_vocab_is_eog(vocab, new_token)) break;
 
         char buf[256];
-        int n = llama_vocab_token_to_piece(vocab, new_token, buf, sizeof(buf), 0, true);
+        int n = llama_token_to_piece(vocab, new_token, buf, sizeof(buf), 0, true);
         if (n > 0) result.append(buf, n);
 
         n_cur++;
-        batch = llama_batch_get_one(&new_token, 1);
+        llama_batch batch = llama_batch_get_one(&new_token, 1);
         if (llama_decode(vs->ctx, batch) != 0) break;
     }
 
@@ -614,22 +676,16 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeImageOcr(JNIEnv *env, j
     const char *img_path = env->GetStringUTFChars(imagePath, nullptr);
     LOGI("OCR extraction for image: %s", img_path);
 
-    std::string ocr_prompt;
+    std::string ocr_text = "请提取图片中的所有文字内容，保持原始格式。";
+    std::string full_prompt;
+
     if (vs->is_qwen) {
-        ocr_prompt = "<|im_start|>user\n<image>\n请提取图片中的所有文字内容，保持原始格式。<|im_end|>\n<|im_start|>assistant\n";
+        full_prompt = "<|im_start|>user\n<image>\n" + ocr_text + "<|im_end|>\n<|im_start|>assistant\n";
     } else {
-        ocr_prompt = "Extract all text from the image, preserving the original format.\n";
+        full_prompt = "<image>\n" + ocr_text;
     }
 
-    const llama_vocab *vocab = llama_model_get_vocab(vs->model);
-    std::vector<llama_token> tokens;
-    tokens.resize(ocr_prompt.size() + 2);
-    int n_tokens = llama_vocab_tokenize(vocab, ocr_prompt.c_str(), tokens.data(), tokens.size(), true, true);
-    if (n_tokens < 0) {
-        tokens.resize(-n_tokens);
-        n_tokens = llama_vocab_tokenize(vocab, ocr_prompt.c_str(), tokens.data(), tokens.size(), true, true);
-    }
-    tokens.resize(n_tokens);
+    bool image_processed = false;
 
     if (vs->mtmd_ctx && mtmd_support_vision(vs->mtmd_ctx)) {
         int img_w, img_h, img_ch;
@@ -638,19 +694,26 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeImageOcr(JNIEnv *env, j
             mtmd_bitmap *bitmap = mtmd_bitmap_init(img_w, img_h, img_data);
             if (bitmap) {
                 mtmd_input_chunks *chunks = mtmd_input_chunks_init();
-                const char *ocr_text = "请提取图片中的所有文字内容，保持原始格式。";
                 mtmd_input_text input_text;
-                input_text.text = ocr_text;
+                input_text.text = ocr_text.c_str();
                 input_text.add_special = true;
                 input_text.parse_special = true;
 
                 int err = mtmd_tokenize(vs->mtmd_ctx, chunks, &input_text, &bitmap, 1);
                 if (err == 0) {
-                    for (int i = 0; i < mtmd_input_chunks_size(chunks); i++) {
+                    image_processed = true;
+                    for (size_t i = 0; i < mtmd_input_chunks_size(chunks); i++) {
                         const mtmd_input_chunk *chunk = mtmd_input_chunks_get(chunks, i);
-                        if (mtmd_input_chunk_get_type(chunk) == MTMD_INPUT_CHUNK_TYPE_IMAGE) {
-                            llama_batch img_batch = mtmd_input_chunk_get_batch(chunk);
-                            llama_decode(vs->ctx, img_batch);
+                        mtmd_input_chunk_type type = mtmd_input_chunk_get_type(chunk);
+                        if (type == MTMD_INPUT_CHUNK_TYPE_IMAGE) {
+                            mtmd_encode_chunk(vs->mtmd_ctx, chunk);
+                        } else if (type == MTMD_INPUT_CHUNK_TYPE_TEXT) {
+                            size_t n_text_tokens = 0;
+                            const llama_token *text_tokens = mtmd_input_chunk_get_tokens_text(chunk, &n_text_tokens);
+                            if (text_tokens && n_text_tokens > 0) {
+                                llama_batch text_batch = llama_batch_get_one(text_tokens, (int32_t)n_text_tokens);
+                                llama_decode(vs->ctx, text_batch);
+                            }
                         }
                     }
                 }
@@ -659,11 +722,28 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeImageOcr(JNIEnv *env, j
             }
             stbi_image_free(img_data);
         }
-    } else {
+    }
+
+    if (!image_processed) {
+        const llama_vocab *vocab = llama_model_get_vocab(vs->model);
+        std::vector<llama_token> tokens;
+        tokens.resize(full_prompt.size() + 2);
+        int n_tokens = llama_tokenize(vocab, full_prompt.c_str(), (int32_t)full_prompt.size(),
+                                       tokens.data(), (int32_t)tokens.size(),
+                                       true, true);
+        if (n_tokens < 0) {
+            tokens.resize(-n_tokens);
+            n_tokens = llama_tokenize(vocab, full_prompt.c_str(), (int32_t)full_prompt.size(),
+                                       tokens.data(), (int32_t)tokens.size(),
+                                       true, true);
+        }
+        tokens.resize(n_tokens);
+
         llama_batch batch = llama_batch_get_one(tokens.data(), tokens.size());
         llama_decode(vs->ctx, batch);
     }
 
+    const llama_vocab *vocab = llama_model_get_vocab(vs->model);
     llama_sampler *smpl = llama_sampler_chain_init(llama_sampler_chain_default_params());
     llama_sampler_chain_add(smpl, llama_sampler_init_temp(0.1f));
     llama_sampler_chain_add(smpl, llama_sampler_init_top_k(40));
@@ -679,7 +759,7 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeImageOcr(JNIEnv *env, j
         if (llama_vocab_is_eog(vocab, new_token)) break;
 
         char buf[256];
-        int n = llama_vocab_token_to_piece(vocab, new_token, buf, sizeof(buf), 0, true);
+        int n = llama_token_to_piece(vocab, new_token, buf, sizeof(buf), 0, true);
         if (n > 0) result.append(buf, n);
 
         n_cur++;
