@@ -441,10 +441,10 @@ public class LoraTrainActivity extends AppCompatActivity {
 
         if (temperature > TEMP_THRESHOLD) {
             pauseTraining();
-            logOutput.append("[警告] 设备温度过高 (" + String.format("%.1f", temperature)
-                    + "°C)，训练已自动暂停\n");
+            logOutput.append("[警告] " + getString(R.string.train_device_overheated) + " (" + String.format("%.1f", temperature)
+                    + "°C)\n");
             new AlertDialog.Builder(this)
-                    .setTitle("设备温度过高")
+                    .setTitle(getString(R.string.train_device_overheated))
                     .setMessage("当前设备温度 " + String.format("%.1f", temperature)
                             + "°C 已超过安全阈值 " + (int) TEMP_THRESHOLD
                             + "°C，训练已自动暂停。请等待设备冷却后继续训练。")
@@ -456,10 +456,10 @@ public class LoraTrainActivity extends AppCompatActivity {
 
         if (availableMemoryMb > 0 && availableMemoryMb < MEMORY_THRESHOLD_MB) {
             pauseTraining();
-            logOutput.append("[警告] 可用内存不足 (" + availableMemoryMb
-                    + "MB)，训练已自动暂停\n");
+            logOutput.append("[警告] " + getString(R.string.train_memory_low_message) + " (" + availableMemoryMb
+                    + "MB)\n");
             new AlertDialog.Builder(this)
-                    .setTitle("内存不足")
+                    .setTitle(getString(R.string.train_memory_low_message))
                     .setMessage("当前可用内存 " + availableMemoryMb
                             + "MB 低于安全阈值 " + MEMORY_THRESHOLD_MB
                             + "MB，训练已自动暂停。请关闭其他应用释放内存后继续训练。")

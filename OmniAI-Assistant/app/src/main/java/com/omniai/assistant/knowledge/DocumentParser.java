@@ -11,12 +11,25 @@ import java.util.List;
 
 public class DocumentParser {
 
+    private static final long MAX_TEXT_SIZE = 10 * 1024 * 1024;
+    private static final int MAX_LINES = 100_000;
+    private static final long MAX_PDF_SIZE = 50 * 1024 * 1024;
+    private static final long MAX_PDF_TEXT_SIZE = 5 * 1024 * 1024;
+    private static final long MAX_DOCX_SIZE = 50 * 1024 * 1024;
+
     public String parseTxt(String path) {
         StringBuilder sb = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8))) {
             String line;
+            int lineCount = 0;
             while ((line = reader.readLine()) != null) {
+                if (sb.length() + line.length() + 1 > MAX_TEXT_SIZE) {
+                    break;
+                }
+                if (++lineCount > MAX_LINES) {
+                    break;
+                }
                 sb.append(line).append("\n");
             }
         } catch (IOException e) {
@@ -42,6 +55,9 @@ public class DocumentParser {
     }
 
     private String extractPdfText(File file) {
+        if (file.length() > MAX_PDF_SIZE) {
+            throw new RuntimeException("PDF file too large: " + file.length() + " bytes (max " + MAX_PDF_SIZE + " bytes)");
+        }
         StringBuilder sb = new StringBuilder();
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] header = new byte[5];
@@ -57,6 +73,9 @@ public class DocumentParser {
             while ((bytesRead = fis.read(buffer)) != -1) {
                 String chunk = new String(buffer, 0, bytesRead, StandardCharsets.US_ASCII);
                 rawContent.append(chunk);
+                if (rawContent.length() > MAX_PDF_TEXT_SIZE * 2) {
+                    break;
+                }
             }
             String content = rawContent.toString();
             int streamIndex = 0;
@@ -72,6 +91,9 @@ public class DocumentParser {
                 }
                 String extracted = text.toString().trim();
                 if (extracted.length() > 10) {
+                    if (sb.length() + extracted.length() + 1 > MAX_PDF_TEXT_SIZE) {
+                        break;
+                    }
                     sb.append(extracted).append("\n");
                 }
                 streamIndex = endStream + 9;
@@ -90,11 +112,18 @@ public class DocumentParser {
                 zipFile.close();
                 throw new RuntimeException("Invalid DOCX file: missing word/document.xml");
             }
+            if (entry.getSize() > MAX_DOCX_SIZE) {
+                zipFile.close();
+                throw new RuntimeException("DOCX entry too large: " + entry.getSize() + " bytes (max " + MAX_DOCX_SIZE + " bytes)");
+            }
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(zipFile.getInputStream(entry), StandardCharsets.UTF_8));
             StringBuilder xmlContent = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
+                if (xmlContent.length() + line.length() > MAX_TEXT_SIZE) {
+                    break;
+                }
                 xmlContent.append(line);
             }
             reader.close();
@@ -141,6 +170,10 @@ public class DocumentParser {
             try (okhttp3.Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
                     throw new RuntimeException("HTTP request failed: " + response.code());
+                }
+                long contentLength = response.body().contentLength();
+                if (contentLength > MAX_TEXT_SIZE) {
+                    throw new RuntimeException("HTML response too large: " + contentLength + " bytes (max " + MAX_TEXT_SIZE + " bytes)");
                 }
                 String html = response.body().string();
                 return extractTextFromHtml(html);

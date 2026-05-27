@@ -269,7 +269,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                uiHandler.post(() -> showSnackbar("微信登录暂不可用"));
+                uiHandler.post(() -> showSnackbar(getString(R.string.social_login_wechat_unavailable)));
             }
         });
     }
@@ -283,7 +283,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                uiHandler.post(() -> showSnackbar("QQ登录暂不可用"));
+                uiHandler.post(() -> showSnackbar(getString(R.string.social_login_qq_unavailable)));
             }
         });
     }
@@ -297,7 +297,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                uiHandler.post(() -> showSnackbar("Apple登录暂不可用"));
+                uiHandler.post(() -> showSnackbar(getString(R.string.social_login_apple_unavailable)));
             }
         });
     }
@@ -317,11 +317,11 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(String message) {
-                        uiHandler.post(() -> showSnackbar("Google登录失败: " + message));
+                        uiHandler.post(() -> showSnackbar(getString(R.string.login_google_failed) + ": " + message));
                     }
                 });
             } catch (ApiException e) {
-                showSnackbar("Google登录失败: " + e.getStatusCode());
+                showSnackbar(getString(R.string.login_google_failed) + ": " + e.getStatusCode());
             }
         }
     }
@@ -329,7 +329,7 @@ public class LoginActivity extends AppCompatActivity {
     private void showForgotPasswordDialog() {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_create_kb, null);
         new AlertDialog.Builder(this)
-                .setTitle("重置密码")
+                .setTitle(getString(R.string.forgot_password_title))
                 .setView(dialogView)
                 .setPositiveButton("发送重置链接", (dialog, which) -> {
                     showSnackbar("密码重置链接已发送到您的邮箱");

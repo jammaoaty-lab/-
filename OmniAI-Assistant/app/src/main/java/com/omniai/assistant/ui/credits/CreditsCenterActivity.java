@@ -78,12 +78,12 @@ public class CreditsCenterActivity extends AppCompatActivity {
 
     private void onRechargeClick(CreditsManager.RechargePlan plan) {
         new AlertDialog.Builder(this)
-                .setTitle("确认充值")
+                .setTitle(getString(R.string.credits_recharge_confirm))
                 .setMessage("确认购买 " + plan.getName() + " 套餐（¥" + plan.getPrice() + "，" + plan.getCredits() + "积分）？")
-                .setPositiveButton("确认", (dialog, which) -> {
+                .setPositiveButton(R.string.confirm, (dialog, which) -> {
                     performRecharge(plan);
                 })
-                .setNegativeButton("取消", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 

@@ -233,7 +233,7 @@ public class KnowledgeBaseActivity extends AppCompatActivity {
             });
         } else if (requestCode == PICK_IMAGE) {
             if (!isValidImageMimeType(uri)) {
-                Snackbar.make(findViewById(android.R.id.content), "请选择有效的图片文件", Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(android.R.id.content), getString(R.string.error_invalid_image), Snackbar.LENGTH_SHORT).show();
                 return;
             }
             processImageWithOcr(uri);

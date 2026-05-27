@@ -1117,15 +1117,15 @@ public class ChatActivity extends AppCompatActivity {
 
             @Override
             public void onError(String error) {
-                runOnUiThread(() -> showSnackbar("快捷指令执行失败: " + error));
+                runOnUiThread(() -> showSnackbar(getString(R.string.quick_command_failed, error)));
             }
         });
     }
 
     private void showMoreMenu() {
-        String[] options = {"Agent智能体", "知识库", "模型管理", "LoRA训练", "终端", "积分中心", "设置"};
+        String[] options = {getString(R.string.option_agent), getString(R.string.option_knowledge), getString(R.string.option_model_management), getString(R.string.option_lora_training), getString(R.string.option_terminal), getString(R.string.option_credits_center), getString(R.string.option_settings)};
         new AlertDialog.Builder(this)
-                .setTitle("更多")
+                .setTitle(getString(R.string.more_options))
                 .setItems(options, (dialog, which) -> {
                     switch (which) {
                         case 0:
@@ -1226,12 +1226,12 @@ public class ChatActivity extends AppCompatActivity {
 
         Uri imageUri = data.getData();
         if (!isValidImageMimeType(imageUri)) {
-            showSnackbar("请选择有效的图片文件");
+            showSnackbar(getString(R.string.error_invalid_image));
             return;
         }
         String localPath = copyUriToFile(imageUri);
         if (localPath == null) {
-            showSnackbar("图片读取失败");
+            showSnackbar(getString(R.string.error_image_read_failed));
             return;
         }
 
@@ -1252,7 +1252,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         }
 
-        showSnackbar("拍照结果获取失败");
+        showSnackbar(getString(R.string.camera_result_failed));
     }
 
     private void handleDocumentPickResult(Intent data) {
@@ -1330,11 +1330,11 @@ public class ChatActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     streamBuffer.endStream();
                     streamBuffer.clear();
-                    currentAiMessage.setContent("文档分析失败: " + error);
+                    currentAiMessage.setContent(getString(R.string.document_analysis_failed, error));
                     messageAdapter.updateLastMessage(currentAiMessage);
                     updateStatusIndicator(false);
                     updateModelDisplay();
-                    showSnackbar("文档分析失败: " + error);
+                    showSnackbar(getString(R.string.document_analysis_failed, error));
                 });
             }
         });
@@ -1345,12 +1345,12 @@ public class ChatActivity extends AppCompatActivity {
 
         Uri imageUri = data.getData();
         if (!isValidImageMimeType(imageUri)) {
-            showSnackbar("请选择有效的图片文件");
+            showSnackbar(getString(R.string.error_invalid_image));
             return;
         }
         String localPath = copyUriToFile(imageUri);
         if (localPath == null) {
-            showSnackbar("图片读取失败");
+            showSnackbar(getString(R.string.error_image_read_failed));
             return;
         }
 

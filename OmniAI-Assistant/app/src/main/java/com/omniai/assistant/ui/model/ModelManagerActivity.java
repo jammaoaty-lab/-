@@ -89,9 +89,9 @@ public class ModelManagerActivity extends AppCompatActivity {
         modelList.setLayoutManager(new LinearLayoutManager(this));
         modelList.setAdapter(adapter);
 
-        tabLayout.addTab(tabLayout.newTab().setText("本地模型"));
-        tabLayout.addTab(tabLayout.newTab().setText("下载模型"));
-        tabLayout.addTab(tabLayout.newTab().setText("视觉模型"));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.local_models)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.download_models)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.vision_models)));
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -210,7 +210,7 @@ public class ModelManagerActivity extends AppCompatActivity {
 
     private void toggleModelEnable(AIModel model) {
         if (isModelOperating) {
-            Toast.makeText(this, "操作进行中，请稍候", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.operation_in_progress), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -258,7 +258,7 @@ public class ModelManagerActivity extends AppCompatActivity {
 
     private void switchVisionModel(AIModel model) {
         if (isModelOperating) {
-            Toast.makeText(this, "操作进行中，请稍候", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.operation_in_progress), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -278,8 +278,8 @@ public class ModelManagerActivity extends AppCompatActivity {
 
         isModelOperating = true;
         AlertDialog switchingDialog = new AlertDialog.Builder(this)
-                .setTitle("切换视觉模型")
-                .setMessage("正在切换到 " + model.getName() + "…")
+                .setTitle(getString(R.string.switching_vision_model))
+                .setMessage(getString(R.string.switching_vision_model_message, model.getName()))
                 .setCancelable(false)
                 .create();
         switchingDialog.show();
@@ -297,7 +297,7 @@ public class ModelManagerActivity extends AppCompatActivity {
                     model.setEnabled(true);
                     model.setLoaded(true);
                     adapter.notifyDataSetChanged();
-                    Toast.makeText(ModelManagerActivity.this, "已切换到 " + model.getName(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ModelManagerActivity.this, getString(R.string.switched_vision_model, model.getName()), Toast.LENGTH_SHORT).show();
                 });
             }
 
@@ -306,7 +306,7 @@ public class ModelManagerActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     isModelOperating = false;
                     switchingDialog.dismiss();
-                    Toast.makeText(ModelManagerActivity.this, "切换失败: " + error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ModelManagerActivity.this, getString(R.string.switch_vision_model_failed, error), Toast.LENGTH_SHORT).show();
                 });
             }
         });
@@ -315,7 +315,7 @@ public class ModelManagerActivity extends AppCompatActivity {
     private void restoreDefaultVisionModel() {
         AIModel defaultModel = visionEngine.getDefaultVisionModel();
         if (defaultModel == null) {
-            Toast.makeText(this, "未找到默认视觉模型", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.default_vision_model_not_found), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -356,9 +356,8 @@ public class ModelManagerActivity extends AppCompatActivity {
 
     private void confirmDeleteModel(AIModel model) {
         new AlertDialog.Builder(this)
-                .setTitle("删除模型")
-                .setMessage("确定要删除 " + model.getName() + " 吗？此操作不可撤销。")
-                .setPositiveButton("确定", (dialog, which) -> {
+                .setTitle(getString(R.string.model_delete_confirm, model.getName()))
+                .setPositiveButton(R.string.ok, (dialog, which) -> {
                     modelManager.deleteModel(model, new ModelManager.ModelCallback() {
                         @Override
                         public void onSuccess() {
@@ -371,7 +370,7 @@ public class ModelManagerActivity extends AppCompatActivity {
                         }
                     });
                 })
-                .setNegativeButton("取消", null)
+                .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
@@ -379,7 +378,7 @@ public class ModelManagerActivity extends AppCompatActivity {
 
     private void handleModelClick(AIModel model) {
         if (isModelOperating) {
-            Toast.makeText(this, "操作进行中，请稍候", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.operation_in_progress), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -442,9 +441,9 @@ public class ModelManagerActivity extends AppCompatActivity {
         long requiredSize = model.getDownloadSize() > 0 ? model.getDownloadSize() : model.getFileSize();
         if (!checkStorageSpace(requiredSize)) {
             new AlertDialog.Builder(this)
-                    .setTitle("存储空间不足")
-                    .setMessage("下载 " + model.getName() + " 需要约 " + formatFileSize(requiredSize) + " 空间，请清理存储后重试。")
-                    .setPositiveButton("确定", null)
+                    .setTitle(getString(R.string.storage_insufficient))
+                    .setMessage(getString(R.string.storage_insufficient_message, model.getName(), formatFileSize(requiredSize)))
+                    .setPositiveButton(R.string.ok, null)
                     .show();
             return;
         }
@@ -461,7 +460,7 @@ public class ModelManagerActivity extends AppCompatActivity {
             public void onSuccess() {
                 runOnUiThread(() -> {
                     dismissDownloadDialog();
-                    Toast.makeText(ModelManagerActivity.this, model.getName() + " 下载完成", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ModelManagerActivity.this, getString(R.string.download_complete, model.getName()), Toast.LENGTH_SHORT).show();
                     loadModels();
                 });
             }
@@ -470,7 +469,7 @@ public class ModelManagerActivity extends AppCompatActivity {
             public void onError(String message) {
                 runOnUiThread(() -> {
                     dismissDownloadDialog();
-                    Toast.makeText(ModelManagerActivity.this, "下载失败: " + message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ModelManagerActivity.this, getString(R.string.download_failed, message), Toast.LENGTH_SHORT).show();
                 });
             }
         });
@@ -484,17 +483,16 @@ public class ModelManagerActivity extends AppCompatActivity {
             }
 
             new AlertDialog.Builder(this)
-                    .setTitle("高级视觉模型")
-                    .setMessage(model.getName() + " 为高级视觉模型，下载将消耗 " +
-                            CreditsManager.CreditsFeature.ADVANCED_VISION_MODEL.getCost() + " 积分。是否继续？")
-                    .setPositiveButton("继续", (dialog, which) -> {
+                    .setTitle(getString(R.string.advanced_vision_model))
+                    .setMessage(getString(R.string.advanced_vision_model_message, model.getName(), CreditsManager.CreditsFeature.ADVANCED_VISION_MODEL.getCost()))
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
                         if (creditsFeatureGate.deductIfNeeded(CreditsManager.CreditsFeature.ADVANCED_VISION_MODEL)) {
                             startVisionModelDownload(model);
                         } else {
                             creditsFeatureGate.showInsufficientCreditsDialog(this);
                         }
                     })
-                    .setNegativeButton("取消", null)
+                    .setNegativeButton(R.string.cancel, null)
                     .show();
         } else {
             startVisionModelDownload(model);
@@ -509,9 +507,9 @@ public class ModelManagerActivity extends AppCompatActivity {
         long requiredSize = model.getDownloadSize() > 0 ? model.getDownloadSize() : model.getFileSize();
         if (!checkStorageSpace(requiredSize)) {
             new AlertDialog.Builder(this)
-                    .setTitle("存储空间不足")
-                    .setMessage("下载 " + model.getName() + " 需要约 " + formatFileSize(requiredSize) + " 空间，请清理存储后重试。")
-                    .setPositiveButton("确定", null)
+                    .setTitle(getString(R.string.storage_insufficient))
+                    .setMessage(getString(R.string.storage_insufficient_message, model.getName(), formatFileSize(requiredSize)))
+                    .setPositiveButton(R.string.ok, null)
                     .show();
             return;
         }
@@ -528,7 +526,7 @@ public class ModelManagerActivity extends AppCompatActivity {
             public void onSuccess() {
                 runOnUiThread(() -> {
                     dismissDownloadDialog();
-                    Toast.makeText(ModelManagerActivity.this, model.getName() + " 下载完成", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ModelManagerActivity.this, getString(R.string.download_complete, model.getName()), Toast.LENGTH_SHORT).show();
                     loadModels();
                 });
             }
@@ -537,7 +535,7 @@ public class ModelManagerActivity extends AppCompatActivity {
             public void onError(String message) {
                 runOnUiThread(() -> {
                     dismissDownloadDialog();
-                    Toast.makeText(ModelManagerActivity.this, "下载失败: " + message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ModelManagerActivity.this, getString(R.string.download_failed, message), Toast.LENGTH_SHORT).show();
                 });
             }
         });
@@ -587,7 +585,7 @@ public class ModelManagerActivity extends AppCompatActivity {
                 .setView(container)
                 .setNegativeButton("取消", (dialog, which) -> {
                     modelManager.cancelDownload(model.getId());
-                    Toast.makeText(ModelManagerActivity.this, "下载已取消", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ModelManagerActivity.this, getString(R.string.download_cancelled), Toast.LENGTH_SHORT).show();
                 })
                 .setCancelable(false)
                 .create();
@@ -614,9 +612,9 @@ public class ModelManagerActivity extends AppCompatActivity {
     }
 
     private void showImportDialog() {
-        String[] options = {"从文件导入", "从URL导入"};
+        String[] options = {getString(R.string.import_from_file), getString(R.string.import_from_url)};
         new AlertDialog.Builder(this)
-                .setTitle("导入模型")
+                .setTitle(getString(R.string.import_model))
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
                         pickModelFile();
@@ -638,7 +636,7 @@ public class ModelManagerActivity extends AppCompatActivity {
     private void showUrlImportDialog() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_import_url, null);
         new AlertDialog.Builder(this)
-                .setTitle("从URL导入")
+                .setTitle(getString(R.string.import_from_url))
                 .setView(dialogView)
                 .setPositiveButton("导入", (dialog, which) -> {
                     android.widget.EditText urlInput = dialogView.findViewById(R.id.input_url);
@@ -656,7 +654,7 @@ public class ModelManagerActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                 runOnUiThread(() -> {
-                    Toast.makeText(ModelManagerActivity.this, "导入成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ModelManagerActivity.this, getString(R.string.import_success), Toast.LENGTH_SHORT).show();
                     loadModels();
                 });
             }
@@ -678,7 +676,7 @@ public class ModelManagerActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess() {
                         runOnUiThread(() -> {
-                            Toast.makeText(ModelManagerActivity.this, "导入成功", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ModelManagerActivity.this, getString(R.string.import_success), Toast.LENGTH_SHORT).show();
                             loadModels();
                         });
                     }
