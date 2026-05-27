@@ -18,6 +18,7 @@ function App() {
   const [page, setPage] = useState<Page>('login')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isGuest, setIsGuest] = useState(false)
 
   const navigateTo = useCallback((p: Page) => {
     setPage(p)
@@ -26,11 +27,19 @@ function App() {
 
   const handleLogin = useCallback(() => {
     setIsLoggedIn(true)
+    setIsGuest(false)
+    setPage('chat')
+  }, [])
+
+  const handleGuestAccess = useCallback(() => {
+    setIsGuest(true)
+    setIsLoggedIn(false)
     setPage('chat')
   }, [])
 
   const handleLogout = useCallback(() => {
     setIsLoggedIn(false)
+    setIsGuest(false)
     setPage('login')
   }, [])
 
@@ -44,6 +53,7 @@ function App() {
             onBack={() => setPage('chat')}
             onGoRegister={() => setPage('register')}
             onLogin={handleLogin}
+            onSkip={handleGuestAccess}
           />
         )
       case 'register':
@@ -63,7 +73,7 @@ function App() {
       case 'models':
         return <ModelsPage />
       case 'profile':
-        return <ProfilePage onNavigate={navigateTo} onLogout={handleLogout} />
+        return <ProfilePage onNavigate={navigateTo} onLogout={handleLogout} isGuest={isGuest} onLogin={() => setPage('login')} />
       case 'settings':
         return <SettingsPage onBack={() => navigateTo('profile')} />
       case 'lora':
@@ -77,7 +87,7 @@ function App() {
     <div className="h-screen w-screen flex flex-col bg-surface-secondary overflow-hidden">
       <div className="flex-1 flex overflow-hidden relative">
         <AnimatePresence>
-          {sidebarOpen && isLoggedIn && (
+          {sidebarOpen && (isLoggedIn || isGuest) && (
             <Sidebar
               onClose={() => setSidebarOpen(false)}
               onNavigate={navigateTo}
@@ -99,7 +109,7 @@ function App() {
           </AnimatePresence>
         </main>
       </div>
-      {isLoggedIn && !isAuthPage && (
+      {(isLoggedIn || isGuest) && !isAuthPage && (
         <BottomNav current={page} onNavigate={navigateTo} />
       )}
     </div>

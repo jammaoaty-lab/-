@@ -13,12 +13,16 @@ import {
   Monitor,
   Crown,
   LogOut,
+  LogIn,
+  UserX,
 } from 'lucide-react'
 import type { Page } from '../App'
 
 interface Props {
   onNavigate: (page: Page) => void
   onLogout: () => void
+  isGuest: boolean
+  onLogin: () => void
 }
 
 const menuSections = [
@@ -40,7 +44,7 @@ const menuSections = [
   },
 ]
 
-export default function ProfilePage({ onNavigate, onLogout }: Props) {
+export default function ProfilePage({ onNavigate, onLogout, isGuest, onLogin }: Props) {
   return (
     <div className="h-full flex flex-col bg-surface-secondary">
       <header className="flex-shrink-0 flex items-center justify-between px-4 h-12 bg-white border-b border-border-light">
@@ -49,65 +53,93 @@ export default function ProfilePage({ onNavigate, onLogout }: Props) {
 
       <div className="flex-1 overflow-y-auto">
         <div className="px-4 pt-4">
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25 }}
-            className="bg-white rounded-xl p-4 mb-4"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-semibold text-xl">U</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-base font-semibold text-text-primary">User</span>
-                  <span className="px-2 py-0.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white text-[10px] font-medium rounded-full flex items-center gap-0.5">
-                    <Crown size={9} /> Pro
-                  </span>
+          {isGuest ? (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="bg-white rounded-xl p-4 mb-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 rounded-full bg-surface-tertiary flex items-center justify-center flex-shrink-0">
+                  <UserX size={24} className="text-text-tertiary" />
                 </div>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="text-xs text-text-tertiary">UID: 100248</span>
-                  <div className="flex items-center gap-1">
-                    <Monitor size={11} className="text-text-tertiary" />
-                    <span className="text-xs text-text-tertiary">2 设备</span>
+                <div className="flex-1 min-w-0">
+                  <span className="text-base font-semibold text-text-primary">游客用户</span>
+                  <p className="text-xs text-text-tertiary mt-0.5">登录后可解锁更多功能</p>
+                </div>
+                <button
+                  onClick={onLogin}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary-dark transition-colors"
+                >
+                  <LogIn size={14} />
+                  登录
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+              className="bg-white rounded-xl p-4 mb-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-semibold text-xl">U</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base font-semibold text-text-primary">User</span>
+                    <span className="px-2 py-0.5 bg-gradient-to-r from-amber-400 to-amber-500 text-white text-[10px] font-medium rounded-full flex items-center gap-0.5">
+                      <Crown size={9} /> Pro
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 mt-1">
+                    <span className="text-xs text-text-tertiary">UID: 100248</span>
+                    <div className="flex items-center gap-1">
+                      <Monitor size={11} className="text-text-tertiary" />
+                      <span className="text-xs text-text-tertiary">2 设备</span>
+                    </div>
                   </div>
                 </div>
+                <ChevronRight size={18} className="text-text-tertiary" />
               </div>
-              <ChevronRight size={18} className="text-text-tertiary" />
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
 
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05, duration: 0.25 }}
-            className="bg-white rounded-xl p-4 mb-4"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-text-primary">会员状态</span>
-              <span className="text-xs text-primary font-medium">续费</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex-1 text-center">
-                <div className="text-lg font-semibold text-text-primary">Pro</div>
-                <div className="text-[11px] text-text-tertiary">当前等级</div>
+          {!isGuest && (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05, duration: 0.25 }}
+              className="bg-white rounded-xl p-4 mb-4"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-text-primary">会员状态</span>
+                <span className="text-xs text-primary font-medium">续费</span>
               </div>
-              <div className="w-px h-8 bg-border-light" />
-              <div className="flex-1 text-center">
-                <div className="text-lg font-semibold text-text-primary">∞</div>
-                <div className="text-[11px] text-text-tertiary">对话额度</div>
-              </div>
-              <div className="w-px h-8 bg-border-light" />
-              <div className="flex-1 text-center">
-                <div className="flex items-center justify-center gap-1">
-                  <Cloud size={14} className="text-success" />
-                  <span className="text-lg font-semibold text-text-primary">ON</span>
+              <div className="flex items-center gap-4">
+                <div className="flex-1 text-center">
+                  <div className="text-lg font-semibold text-text-primary">Pro</div>
+                  <div className="text-[11px] text-text-tertiary">当前等级</div>
                 </div>
-                <div className="text-[11px] text-text-tertiary">云同步</div>
+                <div className="w-px h-8 bg-border-light" />
+                <div className="flex-1 text-center">
+                  <div className="text-lg font-semibold text-text-primary">∞</div>
+                  <div className="text-[11px] text-text-tertiary">对话额度</div>
+                </div>
+                <div className="w-px h-8 bg-border-light" />
+                <div className="flex-1 text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <Cloud size={14} className="text-success" />
+                    <span className="text-lg font-semibold text-text-primary">ON</span>
+                  </div>
+                  <div className="text-[11px] text-text-tertiary">云同步</div>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          )}
 
           <div className="space-y-3 pb-6">
             {menuSections.map((section, sIdx) => (
@@ -165,13 +197,23 @@ export default function ProfilePage({ onNavigate, onLogout }: Props) {
               <span className="text-[11px] text-text-tertiary">OmniAI Assistant v2.5.0</span>
             </div>
 
-            <button
-              onClick={onLogout}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-white rounded-xl text-sm text-danger font-medium hover:bg-danger-light transition-colors"
-            >
-              <LogOut size={16} />
-              退出登录
-            </button>
+            {isGuest ? (
+              <button
+                onClick={onLogin}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary-dark transition-colors"
+              >
+                <LogIn size={16} />
+                登录账号
+              </button>
+            ) : (
+              <button
+                onClick={onLogout}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-white rounded-xl text-sm text-danger font-medium hover:bg-danger-light transition-colors"
+              >
+                <LogOut size={16} />
+                退出登录
+              </button>
+            )}
 
             <div className="h-4" />
           </div>
