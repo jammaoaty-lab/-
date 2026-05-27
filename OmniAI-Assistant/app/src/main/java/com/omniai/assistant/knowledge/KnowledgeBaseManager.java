@@ -38,7 +38,7 @@ public class KnowledgeBaseManager {
         this.prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         this.gson = new Gson();
         this.knowledgeBases = loadKnowledgeBasesFromPrefs();
-        this.embeddingEngine = new EmbeddingEngine();
+        this.embeddingEngine = new EmbeddingEngine(context);
         this.vectorIndex = new VectorIndex();
         this.kbIndexes = new HashMap<>();
         this.documentParser = new DocumentParser();
@@ -61,6 +61,25 @@ public class KnowledgeBaseManager {
     }
 
     public void initialize() {
+        if (!embeddingEngine.isInitialized()) {
+            embeddingEngine.initialize(null, new EmbeddingEngine.InitCallback() {
+                @Override
+                public void onInitialized(int dimension) {
+                    for (KnowledgeBase kb : knowledgeBases) {
+                        VectorIndex idx = kbIndexes.get(kb.getId());
+                        if (idx != null && idx.getDimension() != dimension) {
+                            idx = new VectorIndex(dimension);
+                            kbIndexes.put(kb.getId(), idx);
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(String error) {
+                }
+            });
+        }
+
         for (KnowledgeBase kb : knowledgeBases) {
             String indexPath = Constants.KNOWLEDGE_DIR + "/" + kb.getId() + "/index.bin";
             File indexFile = new File(indexPath);

@@ -472,8 +472,26 @@ public class InferenceEngine {
         if (useSimulationMode) {
             return simulatedEngine.getEmbedding(text);
         }
-        if (modelHandle == 0L || contextHandle == 0L) return new float[0];
-        return bridge.nativeEmbed(contextHandle, text);
+        if (modelHandle == 0L) return new float[0];
+        long ctxHandle = bridge.nativeCreateContext(modelHandle, 512);
+        if (ctxHandle == 0L) return new float[0];
+        try {
+            float[] result = bridge.nativeEmbed(ctxHandle, text);
+            if (result == null || result.length == 0) return new float[0];
+            float norm = 0f;
+            for (float v : result) norm += v * v;
+            norm = (float) Math.sqrt(norm);
+            if (norm > 0) {
+                float[] normalized = new float[result.length];
+                for (int i = 0; i < result.length; i++) normalized[i] = result[i] / norm;
+                return normalized;
+            }
+            return result;
+        } catch (Exception e) {
+            return new float[0];
+        } finally {
+            bridge.nativeFreeContext(ctxHandle);
+        }
     }
 
     public void applyLora(LoraWeight lora, float scale) {
