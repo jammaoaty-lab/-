@@ -209,11 +209,18 @@ public class ModelManagerActivity extends AppCompatActivity {
     }
 
     private void toggleModelEnable(AIModel model) {
+        if (isModelOperating) {
+            Toast.makeText(this, "操作进行中，请稍候", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        isModelOperating = true;
         if (model.isEnabled()) {
             modelManager.unloadModel(model, new ModelManager.ModelCallback() {
                 @Override
                 public void onSuccess() {
                     runOnUiThread(() -> {
+                        isModelOperating = false;
                         model.setEnabled(false);
                         adapter.notifyDataSetChanged();
                     });
@@ -221,7 +228,10 @@ public class ModelManagerActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(String message) {
-                    runOnUiThread(() -> Toast.makeText(ModelManagerActivity.this, message, Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> {
+                        isModelOperating = false;
+                        Toast.makeText(ModelManagerActivity.this, message, Toast.LENGTH_SHORT).show();
+                    });
                 }
             });
         } else {
@@ -229,6 +239,7 @@ public class ModelManagerActivity extends AppCompatActivity {
                 @Override
                 public void onSuccess() {
                     runOnUiThread(() -> {
+                        isModelOperating = false;
                         model.setEnabled(true);
                         adapter.notifyDataSetChanged();
                     });
@@ -236,13 +247,21 @@ public class ModelManagerActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(String message) {
-                    runOnUiThread(() -> Toast.makeText(ModelManagerActivity.this, message, Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> {
+                        isModelOperating = false;
+                        Toast.makeText(ModelManagerActivity.this, message, Toast.LENGTH_SHORT).show();
+                    });
                 }
             });
         }
     }
 
     private void switchVisionModel(AIModel model) {
+        if (isModelOperating) {
+            Toast.makeText(this, "操作进行中，请稍候", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (!visionEngine.checkHardwareCompatibility(model)) {
             new AlertDialog.Builder(this)
                     .setTitle("硬件不兼容")
@@ -257,6 +276,7 @@ public class ModelManagerActivity extends AppCompatActivity {
             return;
         }
 
+        isModelOperating = true;
         AlertDialog switchingDialog = new AlertDialog.Builder(this)
                 .setTitle("切换视觉模型")
                 .setMessage("正在切换到 " + model.getName() + "…")
@@ -268,6 +288,7 @@ public class ModelManagerActivity extends AppCompatActivity {
             @Override
             public void onLoaded(AIModel loadedModel) {
                 runOnUiThread(() -> {
+                    isModelOperating = false;
                     switchingDialog.dismiss();
                     for (AIModel vm : visionModels) {
                         vm.setEnabled(false);
@@ -283,6 +304,7 @@ public class ModelManagerActivity extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 runOnUiThread(() -> {
+                    isModelOperating = false;
                     switchingDialog.dismiss();
                     Toast.makeText(ModelManagerActivity.this, "切换失败: " + error, Toast.LENGTH_SHORT).show();
                 });
@@ -292,6 +314,10 @@ public class ModelManagerActivity extends AppCompatActivity {
 
     private void restoreDefaultVisionModel() {
         AIModel defaultModel = visionEngine.getDefaultVisionModel();
+        if (defaultModel == null) {
+            Toast.makeText(this, "未找到默认视觉模型", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         AlertDialog restoreDialog = new AlertDialog.Builder(this)
                 .setTitle("恢复默认视觉模型")
@@ -349,7 +375,14 @@ public class ModelManagerActivity extends AppCompatActivity {
                 .show();
     }
 
+    private boolean isModelOperating = false;
+
     private void handleModelClick(AIModel model) {
+        if (isModelOperating) {
+            Toast.makeText(this, "操作进行中，请稍候", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (currentTab == TAB_DOWNLOAD) {
             downloadModel(model);
             return;

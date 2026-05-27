@@ -505,7 +505,9 @@ public class ChatActivity extends AppCompatActivity {
         messageList.scrollToPosition(messageAdapter.getItemCount() - 1);
 
         updateStatusIndicator(true);
-        modelNameText.setText(getString(R.string.status_ai_thinking));
+        if (modelNameText != null) {
+            modelNameText.setText(getString(R.string.status_ai_thinking));
+        }
 
         streamBuffer.startStream();
         contextManager.addToContext(userMessage);
@@ -587,7 +589,9 @@ public class ChatActivity extends AppCompatActivity {
         messageList.scrollToPosition(messageAdapter.getItemCount() - 1);
 
         updateStatusIndicator(true);
-        modelNameText.setText(getString(R.string.vision_inference_running));
+        if (modelNameText != null) {
+            modelNameText.setText(getString(R.string.vision_inference_running));
+        }
 
         analyzeImageWithVision(imagePath, "请详细描述这张图片的内容", new VisionInferenceEngine.VisionCallback() {
             @Override
@@ -678,7 +682,9 @@ public class ChatActivity extends AppCompatActivity {
     private void performOcr(String imagePath) {
         isVisionAnalyzing = true;
         updateStatusIndicator(true);
-        modelNameText.setText(getString(R.string.vision_ocr_processing));
+        if (modelNameText != null) {
+            modelNameText.setText(getString(R.string.vision_ocr_processing));
+        }
 
         if (visionEngine.isVisionModelLoaded()) {
             executeOcr(imagePath);
@@ -1279,7 +1285,9 @@ public class ChatActivity extends AppCompatActivity {
         messageList.scrollToPosition(messageAdapter.getItemCount() - 1);
 
         updateStatusIndicator(true);
-        modelNameText.setText(getString(R.string.status_ai_thinking));
+        if (modelNameText != null) {
+            modelNameText.setText(getString(R.string.status_ai_thinking));
+        }
 
         String prompt = "请分析以下文档内容: " + fileName;
         streamBuffer.startStream();

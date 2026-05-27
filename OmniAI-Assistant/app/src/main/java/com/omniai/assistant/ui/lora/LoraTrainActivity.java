@@ -297,8 +297,15 @@ public class LoraTrainActivity extends AppCompatActivity {
             return;
         }
 
-        float learningRate = Float.parseFloat(lrStr);
-        int contextLength = Integer.parseInt(ctxStr);
+        float learningRate;
+        int contextLength;
+        try {
+            learningRate = Float.parseFloat(lrStr);
+            contextLength = Integer.parseInt(ctxStr);
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, R.string.error_invalid_number, Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (isVisionMode && selectedVisionModel == null) {
             Toast.makeText(this, "请选择视觉模型", Toast.LENGTH_SHORT).show();
@@ -425,6 +432,10 @@ public class LoraTrainActivity extends AppCompatActivity {
     }
 
     private void checkHardwareStatus() {
+        if (llamaBridge == null) {
+            return;
+        }
+
         float temperature = llamaBridge.getDeviceTemperature();
         int availableMemoryMb = llamaBridge.getDeviceMemory();
 

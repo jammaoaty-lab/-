@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -100,10 +101,12 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         MaterialButton upgradeBtn = findViewById(R.id.btn_upgrade);
-        upgradeBtn.setText("积分中心");
-        upgradeBtn.setOnClickListener(v -> {
-            startActivity(new Intent(this, CreditsCenterActivity.class));
-        });
+        if (upgradeBtn != null) {
+            upgradeBtn.setText("积分中心");
+            upgradeBtn.setOnClickListener(v -> {
+                startActivity(new Intent(this, CreditsCenterActivity.class));
+            });
+        }
 
         inviteCodeText.setOnClickListener(v -> {
             String inviteCode = creditsManager.getInviteCode();
@@ -132,7 +135,11 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setupVisionModelSection() {
-        LinearLayout mainLayout = (LinearLayout) creditsCard.getParent();
+        if (creditsCard == null) return;
+
+        ViewParent parent = creditsCard.getParent();
+        if (!(parent instanceof LinearLayout)) return;
+        LinearLayout mainLayout = (LinearLayout) parent;
         int cardIndex = mainLayout.indexOfChild(creditsCard);
 
         LinearLayout visionSection = new LinearLayout(this);
@@ -184,37 +191,61 @@ public class ProfileActivity extends AppCompatActivity {
         setupSettingItem(R.id.item_privacy_security, "隐私与安全", null);
         setupSettingItem(R.id.item_developer_mode, "开发者模式", null);
 
-        findViewById(R.id.item_model_center).setOnClickListener(v -> {
-            startActivity(new Intent(this, ModelManagerActivity.class));
-        });
+        View itemModelCenter = findViewById(R.id.item_model_center);
+        if (itemModelCenter != null) {
+            itemModelCenter.setOnClickListener(v -> {
+                startActivity(new Intent(this, ModelManagerActivity.class));
+            });
+        }
 
-        findViewById(R.id.item_lora_train).setOnClickListener(v -> {
-            startActivity(new Intent(this, LoraTrainActivity.class));
-        });
+        View itemLoraTrain = findViewById(R.id.item_lora_train);
+        if (itemLoraTrain != null) {
+            itemLoraTrain.setOnClickListener(v -> {
+                startActivity(new Intent(this, LoraTrainActivity.class));
+            });
+        }
 
-        findViewById(R.id.item_knowledge_base).setOnClickListener(v -> {
-            startActivity(new Intent(this, KnowledgeBaseActivity.class));
-        });
+        View itemKnowledgeBase = findViewById(R.id.item_knowledge_base);
+        if (itemKnowledgeBase != null) {
+            itemKnowledgeBase.setOnClickListener(v -> {
+                startActivity(new Intent(this, KnowledgeBaseActivity.class));
+            });
+        }
 
-        findViewById(R.id.item_voice_assistant).setOnClickListener(v -> {
-            startVoiceAssistant();
-        });
+        View itemVoiceAssistant = findViewById(R.id.item_voice_assistant);
+        if (itemVoiceAssistant != null) {
+            itemVoiceAssistant.setOnClickListener(v -> {
+                startVoiceAssistant();
+            });
+        }
 
-        findViewById(R.id.item_cache_manager).setOnClickListener(v -> {
-            showCacheManagerDialog();
-        });
+        View itemCacheManager = findViewById(R.id.item_cache_manager);
+        if (itemCacheManager != null) {
+            itemCacheManager.setOnClickListener(v -> {
+                showCacheManagerDialog();
+            });
+        }
 
-        findViewById(R.id.item_download_manager).setOnClickListener(v -> {
-            showDownloadManagerDialog();
-        });
+        View itemDownloadManager = findViewById(R.id.item_download_manager);
+        if (itemDownloadManager != null) {
+            itemDownloadManager.setOnClickListener(v -> {
+                showDownloadManagerDialog();
+            });
+        }
 
-        findViewById(R.id.item_privacy_security).setOnClickListener(v -> {
-            showPrivacySecurityDialog();
-        });
+        View itemPrivacySecurity = findViewById(R.id.item_privacy_security);
+        if (itemPrivacySecurity != null) {
+            itemPrivacySecurity.setOnClickListener(v -> {
+                showPrivacySecurityDialog();
+            });
+        }
 
-        findViewById(R.id.item_developer_mode).setOnClickListener(v -> {
-            showDeveloperModeDialog();
-        });
+        View itemDeveloperMode = findViewById(R.id.item_developer_mode);
+        if (itemDeveloperMode != null) {
+            itemDeveloperMode.setOnClickListener(v -> {
+                showDeveloperModeDialog();
+            });
+        }
     }
 
     private void setupSettingItem(int id, String title, String subtitle) {
@@ -235,6 +266,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void addExtraMenuItems() {
         LinearLayout menuContainer = findViewById(R.id.ll_menu_items);
+        if (menuContainer == null) return;
 
         addDivider(menuContainer);
 

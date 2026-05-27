@@ -273,6 +273,12 @@ public class KnowledgeBaseActivity extends AppCompatActivity {
     }
 
     private void importOcrTextToKnowledgeBase(String title, String ocrText) {
+        if (currentKbIdForImport == null) {
+            Snackbar.make(findViewById(android.R.id.content),
+                    getString(R.string.error_kb_not_selected), Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
         String content = title + "\n\n" + ocrText;
 
         kbManager.importText(currentKbIdForImport, title, content, new KnowledgeBaseManager.KbCallback() {
