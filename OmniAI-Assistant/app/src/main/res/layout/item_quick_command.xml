@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/OmniAI.QuickButton"
+    android:layout_width="wrap_content"
+    android:layout_height="@dimen/quick_btn_height"
+    android:background="@drawable/bg_quick_btn"
+    android:gravity="center"
+    android:paddingHorizontal="@dimen/spacing_sm"
+    android:paddingVertical="@dimen/spacing_xs"
+    android:textColor="@color/quick_btn_text"
+    android:textSize="@dimen/text_size_caption"
+    tools:text="AI写作" />
