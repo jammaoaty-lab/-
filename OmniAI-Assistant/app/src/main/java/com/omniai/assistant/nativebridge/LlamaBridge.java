@@ -1,6 +1,10 @@
 package com.omniai.assistant.nativebridge;
 
+import android.util.Log;
+
 public class LlamaBridge {
+
+    private static final String TAG = "LlamaBridge";
 
     static {
         System.loadLibrary("omniainative");
@@ -166,7 +170,8 @@ public class LlamaBridge {
     public void releaseVisionModel(long visionCtx) {
         try {
             nativeReleaseVisionModel(visionCtx);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            Log.w(TAG, "Failed to release vision model", e);
         }
     }
 
@@ -191,7 +196,8 @@ public class LlamaBridge {
     public void abortQuantize() {
         try {
             nativeAbortQuantize();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            Log.w(TAG, "Failed to abort quantize", e);
         }
     }
 

@@ -18,6 +18,7 @@ public class ImageAnalyzer {
 
     private static final long MAX_IMAGE_SIZE = 20 * 1024 * 1024;
     private static final List<String> SUPPORTED_FORMATS = Arrays.asList("jpg", "jpeg", "png", "webp");
+    private static final int VISION_TIMEOUT_SECONDS = 60;
 
     public interface ImageCallback {
         void onSuccess(String result);
@@ -85,7 +86,7 @@ public class ImageAnalyzer {
                 }
             });
 
-            boolean completed = latch.await(60, TimeUnit.SECONDS);
+            boolean completed = latch.await(VISION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (!completed) {
                 throw new RuntimeException("Image analysis timed out");
             }

@@ -23,7 +23,8 @@ public class CloudFallbackManager {
     private FallbackListener listener;
     private Handler handler;
 
-    private static final long RESTORE_CHECK_INTERVAL_MS = 30000L;
+    private static final long RESTORE_CHECK_INTERVAL_MS = 30_000L;
+    private static final long VISION_INFERENCE_TIMEOUT_MS = 120_000L;
 
     private final Runnable restoreCheckRunnable = new Runnable() {
         @Override
@@ -176,7 +177,6 @@ public class CloudFallbackManager {
     }
 
     private long lastVisionInferenceStartTime = 0;
-    private static final long VISION_INFERENCE_TIMEOUT_MS = 120000L;
 
     private boolean isVisionInferenceTimeout() {
         if (lastVisionInferenceStartTime == 0) {

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.omniai.assistant.R;
@@ -12,6 +13,8 @@ import com.omniai.assistant.credits.CreditsManager;
 import com.omniai.assistant.ui.credits.CreditsCenterActivity;
 
 public class GlobalExceptionHandler {
+
+    private static final String TAG = "GlobalExceptionHandler";
 
     private Context context;
     private CreditsManager creditsManager;
@@ -52,7 +55,8 @@ public class GlobalExceptionHandler {
         mainHandler.post(() -> {
             try {
                 Toast.makeText(context, context.getString(R.string.error_app_crash), Toast.LENGTH_LONG).show();
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                Log.w(TAG, "Failed to show crash toast", e);
             }
         });
     }

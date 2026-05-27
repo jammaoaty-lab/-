@@ -1,12 +1,12 @@
 package com.omniai.assistant.ui.knowledge;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -30,6 +30,8 @@ import java.util.List;
 
 public class KnowledgeBaseActivity extends AppCompatActivity {
 
+    private static final String TAG = "KnowledgeBase";
+
     private static final int PICK_DOCUMENT = 5001;
     private static final int PICK_IMAGE = 5002;
 
@@ -42,7 +44,7 @@ public class KnowledgeBaseActivity extends AppCompatActivity {
 
     private List<KnowledgeBase> allKnowledgeBases = new ArrayList<>();
     private String currentKbIdForImport;
-    private ProgressDialog ocrProgressDialog;
+    private AlertDialog ocrProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -338,17 +340,18 @@ public class KnowledgeBaseActivity extends AppCompatActivity {
                 }
                 cursor.close();
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            Log.w(TAG, "Failed to get image file name from URI", e);
         }
         return fileName;
     }
 
     private void showOcrProgressDialog() {
         if (ocrProgressDialog == null) {
-            ocrProgressDialog = new ProgressDialog(this);
-            ocrProgressDialog.setMessage(getString(R.string.ocr_processing));
-            ocrProgressDialog.setIndeterminate(true);
-            ocrProgressDialog.setCancelable(false);
+            ocrProgressDialog = new AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.ocr_processing))
+                    .setCancelable(false)
+                    .create();
         }
         ocrProgressDialog.show();
     }

@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.google.android.play.core.splitinstall.SplitInstallManager;
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory;
@@ -144,6 +145,7 @@ public class DynamicFeatureManager {
         try {
             splitInstallManager.unregisterListener(stateListener);
         } catch (Exception e) {
+            Log.w(TAG, "Failed to unregister split install listener", e);
         }
     }
 

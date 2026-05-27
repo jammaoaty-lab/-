@@ -1,6 +1,7 @@
 package com.omniai.assistant.settings;
 
 import android.content.SharedPreferences;
+import com.omniai.assistant.BuildConfig;
 import com.google.gson.Gson;
 
 public class SettingsManager {
@@ -109,7 +110,7 @@ public class SettingsManager {
         public boolean autoFallback;
 
         public NetworkSettings() {
-            this.cloudApiUrl = "https://api.omniai.com/v1";
+            this.cloudApiUrl = BuildConfig.API_BASE_URL;
             this.cloudApiKey = "";
             this.timeout = 30;
             this.autoFallback = true;

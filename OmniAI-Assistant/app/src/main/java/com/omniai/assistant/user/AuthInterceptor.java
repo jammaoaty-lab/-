@@ -8,6 +8,8 @@ import okhttp3.Response;
 
 public class AuthInterceptor implements Interceptor {
 
+    private static final long TOKEN_REFRESH_TIMEOUT_SECONDS = 10L;
+
     private UserManager userManager;
     private static final String HEADER_AUTHORIZATION = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
@@ -72,7 +74,7 @@ public class AuthInterceptor implements Interceptor {
             }
         });
         try {
-            latch.await(10, java.util.concurrent.TimeUnit.SECONDS);
+            latch.await(TOKEN_REFRESH_TIMEOUT_SECONDS, java.util.concurrent.TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return false;

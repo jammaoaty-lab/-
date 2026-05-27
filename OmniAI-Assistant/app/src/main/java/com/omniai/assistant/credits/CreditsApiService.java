@@ -1,7 +1,11 @@
 package com.omniai.assistant.credits;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.omniai.assistant.BuildConfig;
+import com.omniai.assistant.common.NetworkClient;
 import com.omniai.assistant.common.Result;
 import com.omniai.assistant.user.AuthInterceptor;
 
@@ -18,13 +22,15 @@ import okhttp3.Response;
 
 public class CreditsApiService {
 
+    private static final String TAG = "CreditsApiService";
+
     private final OkHttpClient client;
     private final String apiBaseUrl;
     private final Gson gson;
     private static final MediaType JSON_MEDIA = MediaType.get("application/json; charset=utf-8");
 
     public CreditsApiService() {
-        this("https://api.omniai.com/v1/credits/");
+        this(BuildConfig.API_BASE_URL + "credits/");
     }
 
     public CreditsApiService(String apiBaseUrl) {
@@ -34,9 +40,10 @@ public class CreditsApiService {
         try {
             com.omniai.assistant.user.UserManager userManager = com.omniai.assistant.user.UserManager.getInstance();
             authInterceptor.setUserManager(userManager);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            Log.w(TAG, "Failed to set auth interceptor on CreditsApiService", e);
         }
-        this.client = new OkHttpClient.Builder()
+        this.client = NetworkClient.getSecureBuilder()
                 .addInterceptor(authInterceptor)
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)

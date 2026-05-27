@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.omniai.assistant.common.Constants;
 
@@ -171,7 +172,8 @@ public class ModelDownloadManager {
                 try {
                     String totalStr = contentRange.substring(contentRange.indexOf("/") + 1);
                     totalSize = Long.parseLong(totalStr);
-                } catch (NumberFormatException ignored) {
+                } catch (NumberFormatException e) {
+                    Log.w(TAG, "Failed to parse content range total size", e);
                 }
             }
 

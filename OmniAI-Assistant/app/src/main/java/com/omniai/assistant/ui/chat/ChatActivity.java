@@ -1404,7 +1404,11 @@ public class ChatActivity extends AppCompatActivity {
             try {
                 UserManager.init(this);
                 userManager = UserManager.getInstance();
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                Log.w("ChatActivity", "Token refresh failed", e);
+                Toast.makeText(this, R.string.error_token_expired, Toast.LENGTH_LONG).show();
+            }
+        }
         }
 
         if (userManager != null && userManager.isLoggedIn()) {

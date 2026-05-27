@@ -200,15 +200,21 @@ public class UserManager {
     }
 
     public void loginWeChat(android.app.Activity activity, LoginCallback callback) {
-        loginWithWechat("", callback);
+        if (callback != null) {
+            callback.onError("微信登录SDK尚未集成，请使用其他登录方式");
+        }
     }
 
     public void loginQQ(android.app.Activity activity, LoginCallback callback) {
-        loginWithQQ("", callback);
+        if (callback != null) {
+            callback.onError("QQ登录SDK尚未集成，请使用其他登录方式");
+        }
     }
 
     public void loginApple(android.app.Activity activity, LoginCallback callback) {
-        loginWithApple("", callback);
+        if (callback != null) {
+            callback.onError("Apple登录SDK尚未集成，请使用其他登录方式");
+        }
     }
 
     public void handleGoogleSignInResult(Intent data, LoginCallback callback) {

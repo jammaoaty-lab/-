@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.omniai.assistant.common.Constants;
 import com.omniai.assistant.nativebridge.LlamaBridge;
@@ -318,7 +319,8 @@ public class EmbeddingEngine {
             if (ctxHandle > 0) {
                 try {
                     bridge.nativeFreeContext(ctxHandle);
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    Log.w(TAG, "Failed to free embedding context", e);
                 }
             }
         }
@@ -349,7 +351,8 @@ public class EmbeddingEngine {
         if (isInitialized && modelHandle > 0 && !useSimulationMode) {
             try {
                 bridge.nativeFreeModel(modelHandle);
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                Log.w(TAG, "Failed to free embedding model", e);
             }
             modelHandle = -1;
         }

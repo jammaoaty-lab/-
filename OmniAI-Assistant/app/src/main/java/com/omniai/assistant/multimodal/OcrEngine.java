@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 public class OcrEngine {
 
+    private static final int OCR_TIMEOUT_SECONDS = 30;
+
     private boolean isInitialized;
     private VisionInferenceEngine visionEngine;
 
@@ -77,7 +79,7 @@ public class OcrEngine {
                 }
             });
 
-            boolean completed = latch.await(30, TimeUnit.SECONDS);
+            boolean completed = latch.await(OCR_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (!completed) {
                 return "";
             }

@@ -5,8 +5,10 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.omniai.assistant.common.Result;
+import com.omniai.assistant.security.DataEncryptor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,8 +26,10 @@ public class CreditsManager {
     private List<CreditsRecord> records;
     private CreditsApiService apiService;
     private SharedPreferences prefs;
+    private DataEncryptor dataEncryptor;
     private Context context;
     private ExecutorService executorService;
+    private final Object creditsLock = new Object();
 
     private static final String PREFS_NAME = "omniai_credits_prefs";
     private static final String KEY_CREDITS = "current_credits";
@@ -202,6 +206,7 @@ public class CreditsManager {
         CreditsManager manager = getInstance();
         manager.context = context.getApplicationContext();
         manager.prefs = manager.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        manager.dataEncryptor = new DataEncryptor(context);
         manager.loadFromPrefs();
     }
 
@@ -217,13 +222,17 @@ public class CreditsManager {
     }
 
     public void setCredits(int credits) {
-        this.currentCredits = credits;
-        if (prefs != null) prefs.edit().putInt(KEY_CREDITS, credits).apply();
+        synchronized (creditsLock) {
+            this.currentCredits = credits;
+            saveCreditsEncrypted(credits);
+        }
     }
 
     public void addCredits(int amount, String type, String description) {
-        currentCredits += amount;
-        if (prefs != null) prefs.edit().putInt(KEY_CREDITS, currentCredits).apply();
+        synchronized (creditsLock) {
+            currentCredits += amount;
+            saveCreditsEncrypted(currentCredits);
+        }
 
         CreditsRecord record = new CreditsRecord(
                 System.currentTimeMillis(),
@@ -236,11 +245,13 @@ public class CreditsManager {
     }
 
     public boolean deductCredits(int amount, String type, String description) {
-        if (!hasSufficientCredits(amount)) {
-            return false;
+        synchronized (creditsLock) {
+            if (currentCredits < amount) {
+                return false;
+            }
+            currentCredits -= amount;
+            saveCreditsEncrypted(currentCredits);
         }
-        currentCredits -= amount;
-        if (prefs != null) prefs.edit().putInt(KEY_CREDITS, currentCredits).apply();
 
         CreditsRecord record = new CreditsRecord(
                 System.currentTimeMillis(),
@@ -350,10 +361,23 @@ public class CreditsManager {
 
     public boolean checkAndDeduct(CreditsFeature feature) {
         int cost = feature.getCost();
-        if (!hasSufficientCredits(cost)) {
-            return false;
+        synchronized (creditsLock) {
+            if (currentCredits < cost) {
+                return false;
+            }
+            currentCredits -= cost;
+            saveCreditsEncrypted(currentCredits);
         }
-        return deductCredits(cost, "CONSUME", feature.name());
+
+        CreditsRecord record = new CreditsRecord(
+                System.currentTimeMillis(),
+                -cost,
+                "CONSUME",
+                feature.name(),
+                System.currentTimeMillis()
+        );
+        records.add(record);
+        return true;
     }
 
     public int getCreditsCost(CreditsFeature feature) {
@@ -371,8 +395,10 @@ public class CreditsManager {
 
                 Result<Integer> balanceResult = apiService.getCreditsBalance(userId);
                 if (balanceResult.isSuccess()) {
-                    currentCredits = balanceResult.getData();
-                    prefs.edit().putInt(KEY_CREDITS, currentCredits).apply();
+                    synchronized (creditsLock) {
+                        currentCredits = balanceResult.getData();
+                        saveCreditsEncrypted(currentCredits);
+                    }
                 }
 
                 Result<String[]> inviteResult = apiService.getInviteInfo(userId);
@@ -381,8 +407,8 @@ public class CreditsManager {
                     if (info != null && info.length >= 2) {
                         inviteCode = info[0];
                         inviteCount = Integer.parseInt(info[1]);
+                        saveInviteCodeEncrypted(inviteCode);
                         prefs.edit()
-                                .putString(KEY_INVITE_CODE, inviteCode)
                                 .putInt(KEY_INVITE_COUNT, inviteCount)
                                 .apply();
                     }
@@ -396,8 +422,65 @@ public class CreditsManager {
     }
 
     private void loadFromPrefs() {
-        currentCredits = prefs.getInt(KEY_CREDITS, 0);
-        inviteCode = prefs.getString(KEY_INVITE_CODE, "");
+        if (dataEncryptor != null) {
+            try {
+                String encCredits = prefs.getString(KEY_CREDITS + "_enc", null);
+                if (encCredits != null) {
+                    currentCredits = Integer.parseInt(dataEncryptor.decryptString(encCredits));
+                } else {
+                    currentCredits = prefs.getInt(KEY_CREDITS, 0);
+                }
+                String encInviteCode = prefs.getString(KEY_INVITE_CODE + "_enc", null);
+                if (encInviteCode != null) {
+                    inviteCode = dataEncryptor.decryptString(encInviteCode);
+                } else {
+                    inviteCode = prefs.getString(KEY_INVITE_CODE, "");
+                }
+            } catch (Exception e) {
+                Log.w("CreditsManager", "Failed to decrypt, falling back to plaintext", e);
+                currentCredits = prefs.getInt(KEY_CREDITS, 0);
+                inviteCode = prefs.getString(KEY_INVITE_CODE, "");
+            }
+        } else {
+            currentCredits = prefs.getInt(KEY_CREDITS, 0);
+            inviteCode = prefs.getString(KEY_INVITE_CODE, "");
+        }
         inviteCount = prefs.getInt(KEY_INVITE_COUNT, 0);
+    }
+
+    private void saveCreditsEncrypted(int credits) {
+        if (prefs == null) return;
+        if (dataEncryptor != null) {
+            try {
+                String encCredits = dataEncryptor.encryptString(String.valueOf(credits));
+                prefs.edit()
+                        .putString(KEY_CREDITS + "_enc", encCredits)
+                        .remove(KEY_CREDITS)
+                        .apply();
+            } catch (Exception e) {
+                Log.w("CreditsManager", "Encryption failed, falling back to plaintext", e);
+                prefs.edit().putInt(KEY_CREDITS, credits).apply();
+            }
+        } else {
+            prefs.edit().putInt(KEY_CREDITS, credits).apply();
+        }
+    }
+
+    private void saveInviteCodeEncrypted(String code) {
+        if (prefs == null) return;
+        if (dataEncryptor != null) {
+            try {
+                String encCode = dataEncryptor.encryptString(code);
+                prefs.edit()
+                        .putString(KEY_INVITE_CODE + "_enc", encCode)
+                        .remove(KEY_INVITE_CODE)
+                        .apply();
+            } catch (Exception e) {
+                Log.w("CreditsManager", "Encryption failed, falling back to plaintext", e);
+                prefs.edit().putString(KEY_INVITE_CODE, code).apply();
+            }
+        } else {
+            prefs.edit().putString(KEY_INVITE_CODE, code).apply();
+        }
     }
 }

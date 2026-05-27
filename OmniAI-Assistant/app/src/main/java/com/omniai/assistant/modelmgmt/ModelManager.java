@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.StatFs;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -29,6 +30,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class ModelManager {
+
+    private static final String TAG = "ModelManager";
 
     private static volatile ModelManager instance;
     private List<AIModel> models;
@@ -375,8 +378,8 @@ public class ModelManager {
                 cleanupTempFile(tempFile);
                 mainHandler.post(() -> callback.onError("Download failed: " + e.getMessage()));
             } finally {
-                try { if (fos != null) fos.close(); } catch (IOException ignored) {}
-                try { if (is != null) is.close(); } catch (IOException ignored) {}
+                try { if (fos != null) fos.close(); } catch (IOException e) { Log.w(TAG, "Failed to close file output stream", e); }
+                try { if (is != null) is.close(); } catch (IOException e) { Log.w(TAG, "Failed to close input stream", e); }
                 downloadProgressMap.remove(modelId);
                 downloadCancelledMap.remove(modelId);
             }

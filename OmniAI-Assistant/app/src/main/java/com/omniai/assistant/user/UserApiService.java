@@ -2,6 +2,9 @@ package com.omniai.assistant.user;
 
 import android.util.Base64;
 
+import com.omniai.assistant.BuildConfig;
+import com.omniai.assistant.common.NetworkClient;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,13 +19,13 @@ import okhttp3.Response;
 
 public class UserApiService {
 
-    private static final String BASE_URL = "https://api.omniai.com/v1/";
+    private static final String BASE_URL = BuildConfig.API_BASE_URL;
     private static final MediaType JSON_MEDIA_TYPE = MediaType.get("application/json; charset=utf-8");
 
     private final OkHttpClient client;
 
     public UserApiService(OkHttpClient baseClient, AuthInterceptor authInterceptor) {
-        this.client = baseClient.newBuilder()
+        this.client = NetworkClient.getSecureBuilder()
                 .addInterceptor(authInterceptor)
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(15, TimeUnit.SECONDS)

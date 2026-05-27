@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import com.omniai.assistant.common.Constants;
 import com.omniai.assistant.nativebridge.LlamaBridge;
@@ -13,6 +14,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class GgufQuantizer {
+
+    private static final String TAG = "GgufQuantizer";
 
     public interface QuantizationCallback {
         void onProgress(float progress);
@@ -171,7 +174,8 @@ public class GgufQuantizer {
 
         try {
             progressThread.join(1000);
-        } catch (InterruptedException ignored) {
+        } catch (InterruptedException e) {
+            Log.w(TAG, "Progress thread join interrupted", e);
         }
 
         if (result == 0) {

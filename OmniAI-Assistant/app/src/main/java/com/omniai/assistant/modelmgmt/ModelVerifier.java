@@ -1,5 +1,7 @@
 package com.omniai.assistant.modelmgmt;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -14,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ModelVerifier {
+
+    private static final String TAG = "ModelVerifier";
 
     private static final long GGUF_MAGIC = 0x46475547L;
     private static final int MIN_MODEL_SIZE = 1024;
@@ -278,6 +282,7 @@ public class ModelVerifier {
                 }
             }
         } catch (IOException e) {
+            Log.w(TAG, "Failed to parse GGUF metadata for vision check", e);
         }
         return false;
     }

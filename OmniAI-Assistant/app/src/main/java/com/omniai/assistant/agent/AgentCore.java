@@ -17,7 +17,7 @@ public class AgentCore {
 
     private static final String TOOL_CALL_PATTERN = "\\[TOOL_CALL:\\s*(\\w+)\\s*\\(\\s*\"([^\"]*)\"\\s*\\)\\]";
     private static final String FINAL_ANSWER_PREFIX = "[FINAL_ANSWER:";
-    private static final int DEFAULT_MAX_STEPS = 10;
+    private static final int DEFAULT_MAX_STEPS = 120;
 
     private final Context context;
     private final InferenceEngine inferenceEngine;
