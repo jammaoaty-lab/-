@@ -1281,18 +1281,26 @@ public class ChatActivity extends AppCompatActivity {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startVoiceInput();
                 } else {
-                    exceptionHandler.handlePermissionException(Manifest.permission.RECORD_AUDIO, message -> {
-                        showSnackbar(message);
-                    });
+                    if (!shouldShowPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                        exceptionHandler.showPermissionErrorDialog(this, Manifest.permission.RECORD_AUDIO);
+                    } else {
+                        exceptionHandler.handlePermissionException(Manifest.permission.RECORD_AUDIO, message -> {
+                            showSnackbar(message);
+                        });
+                    }
                 }
                 break;
             case PERMISSION_CAMERA:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     captureImage();
                 } else {
-                    exceptionHandler.handlePermissionException(Manifest.permission.CAMERA, message -> {
-                        showSnackbar(message);
-                    });
+                    if (!shouldShowPermissionRationale(Manifest.permission.CAMERA)) {
+                        exceptionHandler.showPermissionErrorDialog(this, Manifest.permission.CAMERA);
+                    } else {
+                        exceptionHandler.handlePermissionException(Manifest.permission.CAMERA, message -> {
+                            showSnackbar(message);
+                        });
+                    }
                 }
                 break;
             case PERMISSION_STORAGE:
@@ -1303,12 +1311,20 @@ public class ChatActivity extends AppCompatActivity {
                         pickImage();
                     }
                 } else {
-                    exceptionHandler.handlePermissionException(Manifest.permission.READ_EXTERNAL_STORAGE, message -> {
-                        showSnackbar(message);
-                    });
+                    if (!shouldShowPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        exceptionHandler.showPermissionErrorDialog(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+                    } else {
+                        exceptionHandler.handlePermissionException(Manifest.permission.READ_EXTERNAL_STORAGE, message -> {
+                            showSnackbar(message);
+                        });
+                    }
                 }
                 break;
         }
+    }
+
+    private boolean shouldShowPermissionRationale(String permission) {
+        return ActivityCompat.shouldShowRequestPermissionRationale(this, permission);
     }
 
     @Override

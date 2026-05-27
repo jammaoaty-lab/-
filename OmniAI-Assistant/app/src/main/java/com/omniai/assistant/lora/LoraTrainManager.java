@@ -74,6 +74,41 @@ public class LoraTrainManager {
             throw new IllegalStateException("Training is already in progress. Current state: " + currentState);
         }
 
+        if (config == null || config.dataPath == null || config.dataPath.isEmpty()) {
+            if (listener != null) {
+                listener.onError("请指定训练数据路径");
+            }
+            return;
+        }
+
+        if (config.outputPath == null || config.outputPath.isEmpty()) {
+            if (listener != null) {
+                listener.onError("请指定输出路径");
+            }
+            return;
+        }
+
+        if (config.loraRank <= 0) {
+            if (listener != null) {
+                listener.onError("LoRA秩必须大于0");
+            }
+            return;
+        }
+
+        if (config.epochs <= 0) {
+            if (listener != null) {
+                listener.onError("训练轮数必须大于0");
+            }
+            return;
+        }
+
+        if (config.learningRate <= 0) {
+            if (listener != null) {
+                listener.onError("学习率必须大于0");
+            }
+            return;
+        }
+
         if (!CreditsFeatureGate.getInstance().canTrainLora()) {
             if (listener != null) {
                 listener.onError("Insufficient credits for LoRA training");
@@ -96,6 +131,41 @@ public class LoraTrainManager {
     public void startTraining(TrainConfig config, LoraTrainListener listener) {
         if (currentState != TrainState.IDLE && currentState != TrainState.COMPLETED && currentState != TrainState.ERROR) {
             throw new IllegalStateException("Training is already in progress. Current state: " + currentState);
+        }
+
+        if (config == null || config.dataPath == null || config.dataPath.isEmpty()) {
+            if (listener != null) {
+                listener.onError("请指定训练数据路径");
+            }
+            return;
+        }
+
+        if (config.outputPath == null || config.outputPath.isEmpty()) {
+            if (listener != null) {
+                listener.onError("请指定输出路径");
+            }
+            return;
+        }
+
+        if (config.loraRank <= 0) {
+            if (listener != null) {
+                listener.onError("LoRA秩必须大于0");
+            }
+            return;
+        }
+
+        if (config.epochs <= 0) {
+            if (listener != null) {
+                listener.onError("训练轮数必须大于0");
+            }
+            return;
+        }
+
+        if (config.learningRate <= 0) {
+            if (listener != null) {
+                listener.onError("学习率必须大于0");
+            }
+            return;
         }
 
         if (!CreditsFeatureGate.getInstance().canTrainLora()) {
@@ -133,12 +203,19 @@ public class LoraTrainManager {
 
             File dataFile = new File(currentConfig.dataPath);
             if (!dataFile.exists()) {
-                throw new RuntimeException("Training data not found: " + currentConfig.dataPath);
+                throw new RuntimeException("训练数据文件不存在，请选择有效的训练数据");
+            }
+
+            if (dataFile.length() == 0) {
+                throw new RuntimeException("训练数据为空，请准备包含有效内容的训练数据");
             }
 
             File outputDir = new File(currentConfig.outputPath);
             if (!outputDir.exists()) {
-                outputDir.mkdirs();
+                boolean created = outputDir.mkdirs();
+                if (!created && !outputDir.exists()) {
+                    throw new RuntimeException("无法创建输出目录，请检查存储权限");
+                }
             }
 
             setState(TrainState.TOKENIZING);
@@ -156,7 +233,7 @@ public class LoraTrainManager {
                         bridge.isGpuAvailable() ? 1 : 0
                 );
                 if (visionHandle == 0) {
-                    throw new RuntimeException("Failed to load vision model for training");
+                    throw new RuntimeException("LoRA训练失败，请检查训练参数和数据格式");
                 }
                 success = bridge.trainLora(
                         visionHandle,
@@ -191,7 +268,7 @@ public class LoraTrainManager {
             }
 
             if (!success) {
-                throw new RuntimeException("Native training failed");
+                throw new RuntimeException("LoRA训练失败，请检查训练参数和数据格式");
             }
 
             while (!isAborted) {
@@ -233,6 +310,22 @@ public class LoraTrainManager {
                 listener.onCompleted(currentConfig.outputPath);
             }
 
+        } catch (OutOfMemoryError e) {
+            stopMonitoring();
+            setState(TrainState.ERROR);
+            String msg = "训练过程中内存不足，请减少批量大小或使用更小的模型";
+            addLog(TrainState.ERROR, msg, 0f);
+            if (listener != null) {
+                listener.onError(msg);
+            }
+        } catch (UnsatisfiedLinkError e) {
+            stopMonitoring();
+            setState(TrainState.ERROR);
+            String msg = "训练引擎未正确安装，请重新安装应用";
+            addLog(TrainState.ERROR, msg, 0f);
+            if (listener != null) {
+                listener.onError(msg);
+            }
         } catch (Exception e) {
             stopMonitoring();
             setState(TrainState.ERROR);
@@ -273,9 +366,10 @@ public class LoraTrainManager {
                 isAborted = true;
                 bridge.abortTraining();
                 setState(TrainState.PAUSED);
-                addLog(TrainState.PAUSED, "Auto-paused: device temperature too high (" + String.format("%.1f", temp) + "°C)", 0f);
+                String msg = "设备温度过高(" + String.format("%.1f", temp) + "°C)，训练已自动暂停，待设备冷却后可恢复训练";
+                addLog(TrainState.PAUSED, msg, 0f);
                 if (listener != null) {
-                    listener.onError("Training auto-paused: device temperature exceeded " + TEMP_THRESHOLD + "°C");
+                    listener.onError(msg);
                 }
             }
             return;
@@ -286,11 +380,17 @@ public class LoraTrainManager {
                 isAborted = true;
                 bridge.abortTraining();
                 setState(TrainState.PAUSED);
-                addLog(TrainState.PAUSED, "Auto-paused: low memory (" + memoryMb + "MB available)", 0f);
+                String msg = "可用内存不足(" + memoryMb + "MB)，训练已自动暂停，请关闭其他应用后恢复训练";
+                addLog(TrainState.PAUSED, msg, 0f);
                 if (listener != null) {
-                    listener.onError("Training auto-paused: available memory below " + MEMORY_THRESHOLD_MB + "MB");
+                    listener.onError(msg);
                 }
             }
+            return;
+        }
+
+        if (isVisionTraining && !bridge.isGpuAvailable()) {
+            addLog(TrainState.TRAINING, "视觉模型训练建议使用GPU加速，当前设备GPU不可用，训练速度可能较慢", 0f);
         }
     }
 
@@ -349,14 +449,24 @@ public class LoraTrainManager {
             throw new IllegalStateException("No completed training to export");
         }
         File srcDir = new File(currentConfig.outputPath);
+        if (!srcDir.exists()) {
+            throw new RuntimeException("LoRA权重文件不存在");
+        }
         File dstDir = new File(outputPath);
         if (!dstDir.exists()) {
-            dstDir.mkdirs();
+            boolean created = dstDir.mkdirs();
+            if (!created && !dstDir.exists()) {
+                throw new RuntimeException("无法创建导出目录");
+            }
         }
         File[] files = srcDir.listFiles();
         if (files != null) {
             for (File file : files) {
-                copyFile(file, new File(dstDir, file.getName()));
+                try {
+                    copyFile(file, new File(dstDir, file.getName()));
+                } catch (Exception e) {
+                    throw new RuntimeException("LoRA权重导出失败");
+                }
             }
         }
         return outputPath;

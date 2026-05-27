@@ -9,8 +9,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+
+import javax.net.ssl.SSLException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -59,6 +64,23 @@ public class CloudInferenceClient {
         this.isVisionAvailable = false;
     }
 
+    private String classifyNetworkError(IOException e) {
+        if (e instanceof SocketTimeoutException) return "网络请求超时，请检查网络连接";
+        if (e instanceof UnknownHostException) return "无法连接服务器，请检查网络";
+        if (e instanceof ConnectException) return "服务器连接失败";
+        if (e instanceof SSLException) return "安全连接失败";
+        return "网络错误: " + e.getMessage();
+    }
+
+    private String classifyHttpError(int code) {
+        if (code == 401) return "API密钥无效，请检查配置";
+        if (code == 403) return "访问被拒绝，请检查权限";
+        if (code == 404) return "API接口不存在";
+        if (code == 429) return "请求过于频繁，请稍后重试";
+        if (code == 500 || code == 502 || code == 503) return "服务器错误，请稍后重试";
+        return "请求失败: HTTP " + code;
+    }
+
     public void complete(String prompt, InferenceParams params, CloudCallback callback) {
         try {
             JSONObject requestBody = buildRequestJson(prompt, params);
@@ -74,14 +96,14 @@ public class CloudInferenceClient {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     isAvailable = false;
-                    if (callback != null) callback.onError(e.getMessage());
+                    if (callback != null) callback.onError(classifyNetworkError(e));
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) {
                     try {
                         if (!response.isSuccessful()) {
-                            if (callback != null) callback.onError("HTTP " + response.code());
+                            if (callback != null) callback.onError(classifyHttpError(response.code()));
                             return;
                         }
                         String responseBody = response.body().string();
@@ -116,14 +138,14 @@ public class CloudInferenceClient {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     isAvailable = false;
-                    if (callback != null) callback.onError(e.getMessage());
+                    if (callback != null) callback.onError(classifyNetworkError(e));
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) {
                     try {
                         if (!response.isSuccessful()) {
-                            if (callback != null) callback.onError("HTTP " + response.code());
+                            if (callback != null) callback.onError(classifyHttpError(response.code()));
                             return;
                         }
                         BufferedReader reader = new BufferedReader(
@@ -185,14 +207,14 @@ public class CloudInferenceClient {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     isVisionAvailable = false;
-                    callback.onError(e.getMessage());
+                    callback.onError(classifyNetworkError(e));
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) {
                     try {
                         if (!response.isSuccessful()) {
-                            callback.onError("HTTP " + response.code());
+                            callback.onError(classifyHttpError(response.code()));
                             return;
                         }
                         String responseBody = response.body().string();
@@ -242,14 +264,14 @@ public class CloudInferenceClient {
                 @Override
                 public void onFailure(Call call, IOException e) {
                     isVisionAvailable = false;
-                    callback.onError(e.getMessage());
+                    callback.onError(classifyNetworkError(e));
                 }
 
                 @Override
                 public void onResponse(Call call, Response response) {
                     try {
                         if (!response.isSuccessful()) {
-                            callback.onError("HTTP " + response.code());
+                            callback.onError(classifyHttpError(response.code()));
                             return;
                         }
                         String responseBody = response.body().string();
@@ -337,11 +359,13 @@ public class CloudInferenceClient {
     private String encodeImageToBase64(String imagePath) {
         try {
             File file = new File(imagePath);
-            FileInputStream fis = new FileInputStream(file);
-            byte[] bytes = new byte[(int) file.length()];
-            fis.read(bytes);
-            fis.close();
-            return Base64.encodeToString(bytes, Base64.NO_WRAP);
+            if (!file.exists()) return null;
+            if (file.length() > 20 * 1024 * 1024) return null;
+            try (FileInputStream fis = new FileInputStream(file)) {
+                byte[] bytes = new byte[(int) file.length()];
+                fis.read(bytes);
+                return Base64.encodeToString(bytes, Base64.NO_WRAP);
+            }
         } catch (Exception e) {
             return null;
         }

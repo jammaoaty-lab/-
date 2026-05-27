@@ -12,9 +12,11 @@ public class ThermalMonitor {
     private float currentTemp;
     private float highThreshold = 45.0f;
     private float criticalThreshold = 50.0f;
+    private int memoryThresholdMB = 500;
     private boolean isMonitoring;
     private Handler monitoringHandler;
     private ThermalListener listener;
+    private HardwareErrorCallback hardwareErrorCallback;
     private LlamaBridge bridge;
 
     private static final long POLLING_INTERVAL_MS = 5000L;
@@ -30,7 +32,12 @@ public class ThermalMonitor {
                 if (status == ThermalStatus.HIGH || status == ThermalStatus.CRITICAL) {
                     listener.onThermalWarning(status);
                 }
+                if (status == ThermalStatus.CRITICAL && hardwareErrorCallback != null) {
+                    hardwareErrorCallback.onThermalCritical(currentTemp);
+                }
             }
+            checkMemoryStatus();
+            checkGpuAvailability();
             monitoringHandler.postDelayed(this, POLLING_INTERVAL_MS);
         }
     };
@@ -97,8 +104,39 @@ public class ThermalMonitor {
         this.listener = listener;
     }
 
+    public void setHardwareErrorCallback(HardwareErrorCallback callback) {
+        this.hardwareErrorCallback = callback;
+    }
+
     public boolean isMonitoring() {
         return isMonitoring;
+    }
+
+    public void checkMemoryStatus() {
+        int availableMB = bridge.nativeGetDeviceMemory();
+        if (availableMB > 0 && availableMB < memoryThresholdMB) {
+            if (hardwareErrorCallback != null) {
+                hardwareErrorCallback.onMemoryLow(availableMB);
+            }
+        }
+    }
+
+    public void checkGpuAvailability() {
+        boolean gpuAvailable = bridge.nativeIsGpuAvailable();
+        if (!gpuAvailable) {
+            if (hardwareErrorCallback != null) {
+                hardwareErrorCallback.onGpuUnavailable();
+            }
+        }
+    }
+
+    public HardwareStatus checkHardwareStatus() {
+        HardwareStatus status = new HardwareStatus();
+        status.temperature = currentTemp;
+        status.availableMemoryMB = bridge.nativeGetDeviceMemory();
+        status.gpuAvailable = bridge.nativeIsGpuAvailable();
+        status.thermalStatus = checkThermalStatus();
+        return status;
     }
 
     public enum ThermalStatus {
@@ -108,8 +146,21 @@ public class ThermalMonitor {
         CRITICAL
     }
 
+    public static class HardwareStatus {
+        public float temperature;
+        public int availableMemoryMB;
+        public boolean gpuAvailable;
+        public ThermalStatus thermalStatus;
+    }
+
     public interface ThermalListener {
         void onTemperatureChanged(float temperature);
         void onThermalWarning(ThermalStatus status);
+    }
+
+    public interface HardwareErrorCallback {
+        void onMemoryLow(int availableMB);
+        void onGpuUnavailable();
+        void onThermalCritical(float temperature);
     }
 }

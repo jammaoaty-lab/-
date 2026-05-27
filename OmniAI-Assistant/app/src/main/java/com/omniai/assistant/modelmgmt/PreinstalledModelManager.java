@@ -116,9 +116,46 @@ public class PreinstalledModelManager {
         }
 
         try {
-            InputStream is = context.getAssets().open(assetPath);
+            String[] assetList = context.getAssets().list("");
+            boolean assetExists = false;
+            if (assetList != null) {
+                for (String asset : assetList) {
+                    if (assetPath.startsWith(asset) || assetPath.contains(asset)) {
+                        assetExists = true;
+                        break;
+                    }
+                }
+            }
+            InputStream is;
+            try {
+                is = context.getAssets().open(assetPath);
+            } catch (IOException e) {
+                mainHandler.post(() -> {
+                    if (callback != null) callback.onError("Assets文件不存在: " + assetPath);
+                });
+                return false;
+            }
+
             long assetSize = is.available();
-            FileOutputStream fos = new FileOutputStream(outputFile);
+            File modelsDir = new File(context.getFilesDir(), Constants.MODEL_DIR);
+            if (!hasEnoughDiskSpace(modelsDir, assetSize)) {
+                is.close();
+                mainHandler.post(() -> {
+                    if (callback != null) callback.onError("磁盘空间不足，无法提取模型: " + outputName);
+                });
+                return false;
+            }
+
+            FileOutputStream fos;
+            try {
+                fos = new FileOutputStream(outputFile);
+            } catch (IOException e) {
+                is.close();
+                mainHandler.post(() -> {
+                    if (callback != null) callback.onError("文件写入失败: " + outputFile.getAbsolutePath());
+                });
+                return false;
+            }
 
             byte[] buffer = new byte[8192];
             long totalRead = 0;
@@ -126,7 +163,19 @@ public class PreinstalledModelManager {
             int lastProgressPercent = -1;
 
             while ((bytesRead = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, bytesRead);
+                try {
+                    fos.write(buffer, 0, bytesRead);
+                } catch (IOException e) {
+                    is.close();
+                    fos.close();
+                    if (outputFile.exists()) {
+                        outputFile.delete();
+                    }
+                    mainHandler.post(() -> {
+                        if (callback != null) callback.onError("文件写入失败: " + outputFile.getAbsolutePath());
+                    });
+                    return false;
+                }
                 totalRead += bytesRead;
 
                 if (assetSize > 0) {
@@ -147,14 +196,37 @@ public class PreinstalledModelManager {
             is.close();
 
             ModelVerifier verifier = new ModelVerifier();
-            return verifier.verifyGguf(outputFile.getAbsolutePath());
+            boolean verified = verifier.verifyGguf(outputFile.getAbsolutePath());
+            if (!verified) {
+                if (outputFile.exists()) {
+                    outputFile.delete();
+                }
+                mainHandler.post(() -> {
+                    if (callback != null) callback.onError("GGUF验证失败: " + outputName);
+                });
+                return false;
+            }
+            return true;
 
         } catch (Exception e) {
             if (outputFile.exists()) {
                 outputFile.delete();
             }
+            mainHandler.post(() -> {
+                if (callback != null) callback.onError("模型提取异常: " + outputName + " - " + e.getMessage());
+            });
             return false;
         }
+    }
+
+    private boolean hasEnoughDiskSpace(File dir, long requiredBytes) {
+        if (dir != null) {
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            return dir.getFreeSpace() >= requiredBytes;
+        }
+        return true;
     }
 
     private void verifyAndRegisterModels(ExtractionCallback callback) {
