@@ -3,850 +3,626 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OmniAI-Assistant UI Preview</title>
+<title>OmniAI — Premium UI Preview</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --primary:#1A73E8;--primary-light:#E8F0FE;--primary-dark:#1557B0;
-  --bg:#F5F5F7;--surface:#FFFFFF;--surface-v:#F0F0F2;
-  --text1:#1D1D1F;--text2:#86868B;--text3:#AEAEB2;
-  --divider:#E5E5EA;--border:#E5E5EA;
-  --bubble-user:#E8F0FE;--bubble-ai:#FFFFFF;
-  --danger:#FF3B30;--danger-light:#FFEBEE;
-  --success:#34C759;--warning:#FF9500;
-  --tag-local:#34C759;--tag-cloud:#FF9500;--tag-gpu:#1A73E8;--tag-lora:#AF52DE;
-  --radius:12px;--radius-sm:8px;--radius-lg:16px;--radius-full:999px;
-  --shadow:0 1px 3px rgba(0,0,0,0.06);
+  --p:#2563EB;--p-light:#EFF6FF;--p-dark:#1D4ED8;
+  --bg:#F8F9FB;--s:#FFFFFF;--s2:#F1F3F5;
+  --t1:#111318;--t2:#6B7280;--t3:#B0B7C3;
+  --d:#E5E7EB;--b:#E5E7EB;
+  --bu:#EFF6FF;--ba:#FFFFFF;
+  --red:#EF4444;--red-l:#FEF2F2;
+  --green:#22C55E;--orange:#F59E0B;--purple:#8B5CF6;
+  --r:14px;--rs:10px;--rl:18px;--rf:999px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;background:#1a1a2e;display:flex;justify-content:center;align-items:center;min-height:100vh;color:var(--text1);overflow:hidden}
-.phone-frame{width:390px;height:844px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 0 0 8px #2a2a3e,0 0 0 10px #3a3a4e,0 25px 80px rgba(0,0,0,0.5)}
-.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:34px;background:#000;border-radius:0 0 20px 20px;z-index:100}
-.phone-home{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;background:#1D1D1F;border-radius:3px;z-index:100;opacity:0.2}
-.screen{width:100%;height:100%;position:relative;overflow:hidden}
-.page{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity 0.25s,transform 0.25s;transform:translateX(20px);display:flex;flex-direction:column}
-.page.active{opacity:1;pointer-events:auto;transform:translateX(0)}
-.page.slide-left{transform:translateX(-20px)}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:#0F0F1A;display:flex;justify-content:center;align-items:center;color:var(--t1)}
 
-/* Splash */
-.splash{justify-content:center;align-items:center;background:var(--bg)}
-.splash-logo{width:72px;height:72px;background:var(--primary);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff;font-weight:700;margin-bottom:16px}
-.splash-title{font-size:24px;font-weight:600;color:var(--text1);letter-spacing:-0.5px}
-.splash-sub{font-size:14px;color:var(--text2);margin-top:8px}
-.splash-ver{position:absolute;bottom:60px;font-size:12px;color:var(--text3)}
+/* Phone */
+.device{position:relative;width:393px;height:852px;border-radius:48px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,0.08),0 0 0 10px #1a1a2e,0 0 0 11px rgba(255,255,255,0.05),0 40px 100px rgba(0,0,0,0.6)}
+.device::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:130px;height:32px;background:#000;border-radius:0 0 18px 18px;z-index:999}
+.device::after{content:'';position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:130px;height:5px;background:rgba(0,0,0,0.15);border-radius:3px;z-index:999}
+.screen{width:100%;height:100%;position:relative;overflow:hidden;background:var(--bg)}
 
-/* Login */
-.login{background:var(--bg);padding:0 24px}
-.login-scroll{flex:1;overflow-y:auto;padding-top:60px}
-.login-title{font-size:24px;font-weight:600;color:var(--text1);letter-spacing:-0.5px}
-.login-sub{font-size:14px;color:var(--text2);margin-top:6px;margin-bottom:32px}
-.input-group{margin-bottom:16px}
-.input-group label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
-.input-field{width:100%;height:48px;background:var(--surface-v);border:1px solid var(--divider);border-radius:12px;padding:0 16px;font-size:15px;color:var(--text1);outline:none;transition:border-color 0.2s}
-.input-field:focus{border-color:var(--primary)}
-.input-row{display:flex;gap:8px}
-.input-row .input-field{flex:1}
-.code-btn{height:48px;padding:0 14px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;min-width:100px}
-.login-btn{width:100%;height:48px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:500;cursor:pointer;margin-top:8px;transition:opacity 0.15s}
-.login-btn:active{opacity:0.85}
-.divider-row{display:flex;align-items:center;margin:24px 0;gap:12px}
-.divider-row span{font-size:13px;color:var(--text3)}
-.divider-row::before,.divider-row::after{content:'';flex:1;height:0.5px;background:var(--divider)}
-.social-row{display:flex;justify-content:center;gap:16px;margin-bottom:24px}
-.social-btn{width:48px;height:48px;background:var(--surface);border:1px solid var(--divider);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:transform 0.12s}
-.social-btn:active{transform:scale(0.96)}
-.login-link{text-align:center;font-size:14px;color:var(--text2);padding-bottom:40px}
-.login-link a{color:var(--primary);text-decoration:none;font-weight:500}
+/* Pages */
+.P{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;transform:translateX(16px);will-change:opacity,transform}
+.P.on{opacity:1;pointer-events:auto;transform:translateX(0)}
 
-/* Chat */
-.chat{background:var(--bg)}
-.chat-toolbar{height:56px;background:var(--surface);border-bottom:0.5px solid var(--divider);display:flex;align-items:center;padding:0 12px;flex-shrink:0}
-.chat-toolbar .menu-btn,.chat-toolbar .new-btn,.chat-toolbar .more-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;border-radius:50%;font-size:18px;color:var(--text1);transition:background 0.15s}
-.chat-toolbar .menu-btn:active,.chat-toolbar .new-btn:active,.chat-toolbar .more-btn:active{background:var(--surface-v)}
-.chat-toolbar .center{flex:1;text-align:center}
-.chat-toolbar .model-name{font-size:15px;font-weight:600;color:var(--text1)}
-.chat-toolbar .model-status{font-size:11px;color:var(--success);display:flex;align-items:center;justify-content:center;gap:4px;margin-top:1px}
-.chat-toolbar .model-status .dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
-.status-bar{height:28px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:var(--primary);flex-shrink:0}
-.status-bar .dot{width:6px;height:6px;border-radius:50%;background:var(--primary);animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
-.msg{max-width:82%;display:flex;flex-direction:column}
-.msg.user{align-self:flex-end}
-.msg.ai{align-self:flex-start}
-.msg-bubble{padding:10px 14px;font-size:14px;line-height:1.6;border-radius:16px}
-.msg.user .msg-bubble{background:var(--bubble-user);border-bottom-right-radius:4px;color:var(--text1)}
-.msg.ai .msg-bubble{background:var(--bubble-ai);border-bottom-left-radius:4px;color:var(--text1);border:0.5px solid var(--divider);padding:12px 16px}
-.msg.ai .msg-bubble code{background:var(--surface-v);padding:2px 6px;border-radius:4px;font-size:13px;font-family:'SF Mono',Menlo,monospace}
-.msg.ai .msg-bubble pre{background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;margin:8px 0;overflow-x:auto;font-size:13px;font-family:'SF Mono',Menlo,monospace;line-height:1.5}
-.msg-time{font-size:11px;color:var(--text3);margin-top:4px;padding:0 4px}
-.msg.user .msg-time{text-align:right}
-.quick-bar{padding:6px 12px;display:flex;gap:6px;overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch}
-.quick-bar::-webkit-scrollbar{display:none}
-.quick-pill{height:32px;padding:0 14px;background:var(--surface-v);border:0.5px solid var(--divider);border-radius:16px;font-size:12px;font-weight:500;color:var(--text1);white-space:nowrap;display:flex;align-items:center;gap:4px;cursor:pointer;transition:background 0.15s;flex-shrink:0}
-.quick-pill:active{background:var(--primary-light)}
-.quick-pill .pill-icon{font-size:14px}
-.input-area{padding:8px 12px 32px;background:var(--surface);border-top:0.5px solid var(--divider);display:flex;align-items:flex-end;gap:8px;flex-shrink:0}
-.input-area .plus-btn{width:36px;height:36px;border:none;background:var(--surface-v);border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0}
-.input-area .text-input{flex:1;min-height:36px;max-height:100px;background:var(--surface-v);border:1px solid var(--divider);border-radius:20px;padding:8px 16px;font-size:15px;color:var(--text1);outline:none;resize:none;line-height:1.4;font-family:inherit}
-.input-area .text-input::placeholder{color:var(--text3)}
-.input-area .voice-btn{width:36px;height:36px;border:none;background:none;font-size:18px;cursor:pointer;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.input-area .send-btn{width:36px;height:36px;border:none;background:var(--primary);border-radius:50%;font-size:16px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.15s}
-.input-area .send-btn:active{opacity:0.85}
-.input-area .send-btn.disabled{background:var(--text3)}
+/* Icons */
+.ic{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.ic svg{width:100%;height:100%}
 
-/* Sidebar */
-.sidebar-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s}
-.sidebar-overlay.open{opacity:1;pointer-events:auto}
-.sidebar{position:absolute;top:0;left:0;width:280px;height:100%;background:var(--surface);z-index:51;transform:translateX(-100%);transition:transform 0.25s;display:flex;flex-direction:column}
-.sidebar.open{transform:translateX(0)}
-.sidebar-user{padding:20px 16px;border-bottom:0.5px solid var(--divider)}
-.sidebar-user .user-row{display:flex;align-items:center;gap:12px}
-.sidebar-user .avatar{width:40px;height:40px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:16px}
-.sidebar-user .user-info{flex:1}
-.sidebar-user .user-name{font-size:15px;font-weight:600;color:var(--text1)}
-.sidebar-user .user-vip{font-size:11px;color:var(--warning);margin-top:2px}
-.sidebar-user .user-model{font-size:11px;color:var(--text2);margin-top:2px}
-.sidebar-conv{flex:1;overflow-y:auto;padding:8px}
-.sidebar-conv-item{padding:12px;border-radius:8px;cursor:pointer;transition:background 0.15s;display:flex;flex-direction:column;gap:4px;position:relative}
-.sidebar-conv-item:active{background:var(--surface-v)}
-.sidebar-conv-item.selected{background:var(--surface-v)}
-.sidebar-conv-item.selected::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:3px;background:var(--primary);border-radius:2px}
-.sidebar-conv-item .conv-title{font-size:14px;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sidebar-conv-item .conv-meta{display:flex;align-items:center;gap:6px}
-.sidebar-conv-item .conv-time{font-size:12px;color:var(--text2)}
-.sidebar-conv-item .conv-tag{font-size:10px;padding:1px 6px;border-radius:4px;color:#fff}
-.sidebar-bottom{padding:12px 16px;border-top:0.5px solid var(--divider);display:flex;align-items:center;justify-content:space-between}
-.sidebar-bottom .settings-btn{font-size:14px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:6px}
-.sidebar-bottom .ver{font-size:12px;color:var(--text3)}
-
-/* Profile */
-.profile{background:var(--bg)}
-.profile-toolbar{height:56px;background:var(--surface);border-bottom:0.5px solid var(--divider);display:flex;align-items:center;padding:0 16px;flex-shrink:0}
-.profile-toolbar .back-btn{width:36px;height:36px;border:none;background:none;font-size:18px;cursor:pointer;color:var(--text1);display:flex;align-items:center;justify-content:center;border-radius:50%}
-.profile-toolbar .back-btn:active{background:var(--surface-v)}
-.profile-toolbar .title{flex:1;text-align:center;font-size:17px;font-weight:600}
-.profile-toolbar .placeholder{width:36px}
-.profile-scroll{flex:1;overflow-y:auto;padding:16px}
-.profile-card{background:var(--surface);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:16px;border:0.5px solid var(--divider)}
-.profile-card .avatar-lg{width:72px;height:72px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:28px;margin:0 auto 12px}
-.profile-card .name{font-size:18px;font-weight:600;color:var(--text1)}
-.profile-card .uid{font-size:13px;color:var(--text2);margin-top:4px}
-.profile-card .vip-badge{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:4px 12px;background:linear-gradient(135deg,#FFD700,#FFA500);border-radius:var(--radius-full);font-size:12px;font-weight:600;color:#fff}
-.profile-card .device-count{font-size:12px;color:var(--text2);margin-top:8px}
-.vip-card{background:linear-gradient(135deg,var(--primary),#6C5CE7);border-radius:var(--radius);padding:16px;margin-bottom:16px;color:#fff}
-.vip-card .vip-label{font-size:13px;opacity:0.8}
-.vip-card .vip-plan{font-size:18px;font-weight:600;margin-top:4px}
-.vip-card .vip-expiry{font-size:12px;opacity:0.7;margin-top:4px}
-.vip-card .vip-upgrade{margin-top:12px;padding:8px 16px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:var(--radius-sm);color:#fff;font-size:13px;font-weight:500;cursor:pointer;display:inline-block}
-.menu-group{background:var(--surface);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;border:0.5px solid var(--divider)}
-.menu-item{display:flex;align-items:center;padding:14px 16px;cursor:pointer;transition:background 0.12s;gap:12px}
-.menu-item:active{background:var(--surface-v)}
-.menu-item+.menu-item{border-top:0.5px solid var(--divider)}
-.menu-item .menu-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--primary);flex-shrink:0}
-.menu-item .menu-text{flex:1;font-size:15px;color:var(--text1)}
-.menu-item .menu-arrow{font-size:14px;color:var(--text3)}
-.logout-btn{width:100%;height:48px;background:var(--danger-light);color:var(--danger);border:none;border-radius:var(--radius);font-size:15px;font-weight:500;cursor:pointer;margin-top:8px}
-
-/* Model Manager */
-.model-toolbar{height:56px;background:var(--surface);border-bottom:0.5px solid var(--divider);display:flex;align-items:center;padding:0 16px;flex-shrink:0}
-.model-toolbar .back-btn{width:36px;height:36px;border:none;background:none;font-size:18px;cursor:pointer;color:var(--text1);display:flex;align-items:center;justify-content:center;border-radius:50%}
-.model-toolbar .title{flex:1;text-align:center;font-size:17px;font-weight:600}
-.model-toolbar .add-btn{width:36px;height:36px;border:none;background:none;font-size:18px;cursor:pointer;color:var(--primary);display:flex;align-items:center;justify-content:center}
-.tabs{display:flex;background:var(--surface);border-bottom:0.5px solid var(--divider);flex-shrink:0}
-.tab{flex:1;height:44px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s}
-.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
-.model-list{flex:1;overflow-y:auto;padding:12px 16px}
-.model-card{background:var(--surface);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;border:0.5px solid var(--divider)}
-.model-card .model-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.model-card .model-name{font-size:15px;font-weight:600;color:var(--text1)}
-.model-card .model-tags{display:flex;gap:4px}
-.model-card .tag{font-size:10px;padding:2px 6px;border-radius:4px;color:#fff;font-weight:500}
-.model-card .tag.local{background:var(--tag-local)}
-.model-card .tag.gpu{background:var(--tag-gpu)}
-.model-card .tag.cloud{background:var(--tag-cloud)}
-.model-card .tag.lora{background:var(--tag-lora)}
-.model-card .model-info{display:flex;gap:12px;font-size:12px;color:var(--text2);margin-bottom:10px}
-.model-card .model-actions{display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid var(--divider);padding-top:10px}
-.model-card .switch{width:44px;height:26px;background:var(--success);border-radius:13px;position:relative;cursor:pointer;transition:background 0.2s}
-.model-card .switch.off{background:#C7C7CC}
-.model-card .switch::after{content:'';position:absolute;top:2px;left:22px;width:22px;height:22px;background:#fff;border-radius:50%;transition:left 0.2s;box-shadow:0 1px 2px rgba(0,0,0,0.15)}
-.model-card .switch.off::after{left:2px}
-.model-card .delete-btn{font-size:13px;color:var(--danger);cursor:pointer;background:none;border:none}
-
-/* LoRA Training */
-.lora-scroll{flex:1;overflow-y:auto;padding:16px}
-.section-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;margin-top:8px}
-.param-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.param-row .param-label{font-size:14px;color:var(--text1)}
-.param-row .param-value{font-size:14px;color:var(--primary);font-weight:500;min-width:40px;text-align:right}
-input[type=range]{width:100%;height:4px;-webkit-appearance:none;background:var(--surface-v);border-radius:2px;outline:none;margin:8px 0}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:var(--primary);border-radius:50%;cursor:pointer}
-.progress-section{background:var(--surface);border-radius:var(--radius);padding:16px;margin-top:12px;border:0.5px solid var(--divider)}
-.progress-bar{height:6px;background:var(--surface-v);border-radius:3px;overflow:hidden;margin:8px 0}
-.progress-bar .fill{height:100%;background:var(--primary);border-radius:3px;transition:width 0.3s;width:0%}
-.progress-text{font-size:13px;color:var(--text2);text-align:center}
-.loss-chart{height:120px;background:var(--surface-v);border-radius:var(--radius-sm);margin:8px 0;display:flex;align-items:flex-end;padding:8px;gap:2px}
-.loss-bar{flex:1;background:var(--primary);border-radius:2px 2px 0 0;opacity:0.6;transition:height 0.3s}
-.log-area{height:120px;background:#1e1e2e;border-radius:var(--radius-sm);padding:10px;font-size:11px;font-family:'SF Mono',Menlo,monospace;color:#cdd6f4;overflow-y:auto;margin-top:8px;line-height:1.6}
-.train-btns{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
-.train-btn{flex:1;min-width:80px;height:40px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.12s}
-.train-btn:active{opacity:0.85}
-.train-btn.primary{background:var(--primary);color:#fff}
-.train-btn.secondary{background:var(--surface-v);color:var(--text1);border:0.5px solid var(--divider)}
-.train-btn.danger{background:var(--danger-light);color:var(--danger)}
-
-/* Knowledge Base */
-.kb-list{flex:1;overflow-y:auto;padding:12px 16px}
-.kb-card{background:var(--surface);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;border:0.5px solid var(--divider);cursor:pointer;transition:background 0.12s}
-.kb-card:active{background:var(--surface-v)}
-.kb-card .kb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
-.kb-card .kb-name{font-size:15px;font-weight:600;color:var(--text1)}
-.kb-card .kb-count{font-size:12px;color:var(--text2)}
-.kb-card .kb-desc{font-size:13px;color:var(--text2);line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.kb-card .kb-footer{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3)}
-
-/* Settings */
-.settings-scroll{flex:1;overflow-y:auto;padding:0 16px 40px}
-.settings-group-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;padding:20px 0 8px}
-.settings-group{background:var(--surface);border-radius:var(--radius);overflow:hidden;margin-bottom:8px;border:0.5px solid var(--divider)}
-.setting-item{display:flex;align-items:center;padding:13px 16px;gap:12px}
-.setting-item+.setting-item{border-top:0.5px solid var(--divider)}
-.setting-item .setting-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
-.setting-item .setting-text{flex:1}
-.setting-item .setting-title{font-size:15px;color:var(--text1)}
-.setting-item .setting-sub{font-size:12px;color:var(--text2);margin-top:2px}
-.setting-item .setting-value{font-size:14px;color:var(--text2)}
-.setting-item .setting-switch{width:44px;height:26px;border-radius:13px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
-.setting-item .setting-switch.on{background:var(--primary)}
-.setting-item .setting-switch.off{background:#C7C7CC}
-.setting-item .setting-switch::after{content:'';position:absolute;top:2px;width:22px;height:22px;background:#fff;border-radius:50%;transition:left 0.2s;box-shadow:0 1px 2px rgba(0,0,0,0.15)}
-.setting-item .setting-switch.on::after{left:22px}
-.setting-item .setting-switch.off::after{left:2px}
-.setting-item .setting-arrow{font-size:14px;color:var(--text3)}
-
-/* Bottom Nav */
-.bottom-nav{height:56px;background:var(--surface);border-top:0.5px solid var(--divider);display:flex;flex-shrink:0}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:color 0.15s}
-.nav-item .nav-icon{font-size:20px}
-.nav-item .nav-label{font-size:10px;font-weight:500}
-.nav-item.active{color:var(--primary)}
-.nav-item:not(.active){color:var(--text3)}
-
-/* Page nav */
-.page-nav{position:absolute;bottom:20px;right:12px;z-index:90;display:flex;flex-direction:column;gap:6px}
-.page-nav-btn{width:40px;height:40px;border-radius:50%;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);transition:transform 0.12s}
-.page-nav-btn:active{transform:scale(0.94)}
-.page-nav-btn.nav-prev{background:var(--surface);color:var(--text1)}
-.page-nav-btn.nav-next{background:var(--primary);color:#fff}
+/* Nav pill */
+.navpill{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:90;background:rgba(17,19,24,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:6px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.08)}
+.navpill button{width:32px;height:32px;border:none;border-radius:10px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;background:transparent;color:rgba(255,255,255,0.4)}
+.navpill button:hover{color:rgba(255,255,255,0.7)}
+.navpill button:active{transform:scale(.92)}
+.navpill .pn{color:rgba(255,255,255,0.25);font-size:10px;font-weight:600;letter-spacing:.5px}
 
 /* Toast */
-.toast{position:absolute;top:60px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--text1);color:#fff;padding:8px 20px;border-radius:var(--radius-full);font-size:13px;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:200;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast{position:absolute;top:52px;left:50%;transform:translateX(-50%) translateY(-12px);background:var(--t1);color:#fff;padding:8px 18px;border-radius:12px;font-size:13px;font-weight:500;opacity:0;transition:all .2s;z-index:500;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* Typing indicator */
-.typing{display:flex;gap:4px;padding:4px 0}
-.typing span{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:typing 1.2s infinite}
-.typing span:nth-child(2){animation-delay:0.2s}
-.typing span:nth-child(3){animation-delay:0.4s}
-@keyframes typing{0%,60%,100%{opacity:0.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+/* === SPLASH === */
+.splash{justify-content:center;align-items:center;background:var(--bg)}
+.splash-brand{display:flex;flex-direction:column;align-items:center;animation:splashIn .8s ease both}
+@keyframes splashIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.splash-mark{width:80px;height:80px;border-radius:22px;background:linear-gradient(135deg,#2563EB,#7C3AED);display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 32px rgba(37,99,235,0.25)}
+.splash-mark svg{width:40px;height:40px}
+.splash-name{font-size:28px;font-weight:700;color:var(--t1);letter-spacing:-.8px}
+.splash-tag{font-size:14px;color:var(--t2);margin-top:6px;font-weight:400}
+.splash-ver{position:absolute;bottom:52px;font-size:11px;color:var(--t3);letter-spacing:.5px}
 
-/* FAB */
-.fab{position:absolute;bottom:72px;right:16px;width:48px;height:48px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(26,115,232,0.3);z-index:10;transition:transform 0.12s}
-.fab:active{transform:scale(0.94)}
+/* === LOGIN === */
+.auth{background:var(--bg)}
+.auth-head{padding:60px 28px 28px}
+.auth-head h1{font-size:26px;font-weight:700;color:var(--t1);letter-spacing:-.6px;line-height:1.2}
+.auth-head p{font-size:14px;color:var(--t2);margin-top:6px}
+.auth-body{padding:0 28px;flex:1;overflow-y:auto}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase}
+.field input{width:100%;height:50px;background:var(--s);border:1.5px solid var(--d);border-radius:var(--r);padding:0 16px;font-size:15px;color:var(--t1);font-family:var(--font);outline:none;transition:border-color .2s}
+.field input:focus{border-color:var(--p)}
+.field input::placeholder{color:var(--t3)}
+.field-row{display:flex;gap:8px}
+.field-row input{flex:1}
+.code-btn{height:50px;padding:0 16px;background:var(--s);color:var(--p);border:1.5px solid var(--p);border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:var(--font);transition:all .15s}
+.code-btn:active{background:var(--p-light)}
+.btn-p{width:100%;height:50px;background:var(--p);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .15s;letter-spacing:-.2px}
+.btn-p:active{background:var(--p-dark);transform:scale(.98)}
+.divider{display:flex;align-items:center;gap:12px;margin:22px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--d)}
+.divider span{font-size:12px;color:var(--t3);font-weight:500}
+.socials{display:flex;justify-content:center;gap:12px;margin-bottom:20px}
+.social-btn{width:52px;height:52px;background:var(--s);border:1.5px solid var(--d);border-radius:var(--r);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+.social-btn:active{transform:scale(.95);border-color:var(--p)}
+.social-btn svg{width:22px;height:22px}
+.auth-link{text-align:center;font-size:14px;color:var(--t2);padding:8px 0 40px}
+.auth-link a{color:var(--p);text-decoration:none;font-weight:600}
 
-/* Search bar */
-.search-bar{margin:12px 16px;height:40px;background:var(--surface-v);border-radius:var(--radius-full);display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0}
-.search-bar .search-icon{font-size:16px;color:var(--text3)}
-.search-bar input{flex:1;border:none;background:none;font-size:14px;color:var(--text1);outline:none}
-.search-bar input::placeholder{color:var(--text3)}
+/* === CHAT === */
+.chat{background:var(--bg)}
+.chat-bar{height:56px;background:var(--s);border-bottom:1px solid var(--d);display:flex;align-items:center;padding:0 10px;flex-shrink:0}
+.chat-bar .ib{width:38px;height:38px;border:none;background:transparent;cursor:pointer;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;transition:background .15s}
+.chat-bar .ib:active{background:var(--s2)}
+.chat-bar .ib svg{width:20px;height:20px;color:var(--t1)}
+.chat-bar .mid{flex:1;text-align:center}
+.chat-bar .model{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.3px}
+.chat-bar .status{font-size:11px;color:var(--green);font-weight:500;display:flex;align-items:center;justify-content:center;gap:4px;margin-top:1px}
+.chat-bar .status .sd{width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.msgs{flex:1;overflow-y:auto;padding:10px 16px 10px;display:flex;flex-direction:column;gap:6px;-webkit-overflow-scrolling:touch}
+.msg{max-width:82%;display:flex;flex-direction:column;animation:msgIn .25s ease both}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg.u{align-self:flex-end}
+.msg.a{align-self:flex-start}
+.bub{padding:10px 14px;font-size:14px;line-height:1.65;border-radius:var(--rl);letter-spacing:-.1px}
+.msg.u .bub{background:var(--p);color:#fff;border-bottom-right-radius:6px}
+.msg.a .bub{background:var(--s);color:var(--t1);border-bottom-left-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.msg.a .bub strong{font-weight:600;color:var(--t1)}
+.msg.a .bub pre{background:#1E1E2E;color:#CDD6F4;padding:12px 14px;border-radius:10px;margin:8px 0;font-size:12.5px;font-family:'SF Mono',Menlo,Consolas,monospace;line-height:1.55;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.msg.a .bub code{background:var(--s2);padding:1.5px 5px;border-radius:5px;font-size:12.5px;font-family:'SF Mono',Menlo,Consolas,monospace;color:var(--p-dark)}
+.mt{font-size:10px;color:var(--t3);margin-top:3px;padding:0 4px;font-weight:500}
+.msg.u .mt{text-align:right}
+.typing-dots{display:flex;gap:4px;padding:4px 0}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--t3);animation:tdot 1.4s ease infinite}
+.typing-dots span:nth-child(2){animation-delay:.15s}
+.typing-dots span:nth-child(3){animation-delay:.3s}
+@keyframes tdot{0%,60%,100%{opacity:.25;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+.qbar{padding:4px 12px 6px;display:flex;gap:6px;overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.qbar::-webkit-scrollbar{display:none}
+.qpill{height:30px;padding:0 12px;background:var(--s);border:1px solid var(--d);border-radius:var(--rf);font-size:12px;font-weight:500;color:var(--t2);white-space:nowrap;display:flex;align-items:center;gap:5px;cursor:pointer;transition:all .15s;flex-shrink:0}
+.qpill:active{background:var(--p-light);border-color:var(--p);color:var(--p)}
+.qpill svg{width:14px;height:14px}
+.iarea{padding:6px 10px 30px;background:var(--s);border-top:1px solid var(--d);display:flex;align-items:flex-end;gap:6px;flex-shrink:0}
+.iarea .ab{width:36px;height:36px;border:1.5px solid var(--d);background:var(--s);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .12s}
+.iarea .ab:active{background:var(--s2)}
+.iarea .ab svg{width:18px;height:18px;color:var(--t2)}
+.iarea .ti{flex:1;min-height:38px;max-height:100px;background:var(--s2);border:1.5px solid transparent;border-radius:20px;padding:8px 16px;font-size:15px;color:var(--t1);outline:none;resize:none;font-family:var(--font);line-height:1.4;transition:border-color .2s}
+.iarea .ti:focus{border-color:var(--p)}
+.iarea .ti::placeholder{color:var(--t3)}
+.iarea .sb{width:36px;height:36px;border:none;background:var(--p);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .12s;box-shadow:0 2px 8px rgba(37,99,235,0.25)}
+.iarea .sb:active{transform:scale(.92)}
+.iarea .sb svg{width:16px;height:16px;color:#fff}
+
+/* Bottom Nav */
+.bnav{height:52px;background:var(--s);border-top:1px solid var(--d);display:flex;flex-shrink:0}
+.bnav .ni{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;transition:color .15s}
+.bnav .ni svg{width:22px;height:22px;transition:color .15s}
+.bnav .ni span{font-size:10px;font-weight:600;letter-spacing:.2px}
+.bnav .ni.on{color:var(--p)}
+.bnav .ni:not(.on){color:var(--t3)}
+
+/* Sidebar */
+.sov{position:absolute;inset:0;background:rgba(0,0,0,0.35);z-index:50;opacity:0;pointer-events:none;transition:opacity .25s}
+.sov.on{opacity:1;pointer-events:auto}
+.sbar{position:absolute;top:0;left:0;width:280px;height:100%;background:var(--s);z-index:51;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.sbar.on{transform:translateX(0)}
+.sbar-user{padding:52px 18px 16px;border-bottom:1px solid var(--d)}
+.sbar-user .ur{display:flex;align-items:center;gap:12px}
+.sbar-user .av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#7C3AED);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;flex-shrink:0}
+.sbar-user .ui{flex:1;min-width:0}
+.sbar-user .un{font-size:15px;font-weight:600;color:var(--t1)}
+.sbar-user .uv{font-size:11px;font-weight:600;color:var(--orange);margin-top:2px;display:flex;align-items:center;gap:3px}
+.sbar-user .uv svg{width:12px;height:12px}
+.sbar-user .um{font-size:11px;color:var(--t2);margin-top:2px;display:flex;align-items:center;gap:3px}
+.sbar-user .um svg{width:10px;height:10px}
+.sbar-list{flex:1;overflow-y:auto;padding:6px 8px}
+.ci{padding:10px 12px;border-radius:var(--rs);cursor:pointer;transition:background .12s;display:flex;flex-direction:column;gap:3px;position:relative;margin-bottom:1px}
+.ci:active{background:var(--s2)}
+.ci.sel{background:var(--p-light)}
+.ci.sel::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:3px;background:var(--p);border-radius:2px}
+.ci .ct{font-size:14px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci .cm{display:flex;align-items:center;gap:6px}
+.ci .ctime{font-size:11px;color:var(--t3)}
+.ci .ctag{font-size:9px;padding:1px 6px;border-radius:4px;color:#fff;font-weight:600;letter-spacing:.3px}
+.ctag.tl{background:var(--green)}.ctag.tg{background:var(--p)}.ctag.tc{background:var(--orange)}.ctag.tlr{background:var(--purple)}
+.sbar-ft{padding:10px 16px;border-top:1px solid var(--d);display:flex;align-items:center;justify-content:space-between}
+.sbar-ft .sbf{font-size:13px;color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:500}
+.sbar-ft .sbf svg{width:16px;height:16px}
+.sbar-ft .sv{font-size:11px;color:var(--t3)}
+
+/* === PROFILE === */
+.prof{background:var(--bg)}
+.prof-scroll{flex:1;overflow-y:auto;padding:16px}
+.prof-card{background:var(--s);border-radius:var(--rl);padding:24px 20px;text-align:center;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.prof-card .av-lg{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#7C3AED);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:28px;margin:0 auto 14px;box-shadow:0 4px 20px rgba(37,99,235,0.2)}
+.prof-card .pn{font-size:19px;font-weight:700;color:var(--t1);letter-spacing:-.4px}
+.prof-card .puid{font-size:12px;color:var(--t2);margin-top:4px;font-family:'SF Mono',Menlo,monospace;letter-spacing:.5px}
+.prof-card .pvip{display:inline-flex;align-items:center;gap:4px;margin-top:10px;padding:5px 14px;background:linear-gradient(135deg,#F59E0B,#EF4444);border-radius:var(--rf);font-size:12px;font-weight:700;color:#fff;letter-spacing:.3px}
+.prof-card .pvip svg{width:12px;height:12px}
+.prof-card .pdev{font-size:12px;color:var(--t2);margin-top:8px}
+.vip-card{background:linear-gradient(135deg,#2563EB 0%,#7C3AED 50%,#EC4899 100%);border-radius:var(--rl);padding:18px 20px;margin-bottom:14px;color:#fff;position:relative;overflow:hidden}
+.vip-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:rgba(255,255,255,0.08);border-radius:50%}
+.vip-card .vl{font-size:11px;font-weight:600;opacity:.7;letter-spacing:.5px;text-transform:uppercase}
+.vip-card .vp{font-size:19px;font-weight:700;margin-top:4px;letter-spacing:-.3px}
+.vip-card .ve{font-size:12px;opacity:.65;margin-top:4px}
+.vip-card .vub{margin-top:14px;padding:8px 18px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.2);border-radius:var(--rs);color:#fff;font-size:13px;font-weight:600;cursor:pointer;display:inline-block;transition:all .12s;font-family:var(--font)}
+.vip-card .vub:active{background:rgba(255,255,255,0.28)}
+.mg{background:var(--s);border-radius:var(--rl);margin-bottom:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.mi{display:flex;align-items:center;padding:14px 16px;cursor:pointer;transition:background .1s;gap:12px}
+.mi:active{background:var(--s2)}
+.mi+.mi{border-top:1px solid var(--d)}
+.mi .mi-ic{width:32px;height:32px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mi .mi-ic svg{width:18px;height:18px}
+.mi .mi-ic.blue{background:var(--p-light);color:var(--p)}
+.mi .mi-ic.purple{background:#F3E8FF;color:var(--purple)}
+.mi .mi-ic.green{background:#DCFCE7;color:var(--green)}
+.mi .mi-ic.orange{background:#FEF3C7;color:var(--orange)}
+.mi .mi-ic.red{background:var(--red-l);color:var(--red)}
+.mi .mi-ic.gray{background:var(--s2);color:var(--t2)}
+.mi .mi-t{flex:1;font-size:15px;font-weight:500;color:var(--t1)}
+.mi .mi-ar{color:var(--t3)}
+.mi .mi-ar svg{width:16px;height:16px}
+.logout{width:100%;height:48px;background:var(--red-l);color:var(--red);border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);margin-top:4px;transition:all .12s}
+.logout:active{opacity:.8}
+
+/* === MODEL === */
+.mtabs{display:flex;background:var(--s);border-bottom:1px solid var(--d);flex-shrink:0}
+.mtab{flex:1;height:44px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:-.1px}
+.mtab.on{color:var(--p);border-bottom-color:var(--p)}
+.mlist{flex:1;overflow-y:auto;padding:10px 16px}
+.mcard{background:var(--s);border-radius:var(--rl);padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.03);transition:transform .1s}
+.mcard:active{transform:scale(.985)}
+.mcard .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.mcard .mn{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.2px}
+.mcard .mtags{display:flex;gap:4px}
+.mcard .mtag{font-size:9px;padding:2px 7px;border-radius:5px;color:#fff;font-weight:700;letter-spacing:.3px}
+.mcard .minfo{display:flex;gap:10px;font-size:12px;color:var(--t2);margin-bottom:10px;font-weight:500}
+.mcard .minfo span{display:flex;align-items:center;gap:3px}
+.mcard .minfo svg{width:12px;height:12px}
+.mcard .mact{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--d);padding-top:10px}
+.sw{width:44px;height:26px;border-radius:13px;position:relative;cursor:pointer;transition:background .2s}
+.sw.on{background:var(--p)}
+.sw.off{background:#D1D5DB}
+.sw::after{content:'';position:absolute;top:2px;width:22px;height:22px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.15)}
+.sw.on::after{left:20px}
+.sw.off::after{left:2px}
+.del-btn{font-size:12px;color:var(--red);cursor:pointer;background:none;border:none;font-weight:600;font-family:var(--font);display:flex;align-items:center;gap:3px}
+.del-btn svg{width:14px;height:14px}
+
+/* === LORA === */
+.lora-scroll{flex:1;overflow-y:auto;padding:16px}
+.stitle{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;margin-top:16px}
+.stitle:first-child{margin-top:0}
+.ds-card{background:var(--s);border-radius:var(--rl);padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.03);display:flex;align-items:center;justify-content:space-between}
+.ds-card .ds-info{flex:1;min-width:0}
+.ds-card .ds-name{font-size:14px;font-weight:600;color:var(--t1)}
+.ds-card .ds-meta{font-size:12px;color:var(--t2);margin-top:2px;display:flex;align-items:center;gap:4px}
+.ds-card .ds-meta svg{width:12px;height:12px}
+.imp-btn{height:36px;padding:0 14px;background:var(--s);border:1.5px solid var(--d);border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;color:var(--t1);font-family:var(--font);display:flex;align-items:center;gap:4px;transition:all .12s}
+.imp-btn:active{background:var(--p-light);border-color:var(--p);color:var(--p)}
+.imp-btn svg{width:14px;height:14px}
+.param-card{background:var(--s);border-radius:var(--rl);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.pr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.pr .pl{font-size:14px;font-weight:500;color:var(--t1)}
+.pr .pv{font-size:14px;font-weight:700;color:var(--p);min-width:36px;text-align:right}
+input[type=range]{width:100%;height:4px;-webkit-appearance:none;background:var(--s2);border-radius:2px;outline:none;margin:4px 0 14px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--p);border-radius:50%;cursor:pointer;box-shadow:0 1px 4px rgba(37,99,235,0.3)}
+.prog-card{background:var(--s);border-radius:var(--rl);padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.pbar{height:5px;background:var(--s2);border-radius:3px;overflow:hidden;margin:8px 0}
+.pbar .pf{height:100%;background:linear-gradient(90deg,var(--p),var(--purple));border-radius:3px;transition:width .4s}
+.ptxt{font-size:12px;color:var(--t2);text-align:center;font-weight:500}
+.loss-chart{height:100px;background:var(--s2);border-radius:var(--rs);margin:10px 0;display:flex;align-items:flex-end;padding:8px 6px;gap:2px}
+.lbar{flex:1;background:linear-gradient(180deg,var(--p),var(--purple));border-radius:2px 2px 0 0;opacity:.55;transition:height .3s}
+.logbox{height:110px;background:#1E1E2E;border-radius:var(--rs);padding:10px 12px;font-size:10.5px;font-family:'SF Mono',Menlo,Consolas,monospace;color:#94A3B8;overflow-y:auto;margin-top:8px;line-height:1.65;-webkit-overflow-scrolling:touch}
+.logbox .lg{color:#64748B}.logbox .lw{color:#F59E0B}.logbox .ls{color:#22C55E}
+.tbtns{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+.tb{flex:1;min-width:72px;height:38px;border:none;border-radius:var(--rs);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .12s;display:flex;align-items:center;justify-content:center;gap:4px}
+.tb:active{transform:scale(.96)}
+.tb svg{width:14px;height:14px}
+.tb.pri{background:var(--p);color:#fff}
+.tb.sec{background:var(--s);color:var(--t1);border:1.5px solid var(--d)}
+.tb.dan{background:var(--red-l);color:var(--red)}
+
+/* === KB === */
+.kb-list{flex:1;overflow-y:auto;padding:10px 16px}
+.kb-card{background:var(--s);border-radius:var(--rl);padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.03);cursor:pointer;transition:transform .1s}
+.kb-card:active{transform:scale(.985)}
+.kb-card .kh{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.kb-card .kn{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.2px}
+.kb-card .kc{font-size:12px;color:var(--t2);font-weight:500}
+.kb-card .kd{font-size:13px;color:var(--t2);line-height:1.45;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.kb-card .kf{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--t3);font-weight:500}
+
+/* === SETTINGS === */
+.set-scroll{flex:1;overflow-y:auto;padding:0 16px 40px}
+.sg-title{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;padding:18px 0 6px}
+.sg{background:var(--s);border-radius:var(--rl);overflow:hidden;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.03)}
+.si{display:flex;align-items:center;padding:13px 14px;gap:10px}
+.si+.si{border-top:1px solid var(--d)}
+.si .si-ic{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.si .si-ic svg{width:16px;height:16px}
+.si .si-ic.blue{background:var(--p-light);color:var(--p)}
+.si .si-ic.purple{background:#F3E8FF;color:var(--purple)}
+.si .si-ic.green{background:#DCFCE7;color:var(--green)}
+.si .si-ic.orange{background:#FEF3C7;color:var(--orange)}
+.si .si-ic.red{background:var(--red-l);color:var(--red)}
+.si .si-ic.gray{background:var(--s2);color:var(--t2)}
+.si .si-txt{flex:1;min-width:0}
+.si .si-t{font-size:14px;font-weight:500;color:var(--t1)}
+.si .si-sub{font-size:11px;color:var(--t2);margin-top:1px}
+.si .si-val{font-size:13px;color:var(--t2);font-weight:500}
+.si .si-arr svg{width:14px;height:14px;color:var(--t3)}
+
+/* === AGENT === */
+.ag-list{flex:1;overflow-y:auto;padding:10px 16px}
+.ag-card{background:var(--s);border-radius:var(--rl);padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,0.03);cursor:pointer;transition:transform .1s;display:flex;align-items:center;gap:12px}
+.ag-card:active{transform:scale(.985)}
+.ag-card .ag-ic{width:40px;height:40px;border-radius:var(--rs);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ag-card .ag-ic svg{width:20px;height:20px}
+.ag-card .ag-info{flex:1;min-width:0}
+.ag-card .ag-name{font-size:14px;font-weight:600;color:var(--t1)}
+.ag-card .ag-desc{font-size:12px;color:var(--t2);margin-top:2px}
+.ag-card .ag-tag{font-size:9px;padding:2px 7px;border-radius:5px;color:#fff;font-weight:700}
+.fab{position:absolute;bottom:64px;right:16px;width:48px;height:48px;background:var(--p);border-radius:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,0.3);z-index:10;transition:all .12s}
+.fab:active{transform:scale(.92)}
+.fab svg{width:22px;height:22px;color:#fff}
+
+.search{margin:10px 16px;height:40px;background:var(--s);border-radius:var(--rf);display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0;border:1.5px solid var(--d);transition:border-color .2s}
+.search:focus-within{border-color:var(--p)}
+.search svg{width:16px;height:16px;color:var(--t3);flex-shrink:0}
+.search input{flex:1;border:none;background:none;font-size:14px;color:var(--t1);outline:none;font-family:var(--font)}
+.search input::placeholder{color:var(--t3)}
 </style>
 </head>
 <body>
 
-<div class="phone-frame">
-  <div class="phone-notch"></div>
-  <div class="phone-home"></div>
-  <div class="screen">
+<div class="device">
+<div class="screen">
 
-    <!-- Toast -->
-    <div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
-    <!-- Page Navigation -->
-    <div class="page-nav">
-      <button class="page-nav-btn nav-prev" onclick="prevPage()">◀</button>
-      <button class="page-nav-btn nav-next" onclick="nextPage()">▶</button>
+<div class="navpill">
+  <button onclick="prev()">‹</button>
+  <span class="pn" id="pn">1/10</span>
+  <button onclick="next()">›</button>
+</div>
+
+<!-- ====== SPLASH ====== -->
+<div class="P splash on" id="p0">
+  <div class="splash-brand">
+    <div class="splash-mark">
+      <svg viewBox="0 0 40 40" fill="none"><path d="M20 4L8 12v16l12 8 12-8V12L20 4z" stroke="#fff" stroke-width="2" fill="none"/><circle cx="20" cy="18" r="5" fill="#fff" opacity=".9"/><path d="M14 28c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
     </div>
+    <div class="splash-name">OmniAI</div>
+    <div class="splash-tag">本地AI，无限可能</div>
+  </div>
+  <div class="splash-ver">v1.0.0</div>
+</div>
 
-    <!-- 1. Splash -->
-    <div class="page splash active" id="page-splash">
-      <div class="splash-logo">O</div>
-      <div class="splash-title">OmniAI</div>
-      <div class="splash-sub">欢迎使用 OmniAI</div>
-      <div class="splash-ver">v1.0.0</div>
+<!-- ====== LOGIN ====== -->
+<div class="P auth" id="p1">
+  <div class="auth-head">
+    <h1>欢迎使用 OmniAI</h1>
+    <p>登录以继续</p>
+  </div>
+  <div class="auth-body">
+    <div class="field"><label>手机号或邮箱</label><input placeholder="请输入手机号或邮箱" value="user@omniai.com"></div>
+    <div class="field"><label>登录密码</label><input type="password" placeholder="请输入登录密码" value="••••••••"></div>
+    <button class="btn-p" onclick="go('p3')">登 录</button>
+    <div class="divider"><span>其他登录方式</span></div>
+    <div class="socials">
+      <div class="social-btn" onclick="T('Google 登录')"><svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></div>
+      <div class="social-btn" onclick="T('微信登录')"><svg viewBox="0 0 24 24" fill="#07C160"><path d="M8.69 2C4.34 2 .75 5.06.75 8.8c0 2.14 1.12 4.06 2.88 5.34l-.72 2.16 2.52-1.26c.86.24 1.77.37 2.72.37.32 0 .64-.02.95-.05A5.97 5.97 0 018 12.19C8 8.39 11.36 5.3 15.5 5.3c.34 0 .67.02 1 .06C15.6 3.34 12.44 2 8.69 2zM5.5 6.75a1 1 0 110 2 1 1 0 010-2zm6 0a1 1 0 110 2 1 1 0 010-2zM15.5 6.3c-3.59 0-6.5 2.47-6.5 5.5s2.91 5.5 6.5 5.5c.79 0 1.55-.12 2.26-.34l2.02 1.01-.58-1.73C20.96 15.2 22 13.58 22 11.8c0-3.03-2.91-5.5-6.5-5.5zM13 10.25a.75.75 0 110 1.5.75.75 0 010-1.5zm5 0a.75.75 0 110 1.5.75.75 0 010-1.5z"/></svg></div>
+      <div class="social-btn" onclick="T('QQ 登录')"><svg viewBox="0 0 24 24" fill="#12B7F5"><path d="M12 2C7.58 2 4 5.58 4 10c0 2.08.8 3.97 2.11 5.39-.25.84-.67 1.62-1.22 2.28-.33.4-.1.98.42.98.09 0 .18-.02.26-.06 1.1-.52 2.08-1.24 2.89-2.12.82.33 1.72.53 2.66.53h.01c.94 0 1.84-.2 2.66-.53.81.88 1.79 1.6 2.89 2.12.08.04.17.06.26.06.52 0 .75-.58.42-.98-.55-.66-.97-1.44-1.22-2.28A7.96 7.96 0 0020 10c0-4.42-3.58-8-8-8zm-3.5 9a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm7 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3z"/></svg></div>
+      <div class="social-btn" onclick="T('Apple 登录')"><svg viewBox="0 0 24 24" fill="#000"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg></div>
     </div>
-
-    <!-- 2. Login -->
-    <div class="page login" id="page-login">
-      <div class="login-scroll">
-        <div class="login-title">欢迎使用 OmniAI</div>
-        <div class="login-sub">登录以继续</div>
-        <div class="input-group">
-          <label>手机号或邮箱</label>
-          <input class="input-field" placeholder="请输入手机号或邮箱" value="user@omniai.com">
-        </div>
-        <div class="input-group">
-          <label>登录密码</label>
-          <input class="input-field" type="password" placeholder="请输入登录密码" value="••••••••">
-        </div>
-        <button class="login-btn" onclick="navigateTo('page-chat')">登 录</button>
-        <div class="divider-row"><span>或</span></div>
-        <div class="social-row">
-          <div class="social-btn" onclick="showToast('Google 登录')">G</div>
-          <div class="social-btn" onclick="showToast('微信登录')">微</div>
-          <div class="social-btn" onclick="showToast('QQ登录')">Q</div>
-          <div class="social-btn" onclick="showToast('Apple登录')"></div>
-        </div>
-        <div class="login-link">没有账号？<a onclick="navigateTo('page-register')">创建你的AI空间</a></div>
-      </div>
-    </div>
-
-    <!-- 3. Register -->
-    <div class="page login" id="page-register">
-      <div class="login-scroll">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px">
-          <button style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--text1)" onclick="navigateTo('page-login')">◀</button>
-          <div class="login-title" style="margin:0">创建你的AI空间</div>
-        </div>
-        <div class="input-group">
-          <label>手机号或邮箱</label>
-          <input class="input-field" placeholder="请输入手机号或邮箱">
-        </div>
-        <div class="input-group">
-          <label>验证码</label>
-          <div class="input-row">
-            <input class="input-field" placeholder="请输入验证码">
-            <button class="code-btn">获取验证码</button>
-          </div>
-        </div>
-        <div class="input-group">
-          <label>登录密码</label>
-          <input class="input-field" type="password" placeholder="请输入登录密码">
-        </div>
-        <div class="input-group">
-          <label>确认密码</label>
-          <input class="input-field" type="password" placeholder="请再次输入密码">
-        </div>
-        <button class="login-btn" onclick="showToast('注册成功');navigateTo('page-chat')">注 册</button>
-        <div class="login-link">已有账号？<a onclick="navigateTo('page-login')">立即登录</a></div>
-      </div>
-    </div>
-
-    <!-- 4. Chat (Main) -->
-    <div class="page chat" id="page-chat">
-      <!-- Sidebar Overlay -->
-      <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
-      <!-- Sidebar -->
-      <div class="sidebar" id="sidebar">
-        <div class="sidebar-user">
-          <div class="user-row">
-            <div class="avatar">O</div>
-            <div class="user-info">
-              <div class="user-name">OmniAI 用户</div>
-              <div class="user-vip">⭐ Pro 会员</div>
-              <div class="user-model">OmniAI 3B · 本地运行中</div>
-            </div>
-          </div>
-        </div>
-        <div class="sidebar-conv">
-          <div class="sidebar-conv-item selected">
-            <div class="conv-title">关于量子计算的讨论</div>
-            <div class="conv-meta"><span class="conv-time">刚刚</span><span class="conv-tag" style="background:var(--tag-local)">本地</span></div>
-          </div>
-          <div class="sidebar-conv-item">
-            <div class="conv-title">Python 代码优化建议</div>
-            <div class="conv-meta"><span class="conv-time">2小时前</span><span class="conv-tag" style="background:var(--tag-gpu)">GPU</span></div>
-          </div>
-          <div class="sidebar-conv-item">
-            <div class="conv-title">AI 写作助手 - 项目方案</div>
-            <div class="conv-meta"><span class="conv-time">昨天</span><span class="conv-tag" style="background:var(--tag-cloud)">云端</span></div>
-          </div>
-          <div class="sidebar-conv-item">
-            <div class="conv-title">机器学习入门笔记</div>
-            <div class="conv-meta"><span class="conv-time">3天前</span><span class="conv-tag" style="background:var(--tag-lora)">LoRA</span></div>
-          </div>
-          <div class="sidebar-conv-item">
-            <div class="conv-title">翻译：技术文档中译英</div>
-            <div class="conv-meta"><span class="conv-time">上周</span><span class="conv-tag" style="background:var(--tag-local)">本地</span></div>
-          </div>
-        </div>
-        <div class="sidebar-bottom">
-          <div class="settings-btn" onclick="navigateTo('page-settings')">⚙️ 设置</div>
-          <div class="ver">v1.0.0</div>
-        </div>
-      </div>
-
-      <div class="chat-toolbar">
-        <button class="menu-btn" onclick="toggleSidebar(true)">☰</button>
-        <div class="center">
-          <div class="model-name">OmniAI 3B</div>
-          <div class="model-status"><span class="dot"></span>本地推理中</div>
-        </div>
-        <button class="new-btn" onclick="showToast('新建对话')">✚</button>
-        <button class="more-btn" onclick="showToast('更多选项')">⋯</button>
-      </div>
-
-      <div class="messages" id="chatMessages">
-        <div class="msg user">
-          <div class="msg-bubble">请解释一下量子计算的基本原理，以及它与传统计算有什么区别？</div>
-          <div class="msg-time">14:32</div>
-        </div>
-        <div class="msg ai">
-          <div class="msg-bubble">量子计算是利用量子力学原理进行信息处理的计算模式。与经典计算的核心区别在于：<br><br><strong>1. 量子比特 (Qubit)</strong><br>经典计算使用比特（0或1），量子计算使用量子比特，可以同时处于0和1的叠加态。<br><br><strong>2. 量子叠加</strong><br>一个量子比特可以同时表示多个状态，n个量子比特可以同时表示2ⁿ个状态。<br><br><strong>3. 量子纠缠</strong><br>两个量子比特可以产生关联，改变其中一个会瞬间影响另一个。<br><br>以下是一个简单的量子电路示例：</div>
-          <div class="msg-time">14:32 · OmniAI 3B</div>
-        </div>
-        <div class="msg ai">
-          <div class="msg-bubble"><pre>from qiskit import QuantumCircuit\n\nqc = QuantumCircuit(2, 2)\nqc.h(0)       # Hadamard gate\nqc.cx(0, 1)   # CNOT gate\nqc.measure([0,1], [0,1])</pre>这段代码创建了一个贝尔态，展示了量子叠加和纠缠的基本应用。</div>
-          <div class="msg-time">14:33 · OmniAI 3B</div>
-        </div>
-        <div class="msg user">
-          <div class="msg-bubble">能详细解释一下Hadamard门的作用吗？</div>
-          <div class="msg-time">14:35</div>
-        </div>
-        <div class="msg ai">
-          <div class="msg-bubble">
-            <div class="typing"><span></span><span></span><span></span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="quick-bar">
-        <div class="quick-pill" onclick="showToast('AI写作')"><span class="pill-icon">✍️</span>AI写作</div>
-        <div class="quick-pill" onclick="showToast('代码生成')"><span class="pill-icon">💻</span>代码生成</div>
-        <div class="quick-pill" onclick="showToast('翻译')"><span class="pill-icon">🌐</span>翻译</div>
-        <div class="quick-pill" onclick="showToast('OCR识图')"><span class="pill-icon">📷</span>OCR识图</div>
-        <div class="quick-pill" onclick="showToast('语音助手')"><span class="pill-icon">🎤</span>语音助手</div>
-        <div class="quick-pill" onclick="showToast('AI搜索')"><span class="pill-icon">🔍</span>AI搜索</div>
-        <div class="quick-pill" onclick="showToast('知识库')"><span class="pill-icon">📚</span>知识库</div>
-        <div class="quick-pill" onclick="showToast('Agent')"><span class="pill-icon">🤖</span>Agent</div>
-      </div>
-
-      <div class="input-area">
-        <button class="plus-btn" onclick="showToast('上传文件/图片')">＋</button>
-        <textarea class="text-input" rows="1" placeholder="输入内容、图片或语音…"></textarea>
-        <button class="voice-btn" onclick="showToast('语音输入中…')">🎤</button>
-        <button class="send-btn" onclick="showToast('发送消息')">▶</button>
-      </div>
-
-      <div class="bottom-nav">
-        <div class="nav-item active"><span class="nav-icon">💬</span><span class="nav-label">聊天</span></div>
-        <div class="nav-item" onclick="navigateTo('page-agent')"><span class="nav-icon">🤖</span><span class="nav-label">Agent</span></div>
-        <div class="nav-item" onclick="navigateTo('page-kb')"><span class="nav-icon">📚</span><span class="nav-label">知识库</span></div>
-        <div class="nav-item" onclick="navigateTo('page-model')"><span class="nav-icon">🧠</span><span class="nav-label">模型</span></div>
-        <div class="nav-item" onclick="navigateTo('page-profile')"><span class="nav-icon">👤</span><span class="nav-label">我的</span></div>
-      </div>
-    </div>
-
-    <!-- 5. Profile -->
-    <div class="page profile" id="page-profile">
-      <div class="profile-toolbar">
-        <button class="back-btn" onclick="navigateTo('page-chat')">◀</button>
-        <div class="title">我的</div>
-        <div class="placeholder"></div>
-      </div>
-      <div class="profile-scroll">
-        <div class="profile-card">
-          <div class="avatar-lg">O</div>
-          <div class="name">OmniAI 用户</div>
-          <div class="uid">UID: OAI-2024-8866</div>
-          <div class="vip-badge">⭐ Pro 会员</div>
-          <div class="device-count">已绑定 2 台设备</div>
-        </div>
-        <div class="vip-card">
-          <div class="vip-label">当前方案</div>
-          <div class="vip-plan">OmniAI Pro 年付</div>
-          <div class="vip-expiry">有效期至 2026.12.31</div>
-          <div class="vip-upgrade" onclick="showToast('升级方案')">续费 / 升级</div>
-        </div>
-        <div class="menu-group">
-          <div class="menu-item" onclick="navigateTo('page-model')"><span class="menu-icon">🧠</span><span class="menu-text">模型中心</span><span class="menu-arrow">›</span></div>
-          <div class="menu-item" onclick="navigateTo('page-lora')"><span class="menu-icon">🔬</span><span class="menu-text">LoRA训练</span><span class="menu-arrow">›</span></div>
-          <div class="menu-item" onclick="navigateTo('page-kb')"><span class="menu-icon">📚</span><span class="menu-text">知识库</span><span class="menu-arrow">›</span></div>
-          <div class="menu-item" onclick="showToast('语音助手')"><span class="menu-icon">🎤</span><span class="menu-text">语音助手</span><span class="menu-arrow">›</span></div>
-        </div>
-        <div class="menu-group">
-          <div class="menu-item" onclick="showToast('缓存管理')"><span class="menu-icon">🗑️</span><span class="menu-text">缓存管理</span><span class="menu-arrow">›</span></div>
-          <div class="menu-item" onclick="showToast('下载管理')"><span class="menu-icon">📥</span><span class="menu-text">下载管理</span><span class="menu-arrow">›</span></div>
-          <div class="menu-item" onclick="navigateTo('page-settings')"><span class="menu-icon">🔒</span><span class="menu-text">隐私与安全</span><span class="menu-arrow">›</span></div>
-          <div class="menu-item" onclick="showToast('开发者模式')"><span class="menu-icon">🛠️</span><span class="menu-text">开发者模式</span><span class="menu-arrow">›</span></div>
-        </div>
-        <button class="logout-btn" onclick="showToast('已退出登录');navigateTo('page-login')">退出登录</button>
-      </div>
-    </div>
-
-    <!-- 6. Model Manager -->
-    <div class="page" id="page-model" style="background:var(--bg);display:flex;flex-direction:column">
-      <div class="model-toolbar">
-        <button class="back-btn" onclick="navigateTo('page-chat')">◀</button>
-        <div class="title">模型中心</div>
-        <button class="add-btn" onclick="showToast('导入模型')">＋</button>
-      </div>
-      <div class="tabs">
-        <div class="tab active" onclick="showToast('本地模型')">本地模型</div>
-        <div class="tab" onclick="showToast('下载模型')">下载模型</div>
-      </div>
-      <div class="model-list">
-        <div class="model-card">
-          <div class="model-header">
-            <div class="model-name">OmniAI-3B-Q4_K</div>
-            <div class="model-tags"><span class="tag local">已加载</span><span class="tag gpu">GPU</span></div>
-          </div>
-          <div class="model-info"><span>1.8 GB</span><span>Q4_K_M</span><span>4096 ctx</span></div>
-          <div class="model-actions">
-            <div class="switch" onclick="this.classList.toggle('off')"></div>
-            <button class="delete-btn" onclick="showToast('确认删除？')">删除</button>
-          </div>
-        </div>
-        <div class="model-card">
-          <div class="model-header">
-            <div class="model-name">OmniAI-7B-Q5_K</div>
-            <div class="model-tags"><span class="tag lora">LoRA</span></div>
-          </div>
-          <div class="model-info"><span>4.2 GB</span><span>Q5_K_M</span><span>8192 ctx</span></div>
-          <div class="model-actions">
-            <div class="switch off" onclick="this.classList.toggle('off')"></div>
-            <button class="delete-btn" onclick="showToast('确认删除？')">删除</button>
-          </div>
-        </div>
-        <div class="model-card">
-          <div class="model-header">
-            <div class="model-name">Llama-3-8B-Q4_K</div>
-            <div class="model-tags"></div>
-          </div>
-          <div class="model-info"><span>4.7 GB</span><span>Q4_K_M</span><span>4096 ctx</span></div>
-          <div class="model-actions">
-            <div class="switch off" onclick="this.classList.toggle('off')"></div>
-            <button class="delete-btn" onclick="showToast('确认删除？')">删除</button>
-          </div>
-        </div>
-        <div class="model-card">
-          <div class="model-header">
-            <div class="model-name">Qwen2-1.5B-Q8_0</div>
-            <div class="model-tags"><span class="tag cloud">云端</span></div>
-          </div>
-          <div class="model-info"><span>1.6 GB</span><span>Q8_0</span><span>2048 ctx</span></div>
-          <div class="model-actions">
-            <div class="switch off" onclick="this.classList.toggle('off')"></div>
-            <button class="delete-btn" onclick="showToast('确认删除？')">删除</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 7. LoRA Training -->
-    <div class="page" id="page-lora" style="background:var(--bg);display:flex;flex-direction:column">
-      <div class="model-toolbar">
-        <button class="back-btn" onclick="navigateTo('page-profile')">◀</button>
-        <div class="title">LoRA训练</div>
-        <div class="placeholder" style="width:36px"></div>
-      </div>
-      <div class="lora-scroll">
-        <div class="section-title">数据集</div>
-        <div style="background:var(--surface);border-radius:var(--radius);padding:14px;border:0.5px solid var(--divider);margin-bottom:8px">
-          <div style="display:flex;align-items:center;justify-content:space-between">
-            <div><div style="font-size:14px;font-weight:500;color:var(--text1)">training_data.txt</div><div style="font-size:12px;color:var(--text2);margin-top:2px">2.3 MB · 1,247 条</div></div>
-            <button style="background:none;border:1px solid var(--divider);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--text1)" onclick="showToast('选择文件')">导入</button>
-          </div>
-        </div>
-
-        <div class="section-title">训练参数</div>
-        <div style="background:var(--surface);border-radius:var(--radius);padding:16px;border:0.5px solid var(--divider)">
-          <div class="param-row"><span class="param-label">LoRA Rank</span><span class="param-value" id="rankVal">8</span></div>
-          <input type="range" min="1" max="64" value="8" oninput="document.getElementById('rankVal').textContent=this.value">
-          <div class="param-row"><span class="param-label">LoRA Alpha</span><span class="param-value" id="alphaVal">16</span></div>
-          <input type="range" min="1" max="128" value="16" oninput="document.getElementById('alphaVal').textContent=this.value">
-          <div class="param-row"><span class="param-label">学习率</span><span class="param-value">1e-4</span></div>
-          <div class="param-row"><span class="param-label">Epochs</span><span class="param-value" id="epochVal">3</span></div>
-          <input type="range" min="1" max="20" value="3" oninput="document.getElementById('epochVal').textContent=this.value">
-          <div class="param-row"><span class="param-label">Batch Size</span><span class="param-value" id="batchVal">4</span></div>
-          <input type="range" min="1" max="16" value="4" oninput="document.getElementById('batchVal').textContent=this.value">
-          <div class="param-row"><span class="param-label">Dropout</span><span class="param-value" id="dropVal">0.05</span></div>
-          <input type="range" min="0" max="50" value="5" oninput="document.getElementById('dropVal').textContent=(this.value/100).toFixed(2)">
-        </div>
-
-        <div class="section-title">训练进度</div>
-        <div class="progress-section">
-          <div class="progress-bar"><div class="fill" id="trainProgress" style="width:65%"></div></div>
-          <div class="progress-text" id="trainPercent">65% · Epoch 2/3 · Loss: 0.342</div>
-          <div class="loss-chart">
-            <div class="loss-bar" style="height:80%"></div>
-            <div class="loss-bar" style="height:65%"></div>
-            <div class="loss-bar" style="height:55%"></div>
-            <div class="loss-bar" style="height:48%"></div>
-            <div class="loss-bar" style="height:42%"></div>
-            <div class="loss-bar" style="height:38%"></div>
-            <div class="loss-bar" style="height:35%"></div>
-            <div class="loss-bar" style="height:34%"></div>
-            <div class="loss-bar" style="height:33%"></div>
-            <div class="loss-bar" style="height:32%"></div>
-            <div class="loss-bar" style="height:34%"></div>
-            <div class="loss-bar" style="height:31%"></div>
-          </div>
-          <div class="log-area">[14:30:01] 数据集处理中... 1247 条记录
-[14:30:03] Tokenizer初始化完成
-[14:30:05] LoRA训练中... Epoch 1/3
-[14:31:22] Epoch 1 完成, Loss: 0.856
-[14:31:22] LoRA训练中... Epoch 2/3
-[14:32:45] Epoch 2 完成, Loss: 0.342
-[14:32:45] LoRA训练中... Epoch 3/3</div>
-        </div>
-
-        <div class="train-btns">
-          <button class="train-btn secondary" onclick="showToast('训练已暂停')">⏸ 暂停</button>
-          <button class="train-btn danger" onclick="showToast('训练已停止')">⏹ 停止</button>
-          <button class="train-btn primary" onclick="showToast('导出LoRA权重')">📤 导出LoRA</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 8. Knowledge Base -->
-    <div class="page" id="page-kb" style="background:var(--bg);display:flex;flex-direction:column">
-      <div class="model-toolbar">
-        <button class="back-btn" onclick="navigateTo('page-chat')">◀</button>
-        <div class="title">知识库</div>
-        <button class="add-btn" onclick="showToast('新建知识库')">＋</button>
-      </div>
-      <div class="search-bar">
-        <span class="search-icon">🔍</span>
-        <input placeholder="搜索知识库...">
-      </div>
-      <div class="kb-list">
-        <div class="kb-card" onclick="showToast('打开知识库')">
-          <div class="kb-header"><div class="kb-name">AI 技术文档库</div><div class="kb-count">23 篇文档</div></div>
-          <div class="kb-desc">包含大模型原理、训练技术、推理优化等技术文档，支持语义检索和智能问答。</div>
-          <div class="kb-footer"><span class="tag local" style="font-size:10px;padding:1px 6px;border-radius:4px;color:#fff">就绪</span><span>45.2 MB</span><span>更新于 2小时前</span></div>
-        </div>
-        <div class="kb-card" onclick="showToast('打开知识库')">
-          <div class="kb-header"><div class="kb-name">产品需求文档</div><div class="kb-count">8 篇文档</div></div>
-          <div class="kb-desc">项目PRD、功能规格、交互设计文档集合。</div>
-          <div class="kb-footer"><span style="font-size:10px;padding:1px 6px;border-radius:4px;color:#fff;background:var(--tag-cloud)">索引中</span><span>12.8 MB</span><span>更新于 昨天</span></div>
-        </div>
-        <div class="kb-card" onclick="showToast('打开知识库')">
-          <div class="kb-header"><div class="kb-name">法律法规数据库</div><div class="kb-count">156 篇文档</div></div>
-          <div class="kb-desc">中国法律法规、司法解释、部门规章全文检索库。</div>
-          <div class="kb-footer"><span class="tag local" style="font-size:10px;padding:1px 6px;border-radius:4px;color:#fff">就绪</span><span>234.5 MB</span><span>更新于 上周</span></div>
-        </div>
-        <div class="kb-card" onclick="showToast('打开知识库')">
-          <div class="kb-header"><div class="kb-name">个人学习笔记</div><div class="kb-count">42 篇文档</div></div>
-          <div class="kb-desc">机器学习、深度学习、NLP学习笔记与代码片段。</div>
-          <div class="kb-footer"><span class="tag local" style="font-size:10px;padding:1px 6px;border-radius:4px;color:#fff">就绪</span><span>8.7 MB</span><span>更新于 3天前</span></div>
-        </div>
-      </div>
-      <div class="fab" onclick="showToast('新建知识库')">＋</div>
-    </div>
-
-    <!-- 9. Settings -->
-    <div class="page" id="page-settings" style="background:var(--bg);display:flex;flex-direction:column">
-      <div class="profile-toolbar">
-        <button class="back-btn" onclick="navigateTo('page-chat')">◀</button>
-        <div class="title">设置</div>
-        <div class="placeholder"></div>
-      </div>
-      <div class="settings-scroll">
-        <div class="settings-group-title">AI 设置</div>
-        <div class="settings-group">
-          <div class="setting-item"><span class="setting-icon">🧠</span><div class="setting-text"><div class="setting-title">默认模型</div></div><span class="setting-value">OmniAI 3B</span><span class="setting-arrow">›</span></div>
-          <div class="setting-item"><span class="setting-icon">📝</span><div class="setting-text"><div class="setting-title">系统提示词</div></div><span class="setting-arrow">›</span></div>
-          <div class="setting-item"><span class="setting-icon">🌡️</span><div class="setting-text"><div class="setting-title">温度</div></div><span class="setting-value">0.7</span><span class="setting-arrow">›</span></div>
-          <div class="setting-item"><span class="setting-icon">🎯</span><div class="setting-text"><div class="setting-title">Top-P</div></div><span class="setting-value">0.9</span><span class="setting-arrow">›</span></div>
-        </div>
-
-        <div class="settings-group-title">推理设置</div>
-        <div class="settings-group">
-          <div class="setting-item"><span class="setting-icon">⚡</span><div class="setting-text"><div class="setting-title">推理模式</div></div><span class="setting-value">均衡模式</span><span class="setting-arrow">›</span></div>
-          <div class="setting-item"><span class="setting-icon">📐</span><div class="setting-text"><div class="setting-title">上下文长度</div></div><span class="setting-value">4096</span><span class="setting-arrow">›</span></div>
-          <div class="setting-item"><span class="setting-icon">💾</span><div class="setting-text"><div class="setting-title">mmap 加速</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
-          <div class="setting-item"><span class="setting-icon">🎮</span><div class="setting-text"><div class="setting-title">GPU 加速</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
-        </div>
-
-        <div class="settings-group-title">隐私设置</div>
-        <div class="settings-group">
-          <div class="setting-item"><span class="setting-icon">🔒</span><div class="setting-text"><div class="setting-title">应用锁</div></div><div class="setting-switch off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
-          <div class="setting-item"><span class="setting-icon">👆</span><div class="setting-text"><div class="setting-title">指纹解锁</div></div><div class="setting-switch off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
-          <div class="setting-item"><span class="setting-icon">👻</span><div class="setting-text"><div class="setting-title">无痕模式</div></div><div class="setting-switch off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
-          <div class="setting-item"><span class="setting-icon">🔐</span><div class="setting-text"><div class="setting-title">数据加密</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
-          <div class="setting-item"><span class="setting-icon">🛡️</span><div class="setting-text"><div class="setting-title">敏感词过滤</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
-          <div class="setting-item"><span class="setting-icon">☁️</span><div class="setting-text"><div class="setting-title">云端降级</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
-        </div>
-
-        <div class="settings-group-title">缓存设置</div>
-        <div class="settings-group">
-          <div class="setting-item"><span class="setting-icon">🗑️</span><div class="setting-text"><div class="setting-title">自动清理</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
-          <div class="setting-item"><span class="setting-icon">📊</span><div class="setting-text"><div class="setting-title">缓存大小</div></div><span class="setting-value">128.3 MB</span><span class="setting-arrow">›</span></div>
-          <div class="setting-item" onclick="showToast('缓存已清理')"><span class="setting-icon">🧹</span><div class="setting-text"><div class="setting-title">清理缓存</div></div><span class="setting-arrow">›</span></div>
-        </div>
-
-        <div class="settings-group-title">关于</div>
-        <div class="settings-group">
-          <div class="setting-item"><span class="setting-icon">ℹ️</span><div class="setting-text"><div class="setting-title">版本</div></div><span class="setting-value">1.0.0</span></div>
-          <div class="setting-item" onclick="showToast('已是最新版本')"><span class="setting-icon">🔄</span><div class="setting-text"><div class="setting-title">检查更新</div></div><span class="setting-arrow">›</span></div>
-          <div class="setting-item"><span class="setting-icon">📄</span><div class="setting-text"><div class="setting-title">用户协议</div></div><span class="setting-arrow">›</span></div>
-          <div class="setting-item"><span class="setting-icon">🔒</span><div class="setting-text"><div class="setting-title">隐私政策</div></div><span class="setting-arrow">›</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 10. Agent -->
-    <div class="page" id="page-agent" style="background:var(--bg);display:flex;flex-direction:column">
-      <div class="model-toolbar">
-        <button class="back-btn" onclick="navigateTo('page-chat')">◀</button>
-        <div class="title">AI Agent</div>
-        <button class="add-btn" onclick="showToast('创建Agent')">＋</button>
-      </div>
-      <div class="search-bar">
-        <span class="search-icon">🔍</span>
-        <input placeholder="搜索 Agent...">
-      </div>
-      <div style="flex:1;overflow-y:auto;padding:12px 16px">
-        <div class="model-card" onclick="showToast('打开Agent')">
-          <div class="model-header">
-            <div class="model-name">🔍 研究助手</div>
-            <div class="model-tags"><span class="tag local">活跃</span></div>
-          </div>
-          <div class="model-info"><span>深度搜索 · 分析总结</span></div>
-        </div>
-        <div class="model-card" onclick="showToast('打开Agent')">
-          <div class="model-header">
-            <div class="model-name">💻 编程助手</div>
-            <div class="model-tags"><span class="tag gpu">运行中</span></div>
-          </div>
-          <div class="model-info"><span>代码生成 · Debug · 重构</span></div>
-        </div>
-        <div class="model-card" onclick="showToast('打开Agent')">
-          <div class="model-header">
-            <div class="model-name">✍️ 写作助手</div>
-            <div class="model-tags"></div>
-          </div>
-          <div class="model-info"><span>文章撰写 · 润色 · 翻译</span></div>
-        </div>
-        <div class="model-card" onclick="showToast('打开Agent')">
-          <div class="model-header">
-            <div class="model-name">📊 数据分析师</div>
-            <div class="model-tags"><span class="tag lora">LoRA</span></div>
-          </div>
-          <div class="model-info"><span>数据分析 · 可视化 · 报告</span></div>
-        </div>
-      </div>
-      <div class="fab" onclick="showToast('创建Agent')">＋</div>
-      <div class="bottom-nav">
-        <div class="nav-item" onclick="navigateTo('page-chat')"><span class="nav-icon">💬</span><span class="nav-label">聊天</span></div>
-        <div class="nav-item active"><span class="nav-icon">🤖</span><span class="nav-label">Agent</span></div>
-        <div class="nav-item" onclick="navigateTo('page-kb')"><span class="nav-icon">📚</span><span class="nav-label">知识库</span></div>
-        <div class="nav-item" onclick="navigateTo('page-model')"><span class="nav-icon">🧠</span><span class="nav-label">模型</span></div>
-        <div class="nav-item" onclick="navigateTo('page-profile')"><span class="nav-icon">👤</span><span class="nav-label">我的</span></div>
-      </div>
-    </div>
-
+    <div class="auth-link">没有账号？<a onclick="go('p2')">创建你的AI空间</a></div>
   </div>
 </div>
 
-<!-- Page indicator -->
-<div style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.5);font-size:12px;font-family:-apple-system,sans-serif;text-align:center">
-  <div id="pageIndicator">1 / 10 · 启动页</div>
-  <div style="margin-top:4px;opacity:0.6">点击 ◀ ▶ 切换页面</div>
+<!-- ====== REGISTER ====== -->
+<div class="P auth" id="p2">
+  <div class="auth-head" style="padding-top:20px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <button style="border:none;background:none;cursor:pointer;padding:4px" onclick="go('p1')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+    </div>
+    <h1>创建你的AI空间</h1>
+    <p>注册 OmniAI 账号</p>
+  </div>
+  <div class="auth-body">
+    <div class="field"><label>手机号或邮箱</label><input placeholder="请输入手机号或邮箱"></div>
+    <div class="field"><label>验证码</label><div class="field-row"><input placeholder="请输入验证码"><button class="code-btn">获取验证码</button></div></div>
+    <div class="field"><label>登录密码</label><input type="password" placeholder="请输入登录密码"></div>
+    <div class="field"><label>确认密码</label><input type="password" placeholder="请再次输入密码"></div>
+    <button class="btn-p" onclick="T('注册成功');go('p3')">注 册</button>
+    <div class="auth-link">已有账号？<a onclick="go('p1')">立即登录</a></div>
+  </div>
+</div>
+
+<!-- ====== CHAT ====== -->
+<div class="P chat" id="p3">
+  <div class="sov" id="sov" onclick="SB(false)"></div>
+  <div class="sbar" id="sbar">
+    <div class="sbar-user">
+      <div class="ur">
+        <div class="av">O</div>
+        <div class="ui">
+          <div class="un">OmniAI 用户</div>
+          <div class="uv"><svg viewBox="0 0 12 12"><path d="M6 1l1.5 3 3.5.5-2.5 2.5.5 3.5L6 9l-3 1.5.5-3.5L1 4.5l3.5-.5z" fill="currentColor"/></svg>Pro 会员</div>
+          <div class="um"><svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#22C55E"/></svg>OmniAI 3B · 本地运行中</div>
+        </div>
+      </div>
+    </div>
+    <div class="sbar-list">
+      <div class="ci sel"><div class="ct">关于量子计算的讨论</div><div class="cm"><span class="ctime">刚刚</span><span class="ctag tl">本地</span></div></div>
+      <div class="ci"><div class="ct">Python 代码优化建议</div><div class="cm"><span class="ctime">2小时前</span><span class="ctag tg">GPU</span></div></div>
+      <div class="ci"><div class="ct">AI 写作助手 — 项目方案</div><div class="cm"><span class="ctime">昨天</span><span class="ctag tc">云端</span></div></div>
+      <div class="ci"><div class="ct">机器学习入门笔记</div><div class="cm"><span class="ctime">3天前</span><span class="ctag tlr">LoRA</span></div></div>
+      <div class="ci"><div class="ct">翻译：技术文档中译英</div><div class="cm"><span class="ctime">上周</span><span class="ctag tl">本地</span></div></div>
+    </div>
+    <div class="sbar-ft"><div class="sbf" onclick="go('p8')"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3M8 10.5v.5"/></svg>设置</div><div class="sv">v1.0.0</div></div>
+  </div>
+  <div class="chat-bar">
+    <button class="ib" onclick="SB(true)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+    <div class="mid"><div class="model">OmniAI 3B</div><div class="status"><span class="sd"></span>本地推理中</div></div>
+    <button class="ib" onclick="T('新建对话')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button>
+    <button class="ib" onclick="T('更多选项')"><svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="5" r="1.5"/><circle cx="10" cy="10" r="1.5"/><circle cx="10" cy="15" r="1.5"/></svg></button>
+  </div>
+  <div class="msgs">
+    <div class="msg u"><div class="bub">请解释一下量子计算的基本原理，以及它与传统计算有什么区别？</div><div class="mt">14:32</div></div>
+    <div class="msg a"><div class="bub"><strong>量子计算</strong>是利用量子力学原理进行信息处理的计算模式。与经典计算的核心区别在于：<br><br><strong>1. 量子比特 (Qubit)</strong><br>经典计算使用比特（0或1），量子计算使用量子比特，可以同时处于0和1的叠加态。<br><br><strong>2. 量子叠加</strong><br>n个量子比特可以同时表示2ⁿ个状态，实现并行计算。<br><br><strong>3. 量子纠缠</strong><br>两个量子比特可以产生关联，改变其中一个会瞬间影响另一个。</div><div class="mt">14:32 · OmniAI 3B</div></div>
+    <div class="msg a"><div class="bub"><pre>from qiskit import QuantumCircuit\n\nqc = QuantumCircuit(2, 2)\nqc.h(0)       # Hadamard gate\nqc.cx(0, 1)   # CNOT gate\nqc.measure([0,1], [0,1])</pre>这段代码创建了一个贝尔态，展示了量子叠加和纠缠的基本应用。</div><div class="mt">14:33 · OmniAI 3B</div></div>
+    <div class="msg u"><div class="bub">能详细解释一下Hadamard门的作用吗？</div><div class="mt">14:35</div></div>
+    <div class="msg a"><div class="bub"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>
+  </div>
+  <div class="qbar">
+    <div class="qpill" onclick="T('AI写作')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M9 2l3 3L5 12H2V9z"/></svg>AI写作</div>
+    <div class="qpill" onclick="T('代码生成')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M5 3L2 7l3 4M9 3l3 4-3 4"/></svg>代码生成</div>
+    <div class="qpill" onclick="T('翻译')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 7h10M7 2c-2 3-2 7 0 10M7 2c2 3 2 7 0 10"/><circle cx="7" cy="7" r="5"/></svg>翻译</div>
+    <div class="qpill" onclick="T('OCR识图')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="2" y="2" width="10" height="10" rx="2"/><circle cx="5" cy="5.5" r="1.2"/><path d="M2 10l3-3 2 2 2-2.5 3 3.5"/></svg>OCR识图</div>
+    <div class="qpill" onclick="T('语音助手')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="5" y="2" width="4" height="6" rx="2"/><path d="M3 7a4 4 0 008 0M7 11v2"/></svg>语音助手</div>
+    <div class="qpill" onclick="T('知识库')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2 3h4v9H2zM8 3h4v9H8z"/></svg>知识库</div>
+    <div class="qpill" onclick="T('Agent')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="7" cy="5" r="3"/><path d="M2 13c0-2.8 2.2-5 5-5s5 2.2 5 5"/></svg>Agent</div>
+  </div>
+  <div class="iarea">
+    <button class="ab" onclick="T('上传文件')"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 4v10M4 9l5-5 5 5"/></svg></button>
+    <textarea class="ti" rows="1" placeholder="输入内容、图片或语音…"></textarea>
+    <button class="ab" onclick="T('语音输入')"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="6.5" y="3" width="5" height="7" rx="2.5"/><path d="M4 9a5 5 0 0010 0M9 14v2.5"/></svg></button>
+    <button class="sb" onclick="T('发送')"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2.5 2.5l4.5 5-4.5 5.5 11-5.5-11-5zm4.5 5l-3-3.5 8 4-8 4 3-3.5v-1z"/></svg></button>
+  </div>
+  <div class="bnav">
+    <div class="ni on" onclick="go('p3')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h14M4 11h14M4 15h10"/><circle cx="19" cy="15" r="2" fill="currentColor" stroke="none"/></svg><span>聊天</span></div>
+    <div class="ni" onclick="go('p9')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="3.5"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7"/><path d="M17 7l2 2 3-4"/></svg><span>Agent</span></div>
+    <div class="ni" onclick="go('p7')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 4h6v14H4zM12 4h6v14h-6z"/><path d="M6 8h2M14 8h2M6 12h2M14 12h2"/></svg><span>知识库</span></div>
+    <div class="ni" onclick="go('p5')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M11 3l8 5v8l-8 3-8-3V8z"/><path d="M11 3v16M3 8l8 5 8-5"/></svg><span>模型</span></div>
+    <div class="ni" onclick="go('p4')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="4"/><path d="M4 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg><span>我的</span></div>
+  </div>
+</div>
+
+<!-- ====== PROFILE ====== -->
+<div class="P" id="p4" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar">
+    <button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
+    <div class="mid"><div class="model">我的</div></div>
+    <div style="width:38px"></div>
+  </div>
+  <div class="prof-scroll">
+    <div class="prof-card">
+      <div class="av-lg">O</div>
+      <div class="pn">OmniAI 用户</div>
+      <div class="puid">UID: OAI-2024-8866</div>
+      <div class="pvip"><svg viewBox="0 0 12 12"><path d="M6 1l1.5 3 3.5.5-2.5 2.5.5 3.5L6 9l-3 1.5.5-3.5L1 4.5l3.5-.5z" fill="currentColor"/></svg>Pro 会员</div>
+      <div class="pdev">已绑定 2 台设备</div>
+    </div>
+    <div class="vip-card">
+      <div class="vl">当前方案</div>
+      <div class="vp">OmniAI Pro 年付</div>
+      <div class="ve">有效期至 2026.12.31</div>
+      <div class="vub" onclick="T('续费 / 升级')">续费 / 升级</div>
+    </div>
+    <div class="mg">
+      <div class="mi" onclick="go('p5')"><div class="mi-ic blue"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M11 3l8 5v8l-8 3-8-3V8z"/><path d="M11 3v16M3 8l8 5 8-5"/></svg></div><span class="mi-t">模型中心</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
+      <div class="mi" onclick="go('p6')"><div class="mi-ic purple"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 2v14M5 5l4-3 4 3"/><path d="M3 9h12"/></svg></div><span class="mi-t">LoRA训练</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
+      <div class="mi" onclick="go('p7')"><div class="mi-ic green"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h6v14H4zM12 4h6v14h-6z"/></svg></div><span class="mi-t">知识库</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
+      <div class="mi" onclick="T('语音助手')"><div class="mi-ic orange"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="6" y="3" width="6" height="8" rx="3"/><path d="M3 11a6 6 0 0012 0M9 17v2"/></svg></div><span class="mi-t">语音助手</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
+    </div>
+    <div class="mg">
+      <div class="mi" onclick="T('缓存管理')"><div class="mi-ic gray"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="9" cy="9" r="7"/><path d="M9 5v4l3 2"/></svg></div><span class="mi-t">缓存管理</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
+      <div class="mi" onclick="T('下载管理')"><div class="mi-ic gray"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 3v10M5 9l4 4 4-4"/><path d="M3 15h12"/></svg></div><span class="mi-t">下载管理</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
+      <div class="mi" onclick="go('p8')"><div class="mi-ic red"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3" y="6" width="12" height="10" rx="2"/><path d="M6 6V4a3 3 0 016 0v2"/></svg></div><span class="mi-t">隐私与安全</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
+      <div class="mi" onclick="T('开发者模式')"><div class="mi-ic gray"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 5L2 9l4 4M12 5l4 4-4 4"/></svg></div><span class="mi-t">开发者模式</span><span class="mi-ar"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 4l4 4-4 4"/></svg></span></div>
+    </div>
+    <button class="logout" onclick="T('已退出登录');go('p1')">退出登录</button>
+  </div>
+</div>
+
+<!-- ====== MODEL ====== -->
+<div class="P" id="p5" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar">
+    <button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
+    <div class="mid"><div class="model">模型中心</div></div>
+    <button class="ib" onclick="T('导入模型')"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="2" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button>
+  </div>
+  <div class="mtabs"><div class="mtab on">本地模型</div><div class="mtab">下载模型</div></div>
+  <div class="mlist">
+    <div class="mcard"><div class="mh"><div class="mn">OmniAI-3B-Q4_K</div><div class="mtags"><span class="mtag" style="background:var(--green)">已加载</span><span class="mtag" style="background:var(--p)">GPU</span></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>1.8 GB</span><span>Q4_K_M</span><span>4096 ctx</span></div><div class="mact"><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div><button class="del-btn" onclick="T('确认删除？')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M3 4h8M5 4V3a1 1 0 012 0v1M4 4l.5 7h5L10 4"/></svg>删除</button></div></div>
+    <div class="mcard"><div class="mh"><div class="mn">OmniAI-7B-Q5_K</div><div class="mtags"><span class="mtag" style="background:var(--purple)">LoRA</span></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>4.2 GB</span><span>Q5_K_M</span><span>8192 ctx</span></div><div class="mact"><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div><button class="del-btn" onclick="T('确认删除？')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M3 4h8M5 4V3a1 1 0 012 0v1M4 4l.5 7h5L10 4"/></svg>删除</button></div></div>
+    <div class="mcard"><div class="mh"><div class="mn">Llama-3-8B-Q4_K</div><div class="mtags"></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>4.7 GB</span><span>Q4_K_M</span><span>4096 ctx</span></div><div class="mact"><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div><button class="del-btn" onclick="T('确认删除？')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M3 4h8M5 4V3a1 1 0 012 0v1M4 4l.5 7h5L10 4"/></svg>删除</button></div></div>
+    <div class="mcard"><div class="mh"><div class="mn">Qwen2-1.5B-Q8_0</div><div class="mtags"><span class="mtag" style="background:var(--orange)">云端</span></div></div><div class="minfo"><span><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>1.6 GB</span><span>Q8_0</span><span>2048 ctx</span></div><div class="mact"><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div><button class="del-btn" onclick="T('确认删除？')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M3 4h8M5 4V3a1 1 0 012 0v1M4 4l.5 7h5L10 4"/></svg>删除</button></div></div>
+  </div>
+</div>
+
+<!-- ====== LORA ====== -->
+<div class="P" id="p6" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar">
+    <button class="ib" onclick="go('p4')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
+    <div class="mid"><div class="model">LoRA训练</div></div>
+    <div style="width:38px"></div>
+  </div>
+  <div class="lora-scroll">
+    <div class="stitle">数据集</div>
+    <div class="ds-card">
+      <div class="ds-info"><div class="ds-name">training_data.txt</div><div class="ds-meta"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M2 6a4 4 0 018 0 4 4 0 01-8 0"/></svg>2.3 MB · 1,247 条</div></div>
+      <button class="imp-btn" onclick="T('选择文件')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M9 2l3 3L5 12H2V9z"/></svg>导入</button>
+    </div>
+    <div class="stitle">训练参数</div>
+    <div class="param-card">
+      <div class="pr"><span class="pl">LoRA Rank</span><span class="pv" id="rv">8</span></div><input type="range" min="1" max="64" value="8" oninput="document.getElementById('rv').textContent=this.value">
+      <div class="pr"><span class="pl">LoRA Alpha</span><span class="pv" id="av2">16</span></div><input type="range" min="1" max="128" value="16" oninput="document.getElementById('av2').textContent=this.value">
+      <div class="pr"><span class="pl">学习率</span><span class="pv">1e-4</span></div>
+      <div class="pr"><span class="pl">Epochs</span><span class="pv" id="ev">3</span></div><input type="range" min="1" max="20" value="3" oninput="document.getElementById('ev').textContent=this.value">
+      <div class="pr"><span class="pl">Batch Size</span><span class="pv" id="bv">4</span></div><input type="range" min="1" max="16" value="4" oninput="document.getElementById('bv').textContent=this.value">
+      <div class="pr"><span class="pl">Dropout</span><span class="pv" id="dv">0.05</span></div><input type="range" min="0" max="50" value="5" oninput="document.getElementById('dv').textContent=(this.value/100).toFixed(2)">
+    </div>
+    <div class="stitle">训练进度</div>
+    <div class="prog-card">
+      <div class="pbar"><div class="pf" style="width:65%"></div></div>
+      <div class="ptxt">65% · Epoch 2/3 · Loss: 0.342</div>
+      <div class="loss-chart"><div class="lbar" style="height:80%"></div><div class="lbar" style="height:65%"></div><div class="lbar" style="height:55%"></div><div class="lbar" style="height:48%"></div><div class="lbar" style="height:42%"></div><div class="lbar" style="height:38%"></div><div class="lbar" style="height:35%"></div><div class="lbar" style="height:34%"></div><div class="lbar" style="height:33%"></div><div class="lbar" style="height:32%"></div><div class="lbar" style="height:34%"></div><div class="lbar" style="height:31%"></div></div>
+      <div class="logbox"><span class="lg">[14:30:01]</span> 数据集处理中... 1247 条记录\n<span class="lg">[14:30:03]</span> Tokenizer初始化完成\n<span class="lw">[14:30:05]</span> LoRA训练中... Epoch 1/3\n<span class="ls">[14:31:22]</span> Epoch 1 完成, Loss: 0.856\n<span class="lw">[14:31:22]</span> LoRA训练中... Epoch 2/3\n<span class="ls">[14:32:45]</span> Epoch 2 完成, Loss: 0.342\n<span class="lw">[14:32:45]</span> LoRA训练中... Epoch 3/3</div>
+    </div>
+    <div class="tbtns">
+      <button class="tb sec" onclick="T('训练已暂停')"><svg viewBox="0 0 14 14" fill="currentColor"><rect x="3" y="3" width="3" height="8" rx="1"/><rect x="8" y="3" width="3" height="8" rx="1"/></svg>暂停</button>
+      <button class="tb dan" onclick="T('训练已停止')"><svg viewBox="0 0 14 14" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="1"/></svg>停止</button>
+      <button class="tb pri" onclick="T('导出LoRA权重')"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 2l3 3L5 12H2V9z"/></svg>导出LoRA</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== KB ====== -->
+<div class="P" id="p7" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar">
+    <button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
+    <div class="mid"><div class="model">知识库</div></div>
+    <button class="ib" onclick="T('新建知识库')"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="2" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button>
+  </div>
+  <div class="search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg><input placeholder="搜索知识库..."></div>
+  <div class="kb-list">
+    <div class="kb-card" onclick="T('打开知识库')"><div class="kh"><div class="kn">AI 技术文档库</div><div class="kc">23 篇</div></div><div class="kd">包含大模型原理、训练技术、推理优化等技术文档，支持语义检索和智能问答。</div><div class="kf"><span class="ctag tl" style="font-size:9px;padding:1px 6px;border-radius:4px;color:#fff;font-weight:700">就绪</span><span>45.2 MB</span><span>2小时前</span></div></div>
+    <div class="kb-card" onclick="T('打开知识库')"><div class="kh"><div class="kn">产品需求文档</div><div class="kc">8 篇</div></div><div class="kd">项目PRD、功能规格、交互设计文档集合。</div><div class="kf"><span class="ctag tc" style="font-size:9px;padding:1px 6px;border-radius:4px;color:#fff;font-weight:700">索引中</span><span>12.8 MB</span><span>昨天</span></div></div>
+    <div class="kb-card" onclick="T('打开知识库')"><div class="kh"><div class="kn">法律法规数据库</div><div class="kc">156 篇</div></div><div class="kd">中国法律法规、司法解释、部门规章全文检索库。</div><div class="kf"><span class="ctag tl" style="font-size:9px;padding:1px 6px;border-radius:4px;color:#fff;font-weight:700">就绪</span><span>234.5 MB</span><span>上周</span></div></div>
+    <div class="kb-card" onclick="T('打开知识库')"><div class="kh"><div class="kn">个人学习笔记</div><div class="kc">42 篇</div></div><div class="kd">机器学习、深度学习、NLP学习笔记与代码片段。</div><div class="kf"><span class="ctag tl" style="font-size:9px;padding:1px 6px;border-radius:4px;color:#fff;font-weight:700">就绪</span><span>8.7 MB</span><span>3天前</span></div></div>
+  </div>
+  <div class="fab" onclick="T('新建知识库')"><svg viewBox="0 0 22 22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M11 5v12M5 11h12"/></svg></div>
+</div>
+
+<!-- ====== SETTINGS ====== -->
+<div class="P" id="p8" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar">
+    <button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
+    <div class="mid"><div class="model">设置</div></div>
+    <div style="width:38px"></div>
+  </div>
+  <div class="set-scroll">
+    <div class="sg-title">AI 设置</div>
+    <div class="sg">
+      <div class="si"><div class="si-ic blue"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M11 3l8 5v8l-8 3-8-3V8z"/></svg></div><div class="si-txt"><div class="si-t">默认模型</div></div><span class="si-val">OmniAI 3B</span><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
+      <div class="si"><div class="si-ic blue"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M3 3h10v10H3z"/><path d="M3 6h10"/></svg></div><div class="si-txt"><div class="si-t">系统提示词</div></div><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
+      <div class="si"><div class="si-ic blue"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="5"/><path d="M8 5v6M5 8h6"/></svg></div><div class="si-txt"><div class="si-t">温度</div></div><span class="si-val">0.7</span><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
+    </div>
+    <div class="sg-title">推理设置</div>
+    <div class="sg">
+      <div class="si"><div class="si-ic purple"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 2l6 3v6l-6 3-6-3V5z"/></svg></div><div class="si-txt"><div class="si-t">推理模式</div></div><span class="si-val">均衡模式</span><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
+      <div class="si"><div class="si-ic purple"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 2h12v12H2z"/><path d="M2 8h12"/></svg></div><div class="si-txt"><div class="si-t">上下文长度</div></div><span class="si-val">4096</span><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
+      <div class="si"><div class="si-ic purple"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 12h8M8 4v8"/></svg></div><div class="si-txt"><div class="si-t">GPU 加速</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
+      <div class="si"><div class="si-ic purple"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M6 6l4 4M10 6l-4 4"/></svg></div><div class="si-txt"><div class="si-t">mmap 加速</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
+    </div>
+    <div class="sg-title">隐私设置</div>
+    <div class="sg">
+      <div class="si"><div class="si-ic red"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="6" width="10" height="8" rx="1.5"/><path d="M5 6V4.5a3 3 0 016 0V6"/></svg></div><div class="si-txt"><div class="si-t">应用锁</div></div><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
+      <div class="si"><div class="si-ic red"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 2v3M8 11v3M4.5 4.5l2 2M9.5 9.5l2 2M2 8h3M11 8h3M4.5 11.5l2-2M9.5 6.5l2-2"/></svg></div><div class="si-txt"><div class="si-t">指纹解锁</div></div><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
+      <div class="si"><div class="si-ic red"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="5.5"/><path d="M6 8l1.5 1.5L10 7"/></svg></div><div class="si-txt"><div class="si-t">无痕模式</div></div><div class="sw off" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
+      <div class="si"><div class="si-ic red"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M8 2l6 3v5l-6 4-6-4V5z"/></svg></div><div class="si-txt"><div class="si-t">数据加密</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
+      <div class="si"><div class="si-ic red"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M2 4h12v8H2z"/><path d="M5 7h6"/></svg></div><div class="si-txt"><div class="si-t">敏感词过滤</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
+      <div class="si"><div class="si-ic orange"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></div><div class="si-txt"><div class="si-t">云端降级</div></div><div class="sw on" onclick="this.classList.toggle('on');this.classList.toggle('off')" style="transform:scale(.85)"></div></div>
+    </div>
+    <div class="sg-title">关于</div>
+    <div class="sg">
+      <div class="si"><div class="si-ic gray"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="8" cy="8" r="6"/><path d="M8 5v3M8 10.5v.5"/></svg></div><div class="si-txt"><div class="si-t">版本</div></div><span class="si-val">1.0.0</span></div>
+      <div class="si" onclick="T('已是最新版本')"><div class="si-ic gray"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 8a4 4 0 11-8 0 4 4 0 018 0z"/><path d="M8 5v3l2 1"/></svg></div><div class="si-txt"><div class="si-t">检查更新</div></div><span class="si-arr"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== AGENT ====== -->
+<div class="P" id="p9" style="background:var(--bg);display:flex;flex-direction:column">
+  <div class="chat-bar">
+    <button class="ib" onclick="go('p3')"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button>
+    <div class="mid"><div class="model">AI Agent</div></div>
+    <button class="ib" onclick="T('创建Agent')"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="2" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg></button>
+  </div>
+  <div class="search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5L14 14"/></svg><input placeholder="搜索 Agent..."></div>
+  <div class="ag-list">
+    <div class="ag-card" onclick="T('打开Agent')"><div class="ag-ic" style="background:var(--p-light)"><svg viewBox="0 0 20 20" fill="none" stroke="var(--p)" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="7" r="4"/><path d="M3 19c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg></div><div class="ag-info"><div class="ag-name">研究助手</div><div class="ag-desc">深度搜索 · 分析总结</div></div><span class="ag-tag" style="background:var(--green)">活跃</span></div>
+    <div class="ag-card" onclick="T('打开Agent')"><div class="ag-ic" style="background:#F3E8FF"><svg viewBox="0 0 20 20" fill="none" stroke="var(--purple)" stroke-width="1.5" stroke-linecap="round"><path d="M5 5l3-3 3 3M8 2v12M12 8h4v8H4V8h4"/></svg></div><div class="ag-info"><div class="ag-name">编程助手</div><div class="ag-desc">代码生成 · Debug · 重构</div></div><span class="ag-tag" style="background:var(--p)">运行中</span></div>
+    <div class="ag-card" onclick="T('打开Agent')"><div class="ag-ic" style="background:#FEF3C7"><svg viewBox="0 0 20 20" fill="none" stroke="var(--orange)" stroke-width="1.5" stroke-linecap="round"><path d="M4 4h12v12H4z"/><path d="M8 8h4M8 12h4"/></svg></div><div class="ag-info"><div class="ag-name">写作助手</div><div class="ag-desc">文章撰写 · 润色 · 翻译</div></div></div>
+    <div class="ag-card" onclick="T('打开Agent')"><div class="ag-ic" style="background:#DCFCE7"><svg viewBox="0 0 20 20" fill="none" stroke="var(--green)" stroke-width="1.5" stroke-linecap="round"><path d="M4 14l4-4 3 3 5-6"/><path d="M14 7h3v3"/></svg></div><div class="ag-info"><div class="ag-name">数据分析师</div><div class="ag-desc">数据分析 · 可视化 · 报告</div></div><span class="ag-tag" style="background:var(--purple)">LoRA</span></div>
+  </div>
+  <div class="fab" onclick="T('创建Agent')"><svg viewBox="0 0 22 22" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M11 5v12M5 11h12"/></svg></div>
+  <div class="bnav">
+    <div class="ni" onclick="go('p3')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 7h14M4 11h14M4 15h10"/></svg><span>聊天</span></div>
+    <div class="ni on"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="3.5"/><path d="M4 19c0-3.9 3.1-7 7-7s7 3.1 7 7"/><path d="M17 7l2 2 3-4"/></svg><span>Agent</span></div>
+    <div class="ni" onclick="go('p7')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 4h6v14H4zM12 4h6v14h-6z"/></svg><span>知识库</span></div>
+    <div class="ni" onclick="go('p5')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M11 3l8 5v8l-8 3-8-3V8z"/></svg><span>模型</span></div>
+    <div class="ni" onclick="go('p4')"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="8" r="4"/><path d="M4 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg><span>我的</span></div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<div style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.35);font-size:11px;font-family:var(--font);text-align:center;letter-spacing:.3px">
+  <div id="pl">1 / 10 · 启动页</div>
+  <div style="margin-top:3px;opacity:.6">点击 ‹ › 或键盘 ← → 切换</div>
 </div>
 
 <script>
-const pages = [
-  {id:'page-splash', name:'启动页'},
-  {id:'page-login', name:'登录页'},
-  {id:'page-register', name:'注册页'},
-  {id:'page-chat', name:'AI对话'},
-  {id:'page-profile', name:'个人中心'},
-  {id:'page-model', name:'模型管理'},
-  {id:'page-lora', name:'LoRA训练'},
-  {id:'page-kb', name:'知识库'},
-  {id:'page-settings', name:'设置中心'},
-  {id:'page-agent', name:'AI Agent'}
-];
-let currentIndex = 0;
-
-function navigateTo(pageId) {
-  const idx = pages.findIndex(p => p.id === pageId);
-  if (idx >= 0) {
-    currentIndex = idx;
-    showPage(currentIndex);
-  }
-}
-
-function showPage(idx) {
-  document.querySelectorAll('.page').forEach(p => {
-    p.classList.remove('active');
-    p.classList.remove('slide-left');
-  });
-  const target = document.getElementById(pages[idx].id);
-  if (target) {
-    target.classList.add('active');
-  }
-  toggleSidebar(false);
-  updateIndicator();
-}
-
-function nextPage() {
-  if (currentIndex < pages.length - 1) {
-    currentIndex++;
-    showPage(currentIndex);
-  }
-}
-
-function prevPage() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    showPage(currentIndex);
-  }
-}
-
-function updateIndicator() {
-  document.getElementById('pageIndicator').textContent = `${currentIndex + 1} / ${pages.length} · ${pages[currentIndex].name}`;
-}
-
-function toggleSidebar(open) {
-  document.getElementById('sidebar').classList.toggle('open', open);
-  document.getElementById('sidebarOverlay').classList.toggle('open', open);
-}
-
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
-}
-
-// Auto advance from splash
-setTimeout(() => {
-  if (currentIndex === 0) {
-    currentIndex = 1;
-    showPage(1);
-  }
-}, 2500);
-
-// Keyboard navigation
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight') nextPage();
-  if (e.key === 'ArrowLeft') prevPage();
-});
-
-// Simulate typing animation
-let typingActive = true;
-const typingEl = document.querySelector('.typing');
-if (typingEl) {
-  setInterval(() => {
-    if (typingActive && document.getElementById('page-chat').classList.contains('active')) {
-      // Animation runs via CSS
-    }
-  }, 1000);
-}
+const P=['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9'];
+const N=['启动页','登录','注册','AI对话','个人中心','模型管理','LoRA训练','知识库','设置','Agent'];
+let ci=0;
+function go(id){const i=P.indexOf(id);if(i>=0){ci=i;show()}}
+function show(){document.querySelectorAll('.P').forEach(p=>p.classList.remove('on'));document.getElementById(P[ci]).classList.add('on');SB(false);document.getElementById('pl').textContent=`${ci+1} / ${P.length} · ${N[ci]}`;document.getElementById('pn').textContent=`${ci+1}/${P.length}`}
+function next(){if(ci<P.length-1){ci++;show()}}
+function prev(){if(ci>0){ci--;show()}}
+function SB(o){document.getElementById('sbar').classList.toggle('on',o);document.getElementById('sov').classList.toggle('on',o)}
+let tt;function T(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1600)}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev()});
+setTimeout(()=>{if(ci===0){ci=1;show()}},2200);
 </script>
 </body>
 </html>
