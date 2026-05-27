@@ -71,7 +71,7 @@ export default function ProfilePage({ onNavigate, onLogout, isGuest, onLogin }: 
   };
 
   return (
-    <View className="flex-1 bg-surface-secondary">
+    <View style={{ flex: 1 }} className="bg-surface-secondary">
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}

@@ -580,11 +580,12 @@ export default function ChatPage({ onToggleSidebar }: ChatPageProps) {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-surface-secondary"
+      style={{ flex: 1 }}
+      className="bg-surface-secondary"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
-      <View className="flex-1">
+      <View style={{ flex: 1 }}>
         <View className="flex-row items-center justify-between px-3 py-2.5 bg-surface border-b border-border">
           <TouchableOpacity
             onPress={onToggleSidebar}
@@ -622,7 +623,7 @@ export default function ChatPage({ onToggleSidebar }: ChatPageProps) {
         {messages.length > 0 || isGenerating ? (
           <ScrollView
             ref={scrollViewRef}
-            className="flex-1"
+            style={{ flex: 1 }}
             contentContainerStyle={{ paddingVertical: 16 }}
             onContentSizeChange={scrollToBottom}
             keyboardShouldPersistTaps="handled"

@@ -63,10 +63,11 @@ export default function LoginPage({ onBack, onGoRegister, onLogin, onSkip }: Log
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      className="flex-1 bg-white"
+      style={{ flex: 1 }}
+      className="bg-white"
     >
       <ScrollView
-        className="flex-1"
+        style={{ flex: 1 }}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{ flexGrow: 1 }}
       >

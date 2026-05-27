@@ -90,14 +90,15 @@ export default function RegisterPage({ onBack, onGoLogin, onRegister }: Register
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-white"
+      style={{ flex: 1 }}
+      className="bg-white"
     >
       <ScrollView
-        className="flex-1"
+        style={{ flex: 1 }}
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View className="flex-1 px-6 pt-12 pb-8">
+        <View style={{ flex: 1 }} className="px-6 pt-12 pb-8">
           <TouchableOpacity onPress={onBack} className="w-10 h-10 items-center justify-center mb-6">
             <ArrowLeft size={24} color="#1A1D23" />
           </TouchableOpacity>

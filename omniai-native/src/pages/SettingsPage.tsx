@@ -145,7 +145,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
   }, [showToast]);
 
   return (
-    <View className="flex-1 bg-surface-secondary">
+    <View style={{ flex: 1 }} className="bg-surface-secondary">
       <View className="bg-surface pt-14 pb-3 px-5 border-b border-border-light">
         <View className="flex-row items-center">
           <TouchableOpacity

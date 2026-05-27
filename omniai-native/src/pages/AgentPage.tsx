@@ -231,7 +231,7 @@ export default function AgentPage() {
   };
 
   return (
-    <View className="flex-1 bg-surface-secondary">
+    <View style={{ flex: 1 }} className="bg-surface-secondary">
       <View className="bg-surface pt-14 pb-3 px-5 border-b border-border-light">
         <View className="flex-row items-center justify-between mb-3">
           <Text className="text-2xl font-bold text-text-primary">智能体</Text>

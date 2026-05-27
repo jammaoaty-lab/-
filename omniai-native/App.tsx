@@ -1,6 +1,6 @@
 import './src/global.css'
 import { useState, useCallback } from 'react'
-import { SafeAreaView, StatusBar, KeyboardAvoidingView, Platform, View } from 'react-native'
+import { SafeAreaView, StatusBar, KeyboardAvoidingView, Platform, View, StyleSheet } from 'react-native'
 import { ToastProvider } from './src/components/Toast'
 import BottomNav from './src/components/BottomNav'
 import Sidebar from './src/components/Sidebar'
@@ -87,27 +87,39 @@ function AppContent() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-surface-secondary">
+    <View style={StyleSheet.absoluteFillObject}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        className="flex-1"
-      >
-        <Sidebar
-          visible={sidebarOpen && showNav}
-          onClose={() => setSidebarOpen(false)}
-          onNavigate={navigateTo}
-        />
-        <View className="flex-1">
-          {renderPage()}
-        </View>
-        {showNav && (
-          <BottomNav current={page} onNavigate={navigateTo} />
-        )}
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      <SafeAreaView style={styles.container}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.flex}
+        >
+          <Sidebar
+            visible={sidebarOpen && showNav}
+            onClose={() => setSidebarOpen(false)}
+            onNavigate={navigateTo}
+          />
+          <View style={styles.flex}>
+            {renderPage()}
+          </View>
+          {showNav && (
+            <BottomNav current={page} onNavigate={navigateTo} />
+          )}
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F9FB',
+  },
+  flex: {
+    flex: 1,
+  },
+})
 
 export default function App() {
   return (
