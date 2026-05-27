@@ -50,6 +50,12 @@ public class LlamaBridge {
 
     public native boolean nativeIsQwenVisionModel(long visionCtx);
 
+    public native int nativeQuantizeModel(String inputPath, String outputPath, String quantType, int nThreads, boolean allowRequantize, boolean quantizeOutputTensor);
+
+    public native void nativeAbortQuantize();
+
+    public native float nativeGetQuantizeProgress();
+
     private static volatile LlamaBridge instance;
 
     private LlamaBridge() {}
@@ -169,6 +175,31 @@ public class LlamaBridge {
             return nativeIsQwenVisionModel(visionCtx);
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    public int quantizeModel(String inputPath, String outputPath, String quantType, int nThreads, boolean allowRequantize, boolean quantizeOutputTensor) {
+        try {
+            return nativeQuantizeModel(inputPath, outputPath, quantType, nThreads, allowRequantize, quantizeOutputTensor);
+        } catch (UnsatisfiedLinkError e) {
+            return -1;
+        } catch (Exception e) {
+            return -2;
+        }
+    }
+
+    public void abortQuantize() {
+        try {
+            nativeAbortQuantize();
+        } catch (Exception ignored) {
+        }
+    }
+
+    public float getQuantizeProgress() {
+        try {
+            return nativeGetQuantizeProgress();
+        } catch (Exception e) {
+            return 0f;
         }
     }
 }

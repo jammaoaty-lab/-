@@ -797,4 +797,110 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeIsQwenVisionModel(JNIEn
     return vs->is_qwen ? JNI_TRUE : JNI_FALSE;
 }
 
+static volatile bool g_quantize_abort = false;
+static volatile float g_quantize_progress = 0.0f;
+
+static ggml_type parse_quant_type(const char *type_str) {
+    if (strcmp(type_str, "q4_0") == 0) return GGML_TYPE_Q4_0;
+    if (strcmp(type_str, "q4_1") == 0) return GGML_TYPE_Q4_1;
+    if (strcmp(type_str, "q5_0") == 0) return GGML_TYPE_Q5_0;
+    if (strcmp(type_str, "q5_1") == 0) return GGML_TYPE_Q5_1;
+    if (strcmp(type_str, "q8_0") == 0) return GGML_TYPE_Q8_0;
+    if (strcmp(type_str, "q2_k") == 0) return GGML_TYPE_Q2_K;
+    if (strcmp(type_str, "q3_k") == 0) return GGML_TYPE_Q3_K;
+    if (strcmp(type_str, "q4_k") == 0) return GGML_TYPE_Q4_K;
+    if (strcmp(type_str, "q5_k") == 0) return GGML_TYPE_Q5_K;
+    if (strcmp(type_str, "q6_k") == 0) return GGML_TYPE_Q6_K;
+    if (strcmp(type_str, "q8_k") == 0) return GGML_TYPE_Q8_K;
+    if (strcmp(type_str, "iq1_s") == 0) return GGML_TYPE_IQ1_S;
+    if (strcmp(type_str, "iq2_s") == 0) return GGML_TYPE_IQ2_S;
+    if (strcmp(type_str, "iq3_s") == 0) return GGML_TYPE_IQ3_S;
+    if (strcmp(type_str, "iq4_s") == 0) return GGML_TYPE_IQ4_XS;
+    if (strcmp(type_str, "f16") == 0) return GGML_TYPE_F16;
+    if (strcmp(type_str, "f32") == 0) return GGML_TYPE_F32;
+    return GGML_TYPE_Q4_K;
+}
+
+static llama_ftype quant_type_to_ftype(ggml_type type) {
+    switch (type) {
+        case GGML_TYPE_Q4_0: return LLAMA_FTYPE_MOSTLY_Q4_0;
+        case GGML_TYPE_Q4_1: return LLAMA_FTYPE_MOSTLY_Q4_1;
+        case GGML_TYPE_Q5_0: return LLAMA_FTYPE_MOSTLY_Q5_0;
+        case GGML_TYPE_Q5_1: return LLAMA_FTYPE_MOSTLY_Q5_1;
+        case GGML_TYPE_Q8_0: return LLAMA_FTYPE_MOSTLY_Q8_0;
+        case GGML_TYPE_Q2_K: return LLAMA_FTYPE_MOSTLY_Q2_K;
+        case GGML_TYPE_Q3_K: return LLAMA_FTYPE_MOSTLY_Q3_K_M;
+        case GGML_TYPE_Q4_K: return LLAMA_FTYPE_MOSTLY_Q4_K_M;
+        case GGML_TYPE_Q5_K: return LLAMA_FTYPE_MOSTLY_Q5_K_M;
+        case GGML_TYPE_Q6_K: return LLAMA_FTYPE_MOSTLY_Q6_K;
+        case GGML_TYPE_Q8_K: return LLAMA_FTYPE_MOSTLY_Q8_0;
+        case GGML_TYPE_IQ1_S: return LLAMA_FTYPE_MOSTLY_IQ1_S;
+        case GGML_TYPE_IQ2_S: return LLAMA_FTYPE_MOSTLY_IQ2_S;
+        case GGML_TYPE_IQ3_S: return LLAMA_FTYPE_MOSTLY_IQ3_S;
+        case GGML_TYPE_IQ4_XS: return LLAMA_FTYPE_MOSTLY_IQ4_XS;
+        case GGML_TYPE_F16: return LLAMA_FTYPE_MOSTLY_F16;
+        case GGML_TYPE_F32: return LLAMA_FTYPE_ALL_F32;
+        default: return LLAMA_FTYPE_MOSTLY_Q4_K_M;
+    }
+}
+
+JNIEXPORT jint JNICALL
+Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeQuantizeModel(JNIEnv *env, jobject thiz,
+                                                                         jstring inputPath,
+                                                                         jstring outputPath,
+                                                                         jstring quantType,
+                                                                         jint nThreads,
+                                                                         jboolean allowRequantize,
+                                                                         jboolean quantizeOutputTensor) {
+    const char *inp_path = env->GetStringUTFChars(inputPath, nullptr);
+    const char *out_path = env->GetStringUTFChars(outputPath, nullptr);
+    const char *qtype_str = env->GetStringUTFChars(quantType, nullptr);
+
+    g_quantize_abort = false;
+    g_quantize_progress = 0.0f;
+
+    ggml_type ggtype = parse_quant_type(qtype_str);
+    llama_ftype ftype = quant_type_to_ftype(ggtype);
+
+    llama_model_quantize_params params = llama_model_quantize_default_params();
+    params.nthread = (int32_t)nThreads;
+    params.ftype = ftype;
+    params.allow_requantize = allowRequantize == JNI_TRUE;
+    params.quantize_output_tensor = quantizeOutputTensor == JNI_TRUE;
+    params.pure = false;
+    params.keep_split = false;
+    params.dry_run = false;
+
+    g_quantize_progress = 0.05f;
+
+    LOGI("Starting quantization: %s -> %s, type=%s", inp_path, out_path, qtype_str);
+
+    uint32_t result = llama_model_quantize(inp_path, out_path, &params);
+
+    g_quantize_progress = result == 0 ? 1.0f : -1.0f;
+
+    env->ReleaseStringUTFChars(inputPath, inp_path);
+    env->ReleaseStringUTFChars(outputPath, out_path);
+    env->ReleaseStringUTFChars(quantType, qtype_str);
+
+    if (result == 0) {
+        LOGI("Quantization completed successfully");
+    } else {
+        LOGE("Quantization failed with code: %u", result);
+    }
+
+    return (jint)result;
+}
+
+JNIEXPORT void JNICALL
+Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeAbortQuantize(JNIEnv *env, jobject thiz) {
+    g_quantize_abort = true;
+    LOGI("Quantize abort requested");
+}
+
+JNIEXPORT jfloat JNICALL
+Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeGetQuantizeProgress(JNIEnv *env, jobject thiz) {
+    return (jfloat)g_quantize_progress;
+}
+
 }
