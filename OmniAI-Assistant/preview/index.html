@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniAI-Assistant UI Preview</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#1A73E8;--primary-light:#E8F0FE;--primary-dark:#1557B0;
+  --bg:#F5F5F7;--surface:#FFFFFF;--surface-v:#F0F0F2;
+  --text1:#1D1D1F;--text2:#86868B;--text3:#AEAEB2;
+  --divider:#E5E5EA;--border:#E5E5EA;
+  --bubble-user:#E8F0FE;--bubble-ai:#FFFFFF;
+  --danger:#FF3B30;--danger-light:#FFEBEE;
+  --success:#34C759;--warning:#FF9500;
+  --tag-local:#34C759;--tag-cloud:#FF9500;--tag-gpu:#1A73E8;--tag-lora:#AF52DE;
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;--radius-full:999px;
+  --shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;background:#1a1a2e;display:flex;justify-content:center;align-items:center;min-height:100vh;color:var(--text1);overflow:hidden}
+.phone-frame{width:390px;height:844px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 0 0 8px #2a2a3e,0 0 0 10px #3a3a4e,0 25px 80px rgba(0,0,0,0.5)}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:126px;height:34px;background:#000;border-radius:0 0 20px 20px;z-index:100}
+.phone-home{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;background:#1D1D1F;border-radius:3px;z-index:100;opacity:0.2}
+.screen{width:100%;height:100%;position:relative;overflow:hidden}
+.page{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;pointer-events:none;transition:opacity 0.25s,transform 0.25s;transform:translateX(20px);display:flex;flex-direction:column}
+.page.active{opacity:1;pointer-events:auto;transform:translateX(0)}
+.page.slide-left{transform:translateX(-20px)}
+
+/* Splash */
+.splash{justify-content:center;align-items:center;background:var(--bg)}
+.splash-logo{width:72px;height:72px;background:var(--primary);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#fff;font-weight:700;margin-bottom:16px}
+.splash-title{font-size:24px;font-weight:600;color:var(--text1);letter-spacing:-0.5px}
+.splash-sub{font-size:14px;color:var(--text2);margin-top:8px}
+.splash-ver{position:absolute;bottom:60px;font-size:12px;color:var(--text3)}
+
+/* Login */
+.login{background:var(--bg);padding:0 24px}
+.login-scroll{flex:1;overflow-y:auto;padding-top:60px}
+.login-title{font-size:24px;font-weight:600;color:var(--text1);letter-spacing:-0.5px}
+.login-sub{font-size:14px;color:var(--text2);margin-top:6px;margin-bottom:32px}
+.input-group{margin-bottom:16px}
+.input-group label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block}
+.input-field{width:100%;height:48px;background:var(--surface-v);border:1px solid var(--divider);border-radius:12px;padding:0 16px;font-size:15px;color:var(--text1);outline:none;transition:border-color 0.2s}
+.input-field:focus{border-color:var(--primary)}
+.input-row{display:flex;gap:8px}
+.input-row .input-field{flex:1}
+.code-btn{height:48px;padding:0 14px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;min-width:100px}
+.login-btn{width:100%;height:48px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:500;cursor:pointer;margin-top:8px;transition:opacity 0.15s}
+.login-btn:active{opacity:0.85}
+.divider-row{display:flex;align-items:center;margin:24px 0;gap:12px}
+.divider-row span{font-size:13px;color:var(--text3)}
+.divider-row::before,.divider-row::after{content:'';flex:1;height:0.5px;background:var(--divider)}
+.social-row{display:flex;justify-content:center;gap:16px;margin-bottom:24px}
+.social-btn{width:48px;height:48px;background:var(--surface);border:1px solid var(--divider);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:transform 0.12s}
+.social-btn:active{transform:scale(0.96)}
+.login-link{text-align:center;font-size:14px;color:var(--text2);padding-bottom:40px}
+.login-link a{color:var(--primary);text-decoration:none;font-weight:500}
+
+/* Chat */
+.chat{background:var(--bg)}
+.chat-toolbar{height:56px;background:var(--surface);border-bottom:0.5px solid var(--divider);display:flex;align-items:center;padding:0 12px;flex-shrink:0}
+.chat-toolbar .menu-btn,.chat-toolbar .new-btn,.chat-toolbar .more-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;border-radius:50%;font-size:18px;color:var(--text1);transition:background 0.15s}
+.chat-toolbar .menu-btn:active,.chat-toolbar .new-btn:active,.chat-toolbar .more-btn:active{background:var(--surface-v)}
+.chat-toolbar .center{flex:1;text-align:center}
+.chat-toolbar .model-name{font-size:15px;font-weight:600;color:var(--text1)}
+.chat-toolbar .model-status{font-size:11px;color:var(--success);display:flex;align-items:center;justify-content:center;gap:4px;margin-top:1px}
+.chat-toolbar .model-status .dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+.status-bar{height:28px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:var(--primary);flex-shrink:0}
+.status-bar .dot{width:6px;height:6px;border-radius:50%;background:var(--primary);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.messages{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:82%;display:flex;flex-direction:column}
+.msg.user{align-self:flex-end}
+.msg.ai{align-self:flex-start}
+.msg-bubble{padding:10px 14px;font-size:14px;line-height:1.6;border-radius:16px}
+.msg.user .msg-bubble{background:var(--bubble-user);border-bottom-right-radius:4px;color:var(--text1)}
+.msg.ai .msg-bubble{background:var(--bubble-ai);border-bottom-left-radius:4px;color:var(--text1);border:0.5px solid var(--divider);padding:12px 16px}
+.msg.ai .msg-bubble code{background:var(--surface-v);padding:2px 6px;border-radius:4px;font-size:13px;font-family:'SF Mono',Menlo,monospace}
+.msg.ai .msg-bubble pre{background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;margin:8px 0;overflow-x:auto;font-size:13px;font-family:'SF Mono',Menlo,monospace;line-height:1.5}
+.msg-time{font-size:11px;color:var(--text3);margin-top:4px;padding:0 4px}
+.msg.user .msg-time{text-align:right}
+.quick-bar{padding:6px 12px;display:flex;gap:6px;overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch}
+.quick-bar::-webkit-scrollbar{display:none}
+.quick-pill{height:32px;padding:0 14px;background:var(--surface-v);border:0.5px solid var(--divider);border-radius:16px;font-size:12px;font-weight:500;color:var(--text1);white-space:nowrap;display:flex;align-items:center;gap:4px;cursor:pointer;transition:background 0.15s;flex-shrink:0}
+.quick-pill:active{background:var(--primary-light)}
+.quick-pill .pill-icon{font-size:14px}
+.input-area{padding:8px 12px 32px;background:var(--surface);border-top:0.5px solid var(--divider);display:flex;align-items:flex-end;gap:8px;flex-shrink:0}
+.input-area .plus-btn{width:36px;height:36px;border:none;background:var(--surface-v);border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0}
+.input-area .text-input{flex:1;min-height:36px;max-height:100px;background:var(--surface-v);border:1px solid var(--divider);border-radius:20px;padding:8px 16px;font-size:15px;color:var(--text1);outline:none;resize:none;line-height:1.4;font-family:inherit}
+.input-area .text-input::placeholder{color:var(--text3)}
+.input-area .voice-btn{width:36px;height:36px;border:none;background:none;font-size:18px;cursor:pointer;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.input-area .send-btn{width:36px;height:36px;border:none;background:var(--primary);border-radius:50%;font-size:16px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.15s}
+.input-area .send-btn:active{opacity:0.85}
+.input-area .send-btn.disabled{background:var(--text3)}
+
+/* Sidebar */
+.sidebar-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s}
+.sidebar-overlay.open{opacity:1;pointer-events:auto}
+.sidebar{position:absolute;top:0;left:0;width:280px;height:100%;background:var(--surface);z-index:51;transform:translateX(-100%);transition:transform 0.25s;display:flex;flex-direction:column}
+.sidebar.open{transform:translateX(0)}
+.sidebar-user{padding:20px 16px;border-bottom:0.5px solid var(--divider)}
+.sidebar-user .user-row{display:flex;align-items:center;gap:12px}
+.sidebar-user .avatar{width:40px;height:40px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:16px}
+.sidebar-user .user-info{flex:1}
+.sidebar-user .user-name{font-size:15px;font-weight:600;color:var(--text1)}
+.sidebar-user .user-vip{font-size:11px;color:var(--warning);margin-top:2px}
+.sidebar-user .user-model{font-size:11px;color:var(--text2);margin-top:2px}
+.sidebar-conv{flex:1;overflow-y:auto;padding:8px}
+.sidebar-conv-item{padding:12px;border-radius:8px;cursor:pointer;transition:background 0.15s;display:flex;flex-direction:column;gap:4px;position:relative}
+.sidebar-conv-item:active{background:var(--surface-v)}
+.sidebar-conv-item.selected{background:var(--surface-v)}
+.sidebar-conv-item.selected::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:3px;background:var(--primary);border-radius:2px}
+.sidebar-conv-item .conv-title{font-size:14px;color:var(--text1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-conv-item .conv-meta{display:flex;align-items:center;gap:6px}
+.sidebar-conv-item .conv-time{font-size:12px;color:var(--text2)}
+.sidebar-conv-item .conv-tag{font-size:10px;padding:1px 6px;border-radius:4px;color:#fff}
+.sidebar-bottom{padding:12px 16px;border-top:0.5px solid var(--divider);display:flex;align-items:center;justify-content:space-between}
+.sidebar-bottom .settings-btn{font-size:14px;color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:6px}
+.sidebar-bottom .ver{font-size:12px;color:var(--text3)}
+
+/* Profile */
+.profile{background:var(--bg)}
+.profile-toolbar{height:56px;background:var(--surface);border-bottom:0.5px solid var(--divider);display:flex;align-items:center;padding:0 16px;flex-shrink:0}
+.profile-toolbar .back-btn{width:36px;height:36px;border:none;background:none;font-size:18px;cursor:pointer;color:var(--text1);display:flex;align-items:center;justify-content:center;border-radius:50%}
+.profile-toolbar .back-btn:active{background:var(--surface-v)}
+.profile-toolbar .title{flex:1;text-align:center;font-size:17px;font-weight:600}
+.profile-toolbar .placeholder{width:36px}
+.profile-scroll{flex:1;overflow-y:auto;padding:16px}
+.profile-card{background:var(--surface);border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:16px;border:0.5px solid var(--divider)}
+.profile-card .avatar-lg{width:72px;height:72px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:28px;margin:0 auto 12px}
+.profile-card .name{font-size:18px;font-weight:600;color:var(--text1)}
+.profile-card .uid{font-size:13px;color:var(--text2);margin-top:4px}
+.profile-card .vip-badge{display:inline-flex;align-items:center;gap:4px;margin-top:8px;padding:4px 12px;background:linear-gradient(135deg,#FFD700,#FFA500);border-radius:var(--radius-full);font-size:12px;font-weight:600;color:#fff}
+.profile-card .device-count{font-size:12px;color:var(--text2);margin-top:8px}
+.vip-card{background:linear-gradient(135deg,var(--primary),#6C5CE7);border-radius:var(--radius);padding:16px;margin-bottom:16px;color:#fff}
+.vip-card .vip-label{font-size:13px;opacity:0.8}
+.vip-card .vip-plan{font-size:18px;font-weight:600;margin-top:4px}
+.vip-card .vip-expiry{font-size:12px;opacity:0.7;margin-top:4px}
+.vip-card .vip-upgrade{margin-top:12px;padding:8px 16px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:var(--radius-sm);color:#fff;font-size:13px;font-weight:500;cursor:pointer;display:inline-block}
+.menu-group{background:var(--surface);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;border:0.5px solid var(--divider)}
+.menu-item{display:flex;align-items:center;padding:14px 16px;cursor:pointer;transition:background 0.12s;gap:12px}
+.menu-item:active{background:var(--surface-v)}
+.menu-item+.menu-item{border-top:0.5px solid var(--divider)}
+.menu-item .menu-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--primary);flex-shrink:0}
+.menu-item .menu-text{flex:1;font-size:15px;color:var(--text1)}
+.menu-item .menu-arrow{font-size:14px;color:var(--text3)}
+.logout-btn{width:100%;height:48px;background:var(--danger-light);color:var(--danger);border:none;border-radius:var(--radius);font-size:15px;font-weight:500;cursor:pointer;margin-top:8px}
+
+/* Model Manager */
+.model-toolbar{height:56px;background:var(--surface);border-bottom:0.5px solid var(--divider);display:flex;align-items:center;padding:0 16px;flex-shrink:0}
+.model-toolbar .back-btn{width:36px;height:36px;border:none;background:none;font-size:18px;cursor:pointer;color:var(--text1);display:flex;align-items:center;justify-content:center;border-radius:50%}
+.model-toolbar .title{flex:1;text-align:center;font-size:17px;font-weight:600}
+.model-toolbar .add-btn{width:36px;height:36px;border:none;background:none;font-size:18px;cursor:pointer;color:var(--primary);display:flex;align-items:center;justify-content:center}
+.tabs{display:flex;background:var(--surface);border-bottom:0.5px solid var(--divider);flex-shrink:0}
+.tab{flex:1;height:44px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:color 0.2s,border-color 0.2s}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.model-list{flex:1;overflow-y:auto;padding:12px 16px}
+.model-card{background:var(--surface);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;border:0.5px solid var(--divider)}
+.model-card .model-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.model-card .model-name{font-size:15px;font-weight:600;color:var(--text1)}
+.model-card .model-tags{display:flex;gap:4px}
+.model-card .tag{font-size:10px;padding:2px 6px;border-radius:4px;color:#fff;font-weight:500}
+.model-card .tag.local{background:var(--tag-local)}
+.model-card .tag.gpu{background:var(--tag-gpu)}
+.model-card .tag.cloud{background:var(--tag-cloud)}
+.model-card .tag.lora{background:var(--tag-lora)}
+.model-card .model-info{display:flex;gap:12px;font-size:12px;color:var(--text2);margin-bottom:10px}
+.model-card .model-actions{display:flex;align-items:center;justify-content:space-between;border-top:0.5px solid var(--divider);padding-top:10px}
+.model-card .switch{width:44px;height:26px;background:var(--success);border-radius:13px;position:relative;cursor:pointer;transition:background 0.2s}
+.model-card .switch.off{background:#C7C7CC}
+.model-card .switch::after{content:'';position:absolute;top:2px;left:22px;width:22px;height:22px;background:#fff;border-radius:50%;transition:left 0.2s;box-shadow:0 1px 2px rgba(0,0,0,0.15)}
+.model-card .switch.off::after{left:2px}
+.model-card .delete-btn{font-size:13px;color:var(--danger);cursor:pointer;background:none;border:none}
+
+/* LoRA Training */
+.lora-scroll{flex:1;overflow-y:auto;padding:16px}
+.section-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;margin-top:8px}
+.param-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.param-row .param-label{font-size:14px;color:var(--text1)}
+.param-row .param-value{font-size:14px;color:var(--primary);font-weight:500;min-width:40px;text-align:right}
+input[type=range]{width:100%;height:4px;-webkit-appearance:none;background:var(--surface-v);border-radius:2px;outline:none;margin:8px 0}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:var(--primary);border-radius:50%;cursor:pointer}
+.progress-section{background:var(--surface);border-radius:var(--radius);padding:16px;margin-top:12px;border:0.5px solid var(--divider)}
+.progress-bar{height:6px;background:var(--surface-v);border-radius:3px;overflow:hidden;margin:8px 0}
+.progress-bar .fill{height:100%;background:var(--primary);border-radius:3px;transition:width 0.3s;width:0%}
+.progress-text{font-size:13px;color:var(--text2);text-align:center}
+.loss-chart{height:120px;background:var(--surface-v);border-radius:var(--radius-sm);margin:8px 0;display:flex;align-items:flex-end;padding:8px;gap:2px}
+.loss-bar{flex:1;background:var(--primary);border-radius:2px 2px 0 0;opacity:0.6;transition:height 0.3s}
+.log-area{height:120px;background:#1e1e2e;border-radius:var(--radius-sm);padding:10px;font-size:11px;font-family:'SF Mono',Menlo,monospace;color:#cdd6f4;overflow-y:auto;margin-top:8px;line-height:1.6}
+.train-btns{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.train-btn{flex:1;min-width:80px;height:40px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.12s}
+.train-btn:active{opacity:0.85}
+.train-btn.primary{background:var(--primary);color:#fff}
+.train-btn.secondary{background:var(--surface-v);color:var(--text1);border:0.5px solid var(--divider)}
+.train-btn.danger{background:var(--danger-light);color:var(--danger)}
+
+/* Knowledge Base */
+.kb-list{flex:1;overflow-y:auto;padding:12px 16px}
+.kb-card{background:var(--surface);border-radius:var(--radius);padding:14px 16px;margin-bottom:8px;border:0.5px solid var(--divider);cursor:pointer;transition:background 0.12s}
+.kb-card:active{background:var(--surface-v)}
+.kb-card .kb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.kb-card .kb-name{font-size:15px;font-weight:600;color:var(--text1)}
+.kb-card .kb-count{font-size:12px;color:var(--text2)}
+.kb-card .kb-desc{font-size:13px;color:var(--text2);line-height:1.4;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.kb-card .kb-footer{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3)}
+
+/* Settings */
+.settings-scroll{flex:1;overflow-y:auto;padding:0 16px 40px}
+.settings-group-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;padding:20px 0 8px}
+.settings-group{background:var(--surface);border-radius:var(--radius);overflow:hidden;margin-bottom:8px;border:0.5px solid var(--divider)}
+.setting-item{display:flex;align-items:center;padding:13px 16px;gap:12px}
+.setting-item+.setting-item{border-top:0.5px solid var(--divider)}
+.setting-item .setting-icon{font-size:18px;width:24px;text-align:center;flex-shrink:0}
+.setting-item .setting-text{flex:1}
+.setting-item .setting-title{font-size:15px;color:var(--text1)}
+.setting-item .setting-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.setting-item .setting-value{font-size:14px;color:var(--text2)}
+.setting-item .setting-switch{width:44px;height:26px;border-radius:13px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
+.setting-item .setting-switch.on{background:var(--primary)}
+.setting-item .setting-switch.off{background:#C7C7CC}
+.setting-item .setting-switch::after{content:'';position:absolute;top:2px;width:22px;height:22px;background:#fff;border-radius:50%;transition:left 0.2s;box-shadow:0 1px 2px rgba(0,0,0,0.15)}
+.setting-item .setting-switch.on::after{left:22px}
+.setting-item .setting-switch.off::after{left:2px}
+.setting-item .setting-arrow{font-size:14px;color:var(--text3)}
+
+/* Bottom Nav */
+.bottom-nav{height:56px;background:var(--surface);border-top:0.5px solid var(--divider);display:flex;flex-shrink:0}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:color 0.15s}
+.nav-item .nav-icon{font-size:20px}
+.nav-item .nav-label{font-size:10px;font-weight:500}
+.nav-item.active{color:var(--primary)}
+.nav-item:not(.active){color:var(--text3)}
+
+/* Page nav */
+.page-nav{position:absolute;bottom:20px;right:12px;z-index:90;display:flex;flex-direction:column;gap:6px}
+.page-nav-btn{width:40px;height:40px;border-radius:50%;border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);transition:transform 0.12s}
+.page-nav-btn:active{transform:scale(0.94)}
+.page-nav-btn.nav-prev{background:var(--surface);color:var(--text1)}
+.page-nav-btn.nav-next{background:var(--primary);color:#fff}
+
+/* Toast */
+.toast{position:absolute;top:60px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--text1);color:#fff;padding:8px 20px;border-radius:var(--radius-full);font-size:13px;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:200;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Typing indicator */
+.typing{display:flex;gap:4px;padding:4px 0}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--text3);animation:typing 1.2s infinite}
+.typing span:nth-child(2){animation-delay:0.2s}
+.typing span:nth-child(3){animation-delay:0.4s}
+@keyframes typing{0%,60%,100%{opacity:0.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+/* FAB */
+.fab{position:absolute;bottom:72px;right:16px;width:48px;height:48px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;cursor:pointer;box-shadow:0 4px 12px rgba(26,115,232,0.3);z-index:10;transition:transform 0.12s}
+.fab:active{transform:scale(0.94)}
+
+/* Search bar */
+.search-bar{margin:12px 16px;height:40px;background:var(--surface-v);border-radius:var(--radius-full);display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0}
+.search-bar .search-icon{font-size:16px;color:var(--text3)}
+.search-bar input{flex:1;border:none;background:none;font-size:14px;color:var(--text1);outline:none}
+.search-bar input::placeholder{color:var(--text3)}
+</style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="phone-notch"></div>
+  <div class="phone-home"></div>
+  <div class="screen">
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Page Navigation -->
+    <div class="page-nav">
+      <button class="page-nav-btn nav-prev" onclick="prevPage()">◀</button>
+      <button class="page-nav-btn nav-next" onclick="nextPage()">▶</button>
+    </div>
+
+    <!-- 1. Splash -->
+    <div class="page splash active" id="page-splash">
+      <div class="splash-logo">O</div>
+      <div class="splash-title">OmniAI</div>
+      <div class="splash-sub">欢迎使用 OmniAI</div>
+      <div class="splash-ver">v1.0.0</div>
+    </div>
+
+    <!-- 2. Login -->
+    <div class="page login" id="page-login">
+      <div class="login-scroll">
+        <div class="login-title">欢迎使用 OmniAI</div>
+        <div class="login-sub">登录以继续</div>
+        <div class="input-group">
+          <label>手机号或邮箱</label>
+          <input class="input-field" placeholder="请输入手机号或邮箱" value="user@omniai.com">
+        </div>
+        <div class="input-group">
+          <label>登录密码</label>
+          <input class="input-field" type="password" placeholder="请输入登录密码" value="••••••••">
+        </div>
+        <button class="login-btn" onclick="navigateTo('page-chat')">登 录</button>
+        <div class="divider-row"><span>或</span></div>
+        <div class="social-row">
+          <div class="social-btn" onclick="showToast('Google 登录')">G</div>
+          <div class="social-btn" onclick="showToast('微信登录')">微</div>
+          <div class="social-btn" onclick="showToast('QQ登录')">Q</div>
+          <div class="social-btn" onclick="showToast('Apple登录')"></div>
+        </div>
+        <div class="login-link">没有账号？<a onclick="navigateTo('page-register')">创建你的AI空间</a></div>
+      </div>
+    </div>
+
+    <!-- 3. Register -->
+    <div class="page login" id="page-register">
+      <div class="login-scroll">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:24px">
+          <button style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--text1)" onclick="navigateTo('page-login')">◀</button>
+          <div class="login-title" style="margin:0">创建你的AI空间</div>
+        </div>
+        <div class="input-group">
+          <label>手机号或邮箱</label>
+          <input class="input-field" placeholder="请输入手机号或邮箱">
+        </div>
+        <div class="input-group">
+          <label>验证码</label>
+          <div class="input-row">
+            <input class="input-field" placeholder="请输入验证码">
+            <button class="code-btn">获取验证码</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>登录密码</label>
+          <input class="input-field" type="password" placeholder="请输入登录密码">
+        </div>
+        <div class="input-group">
+          <label>确认密码</label>
+          <input class="input-field" type="password" placeholder="请再次输入密码">
+        </div>
+        <button class="login-btn" onclick="showToast('注册成功');navigateTo('page-chat')">注 册</button>
+        <div class="login-link">已有账号？<a onclick="navigateTo('page-login')">立即登录</a></div>
+      </div>
+    </div>
+
+    <!-- 4. Chat (Main) -->
+    <div class="page chat" id="page-chat">
+      <!-- Sidebar Overlay -->
+      <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+      <!-- Sidebar -->
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-user">
+          <div class="user-row">
+            <div class="avatar">O</div>
+            <div class="user-info">
+              <div class="user-name">OmniAI 用户</div>
+              <div class="user-vip">⭐ Pro 会员</div>
+              <div class="user-model">OmniAI 3B · 本地运行中</div>
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-conv">
+          <div class="sidebar-conv-item selected">
+            <div class="conv-title">关于量子计算的讨论</div>
+            <div class="conv-meta"><span class="conv-time">刚刚</span><span class="conv-tag" style="background:var(--tag-local)">本地</span></div>
+          </div>
+          <div class="sidebar-conv-item">
+            <div class="conv-title">Python 代码优化建议</div>
+            <div class="conv-meta"><span class="conv-time">2小时前</span><span class="conv-tag" style="background:var(--tag-gpu)">GPU</span></div>
+          </div>
+          <div class="sidebar-conv-item">
+            <div class="conv-title">AI 写作助手 - 项目方案</div>
+            <div class="conv-meta"><span class="conv-time">昨天</span><span class="conv-tag" style="background:var(--tag-cloud)">云端</span></div>
+          </div>
+          <div class="sidebar-conv-item">
+            <div class="conv-title">机器学习入门笔记</div>
+            <div class="conv-meta"><span class="conv-time">3天前</span><span class="conv-tag" style="background:var(--tag-lora)">LoRA</span></div>
+          </div>
+          <div class="sidebar-conv-item">
+            <div class="conv-title">翻译：技术文档中译英</div>
+            <div class="conv-meta"><span class="conv-time">上周</span><span class="conv-tag" style="background:var(--tag-local)">本地</span></div>
+          </div>
+        </div>
+        <div class="sidebar-bottom">
+          <div class="settings-btn" onclick="navigateTo('page-settings')">⚙️ 设置</div>
+          <div class="ver">v1.0.0</div>
+        </div>
+      </div>
+
+      <div class="chat-toolbar">
+        <button class="menu-btn" onclick="toggleSidebar(true)">☰</button>
+        <div class="center">
+          <div class="model-name">OmniAI 3B</div>
+          <div class="model-status"><span class="dot"></span>本地推理中</div>
+        </div>
+        <button class="new-btn" onclick="showToast('新建对话')">✚</button>
+        <button class="more-btn" onclick="showToast('更多选项')">⋯</button>
+      </div>
+
+      <div class="messages" id="chatMessages">
+        <div class="msg user">
+          <div class="msg-bubble">请解释一下量子计算的基本原理，以及它与传统计算有什么区别？</div>
+          <div class="msg-time">14:32</div>
+        </div>
+        <div class="msg ai">
+          <div class="msg-bubble">量子计算是利用量子力学原理进行信息处理的计算模式。与经典计算的核心区别在于：<br><br><strong>1. 量子比特 (Qubit)</strong><br>经典计算使用比特（0或1），量子计算使用量子比特，可以同时处于0和1的叠加态。<br><br><strong>2. 量子叠加</strong><br>一个量子比特可以同时表示多个状态，n个量子比特可以同时表示2ⁿ个状态。<br><br><strong>3. 量子纠缠</strong><br>两个量子比特可以产生关联，改变其中一个会瞬间影响另一个。<br><br>以下是一个简单的量子电路示例：</div>
+          <div class="msg-time">14:32 · OmniAI 3B</div>
+        </div>
+        <div class="msg ai">
+          <div class="msg-bubble"><pre>from qiskit import QuantumCircuit\n\nqc = QuantumCircuit(2, 2)\nqc.h(0)       # Hadamard gate\nqc.cx(0, 1)   # CNOT gate\nqc.measure([0,1], [0,1])</pre>这段代码创建了一个贝尔态，展示了量子叠加和纠缠的基本应用。</div>
+          <div class="msg-time">14:33 · OmniAI 3B</div>
+        </div>
+        <div class="msg user">
+          <div class="msg-bubble">能详细解释一下Hadamard门的作用吗？</div>
+          <div class="msg-time">14:35</div>
+        </div>
+        <div class="msg ai">
+          <div class="msg-bubble">
+            <div class="typing"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-bar">
+        <div class="quick-pill" onclick="showToast('AI写作')"><span class="pill-icon">✍️</span>AI写作</div>
+        <div class="quick-pill" onclick="showToast('代码生成')"><span class="pill-icon">💻</span>代码生成</div>
+        <div class="quick-pill" onclick="showToast('翻译')"><span class="pill-icon">🌐</span>翻译</div>
+        <div class="quick-pill" onclick="showToast('OCR识图')"><span class="pill-icon">📷</span>OCR识图</div>
+        <div class="quick-pill" onclick="showToast('语音助手')"><span class="pill-icon">🎤</span>语音助手</div>
+        <div class="quick-pill" onclick="showToast('AI搜索')"><span class="pill-icon">🔍</span>AI搜索</div>
+        <div class="quick-pill" onclick="showToast('知识库')"><span class="pill-icon">📚</span>知识库</div>
+        <div class="quick-pill" onclick="showToast('Agent')"><span class="pill-icon">🤖</span>Agent</div>
+      </div>
+
+      <div class="input-area">
+        <button class="plus-btn" onclick="showToast('上传文件/图片')">＋</button>
+        <textarea class="text-input" rows="1" placeholder="输入内容、图片或语音…"></textarea>
+        <button class="voice-btn" onclick="showToast('语音输入中…')">🎤</button>
+        <button class="send-btn" onclick="showToast('发送消息')">▶</button>
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item active"><span class="nav-icon">💬</span><span class="nav-label">聊天</span></div>
+        <div class="nav-item" onclick="navigateTo('page-agent')"><span class="nav-icon">🤖</span><span class="nav-label">Agent</span></div>
+        <div class="nav-item" onclick="navigateTo('page-kb')"><span class="nav-icon">📚</span><span class="nav-label">知识库</span></div>
+        <div class="nav-item" onclick="navigateTo('page-model')"><span class="nav-icon">🧠</span><span class="nav-label">模型</span></div>
+        <div class="nav-item" onclick="navigateTo('page-profile')"><span class="nav-icon">👤</span><span class="nav-label">我的</span></div>
+      </div>
+    </div>
+
+    <!-- 5. Profile -->
+    <div class="page profile" id="page-profile">
+      <div class="profile-toolbar">
+        <button class="back-btn" onclick="navigateTo('page-chat')">◀</button>
+        <div class="title">我的</div>
+        <div class="placeholder"></div>
+      </div>
+      <div class="profile-scroll">
+        <div class="profile-card">
+          <div class="avatar-lg">O</div>
+          <div class="name">OmniAI 用户</div>
+          <div class="uid">UID: OAI-2024-8866</div>
+          <div class="vip-badge">⭐ Pro 会员</div>
+          <div class="device-count">已绑定 2 台设备</div>
+        </div>
+        <div class="vip-card">
+          <div class="vip-label">当前方案</div>
+          <div class="vip-plan">OmniAI Pro 年付</div>
+          <div class="vip-expiry">有效期至 2026.12.31</div>
+          <div class="vip-upgrade" onclick="showToast('升级方案')">续费 / 升级</div>
+        </div>
+        <div class="menu-group">
+          <div class="menu-item" onclick="navigateTo('page-model')"><span class="menu-icon">🧠</span><span class="menu-text">模型中心</span><span class="menu-arrow">›</span></div>
+          <div class="menu-item" onclick="navigateTo('page-lora')"><span class="menu-icon">🔬</span><span class="menu-text">LoRA训练</span><span class="menu-arrow">›</span></div>
+          <div class="menu-item" onclick="navigateTo('page-kb')"><span class="menu-icon">📚</span><span class="menu-text">知识库</span><span class="menu-arrow">›</span></div>
+          <div class="menu-item" onclick="showToast('语音助手')"><span class="menu-icon">🎤</span><span class="menu-text">语音助手</span><span class="menu-arrow">›</span></div>
+        </div>
+        <div class="menu-group">
+          <div class="menu-item" onclick="showToast('缓存管理')"><span class="menu-icon">🗑️</span><span class="menu-text">缓存管理</span><span class="menu-arrow">›</span></div>
+          <div class="menu-item" onclick="showToast('下载管理')"><span class="menu-icon">📥</span><span class="menu-text">下载管理</span><span class="menu-arrow">›</span></div>
+          <div class="menu-item" onclick="navigateTo('page-settings')"><span class="menu-icon">🔒</span><span class="menu-text">隐私与安全</span><span class="menu-arrow">›</span></div>
+          <div class="menu-item" onclick="showToast('开发者模式')"><span class="menu-icon">🛠️</span><span class="menu-text">开发者模式</span><span class="menu-arrow">›</span></div>
+        </div>
+        <button class="logout-btn" onclick="showToast('已退出登录');navigateTo('page-login')">退出登录</button>
+      </div>
+    </div>
+
+    <!-- 6. Model Manager -->
+    <div class="page" id="page-model" style="background:var(--bg);display:flex;flex-direction:column">
+      <div class="model-toolbar">
+        <button class="back-btn" onclick="navigateTo('page-chat')">◀</button>
+        <div class="title">模型中心</div>
+        <button class="add-btn" onclick="showToast('导入模型')">＋</button>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="showToast('本地模型')">本地模型</div>
+        <div class="tab" onclick="showToast('下载模型')">下载模型</div>
+      </div>
+      <div class="model-list">
+        <div class="model-card">
+          <div class="model-header">
+            <div class="model-name">OmniAI-3B-Q4_K</div>
+            <div class="model-tags"><span class="tag local">已加载</span><span class="tag gpu">GPU</span></div>
+          </div>
+          <div class="model-info"><span>1.8 GB</span><span>Q4_K_M</span><span>4096 ctx</span></div>
+          <div class="model-actions">
+            <div class="switch" onclick="this.classList.toggle('off')"></div>
+            <button class="delete-btn" onclick="showToast('确认删除？')">删除</button>
+          </div>
+        </div>
+        <div class="model-card">
+          <div class="model-header">
+            <div class="model-name">OmniAI-7B-Q5_K</div>
+            <div class="model-tags"><span class="tag lora">LoRA</span></div>
+          </div>
+          <div class="model-info"><span>4.2 GB</span><span>Q5_K_M</span><span>8192 ctx</span></div>
+          <div class="model-actions">
+            <div class="switch off" onclick="this.classList.toggle('off')"></div>
+            <button class="delete-btn" onclick="showToast('确认删除？')">删除</button>
+          </div>
+        </div>
+        <div class="model-card">
+          <div class="model-header">
+            <div class="model-name">Llama-3-8B-Q4_K</div>
+            <div class="model-tags"></div>
+          </div>
+          <div class="model-info"><span>4.7 GB</span><span>Q4_K_M</span><span>4096 ctx</span></div>
+          <div class="model-actions">
+            <div class="switch off" onclick="this.classList.toggle('off')"></div>
+            <button class="delete-btn" onclick="showToast('确认删除？')">删除</button>
+          </div>
+        </div>
+        <div class="model-card">
+          <div class="model-header">
+            <div class="model-name">Qwen2-1.5B-Q8_0</div>
+            <div class="model-tags"><span class="tag cloud">云端</span></div>
+          </div>
+          <div class="model-info"><span>1.6 GB</span><span>Q8_0</span><span>2048 ctx</span></div>
+          <div class="model-actions">
+            <div class="switch off" onclick="this.classList.toggle('off')"></div>
+            <button class="delete-btn" onclick="showToast('确认删除？')">删除</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. LoRA Training -->
+    <div class="page" id="page-lora" style="background:var(--bg);display:flex;flex-direction:column">
+      <div class="model-toolbar">
+        <button class="back-btn" onclick="navigateTo('page-profile')">◀</button>
+        <div class="title">LoRA训练</div>
+        <div class="placeholder" style="width:36px"></div>
+      </div>
+      <div class="lora-scroll">
+        <div class="section-title">数据集</div>
+        <div style="background:var(--surface);border-radius:var(--radius);padding:14px;border:0.5px solid var(--divider);margin-bottom:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-size:14px;font-weight:500;color:var(--text1)">training_data.txt</div><div style="font-size:12px;color:var(--text2);margin-top:2px">2.3 MB · 1,247 条</div></div>
+            <button style="background:none;border:1px solid var(--divider);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--text1)" onclick="showToast('选择文件')">导入</button>
+          </div>
+        </div>
+
+        <div class="section-title">训练参数</div>
+        <div style="background:var(--surface);border-radius:var(--radius);padding:16px;border:0.5px solid var(--divider)">
+          <div class="param-row"><span class="param-label">LoRA Rank</span><span class="param-value" id="rankVal">8</span></div>
+          <input type="range" min="1" max="64" value="8" oninput="document.getElementById('rankVal').textContent=this.value">
+          <div class="param-row"><span class="param-label">LoRA Alpha</span><span class="param-value" id="alphaVal">16</span></div>
+          <input type="range" min="1" max="128" value="16" oninput="document.getElementById('alphaVal').textContent=this.value">
+          <div class="param-row"><span class="param-label">学习率</span><span class="param-value">1e-4</span></div>
+          <div class="param-row"><span class="param-label">Epochs</span><span class="param-value" id="epochVal">3</span></div>
+          <input type="range" min="1" max="20" value="3" oninput="document.getElementById('epochVal').textContent=this.value">
+          <div class="param-row"><span class="param-label">Batch Size</span><span class="param-value" id="batchVal">4</span></div>
+          <input type="range" min="1" max="16" value="4" oninput="document.getElementById('batchVal').textContent=this.value">
+          <div class="param-row"><span class="param-label">Dropout</span><span class="param-value" id="dropVal">0.05</span></div>
+          <input type="range" min="0" max="50" value="5" oninput="document.getElementById('dropVal').textContent=(this.value/100).toFixed(2)">
+        </div>
+
+        <div class="section-title">训练进度</div>
+        <div class="progress-section">
+          <div class="progress-bar"><div class="fill" id="trainProgress" style="width:65%"></div></div>
+          <div class="progress-text" id="trainPercent">65% · Epoch 2/3 · Loss: 0.342</div>
+          <div class="loss-chart">
+            <div class="loss-bar" style="height:80%"></div>
+            <div class="loss-bar" style="height:65%"></div>
+            <div class="loss-bar" style="height:55%"></div>
+            <div class="loss-bar" style="height:48%"></div>
+            <div class="loss-bar" style="height:42%"></div>
+            <div class="loss-bar" style="height:38%"></div>
+            <div class="loss-bar" style="height:35%"></div>
+            <div class="loss-bar" style="height:34%"></div>
+            <div class="loss-bar" style="height:33%"></div>
+            <div class="loss-bar" style="height:32%"></div>
+            <div class="loss-bar" style="height:34%"></div>
+            <div class="loss-bar" style="height:31%"></div>
+          </div>
+          <div class="log-area">[14:30:01] 数据集处理中... 1247 条记录
+[14:30:03] Tokenizer初始化完成
+[14:30:05] LoRA训练中... Epoch 1/3
+[14:31:22] Epoch 1 完成, Loss: 0.856
+[14:31:22] LoRA训练中... Epoch 2/3
+[14:32:45] Epoch 2 完成, Loss: 0.342
+[14:32:45] LoRA训练中... Epoch 3/3</div>
+        </div>
+
+        <div class="train-btns">
+          <button class="train-btn secondary" onclick="showToast('训练已暂停')">⏸ 暂停</button>
+          <button class="train-btn danger" onclick="showToast('训练已停止')">⏹ 停止</button>
+          <button class="train-btn primary" onclick="showToast('导出LoRA权重')">📤 导出LoRA</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Knowledge Base -->
+    <div class="page" id="page-kb" style="background:var(--bg);display:flex;flex-direction:column">
+      <div class="model-toolbar">
+        <button class="back-btn" onclick="navigateTo('page-chat')">◀</button>
+        <div class="title">知识库</div>
+        <button class="add-btn" onclick="showToast('新建知识库')">＋</button>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input placeholder="搜索知识库...">
+      </div>
+      <div class="kb-list">
+        <div class="kb-card" onclick="showToast('打开知识库')">
+          <div class="kb-header"><div class="kb-name">AI 技术文档库</div><div class="kb-count">23 篇文档</div></div>
+          <div class="kb-desc">包含大模型原理、训练技术、推理优化等技术文档，支持语义检索和智能问答。</div>
+          <div class="kb-footer"><span class="tag local" style="font-size:10px;padding:1px 6px;border-radius:4px;color:#fff">就绪</span><span>45.2 MB</span><span>更新于 2小时前</span></div>
+        </div>
+        <div class="kb-card" onclick="showToast('打开知识库')">
+          <div class="kb-header"><div class="kb-name">产品需求文档</div><div class="kb-count">8 篇文档</div></div>
+          <div class="kb-desc">项目PRD、功能规格、交互设计文档集合。</div>
+          <div class="kb-footer"><span style="font-size:10px;padding:1px 6px;border-radius:4px;color:#fff;background:var(--tag-cloud)">索引中</span><span>12.8 MB</span><span>更新于 昨天</span></div>
+        </div>
+        <div class="kb-card" onclick="showToast('打开知识库')">
+          <div class="kb-header"><div class="kb-name">法律法规数据库</div><div class="kb-count">156 篇文档</div></div>
+          <div class="kb-desc">中国法律法规、司法解释、部门规章全文检索库。</div>
+          <div class="kb-footer"><span class="tag local" style="font-size:10px;padding:1px 6px;border-radius:4px;color:#fff">就绪</span><span>234.5 MB</span><span>更新于 上周</span></div>
+        </div>
+        <div class="kb-card" onclick="showToast('打开知识库')">
+          <div class="kb-header"><div class="kb-name">个人学习笔记</div><div class="kb-count">42 篇文档</div></div>
+          <div class="kb-desc">机器学习、深度学习、NLP学习笔记与代码片段。</div>
+          <div class="kb-footer"><span class="tag local" style="font-size:10px;padding:1px 6px;border-radius:4px;color:#fff">就绪</span><span>8.7 MB</span><span>更新于 3天前</span></div>
+        </div>
+      </div>
+      <div class="fab" onclick="showToast('新建知识库')">＋</div>
+    </div>
+
+    <!-- 9. Settings -->
+    <div class="page" id="page-settings" style="background:var(--bg);display:flex;flex-direction:column">
+      <div class="profile-toolbar">
+        <button class="back-btn" onclick="navigateTo('page-chat')">◀</button>
+        <div class="title">设置</div>
+        <div class="placeholder"></div>
+      </div>
+      <div class="settings-scroll">
+        <div class="settings-group-title">AI 设置</div>
+        <div class="settings-group">
+          <div class="setting-item"><span class="setting-icon">🧠</span><div class="setting-text"><div class="setting-title">默认模型</div></div><span class="setting-value">OmniAI 3B</span><span class="setting-arrow">›</span></div>
+          <div class="setting-item"><span class="setting-icon">📝</span><div class="setting-text"><div class="setting-title">系统提示词</div></div><span class="setting-arrow">›</span></div>
+          <div class="setting-item"><span class="setting-icon">🌡️</span><div class="setting-text"><div class="setting-title">温度</div></div><span class="setting-value">0.7</span><span class="setting-arrow">›</span></div>
+          <div class="setting-item"><span class="setting-icon">🎯</span><div class="setting-text"><div class="setting-title">Top-P</div></div><span class="setting-value">0.9</span><span class="setting-arrow">›</span></div>
+        </div>
+
+        <div class="settings-group-title">推理设置</div>
+        <div class="settings-group">
+          <div class="setting-item"><span class="setting-icon">⚡</span><div class="setting-text"><div class="setting-title">推理模式</div></div><span class="setting-value">均衡模式</span><span class="setting-arrow">›</span></div>
+          <div class="setting-item"><span class="setting-icon">📐</span><div class="setting-text"><div class="setting-title">上下文长度</div></div><span class="setting-value">4096</span><span class="setting-arrow">›</span></div>
+          <div class="setting-item"><span class="setting-icon">💾</span><div class="setting-text"><div class="setting-title">mmap 加速</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+          <div class="setting-item"><span class="setting-icon">🎮</span><div class="setting-text"><div class="setting-title">GPU 加速</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+        </div>
+
+        <div class="settings-group-title">隐私设置</div>
+        <div class="settings-group">
+          <div class="setting-item"><span class="setting-icon">🔒</span><div class="setting-text"><div class="setting-title">应用锁</div></div><div class="setting-switch off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+          <div class="setting-item"><span class="setting-icon">👆</span><div class="setting-text"><div class="setting-title">指纹解锁</div></div><div class="setting-switch off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+          <div class="setting-item"><span class="setting-icon">👻</span><div class="setting-text"><div class="setting-title">无痕模式</div></div><div class="setting-switch off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+          <div class="setting-item"><span class="setting-icon">🔐</span><div class="setting-text"><div class="setting-title">数据加密</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+          <div class="setting-item"><span class="setting-icon">🛡️</span><div class="setting-text"><div class="setting-title">敏感词过滤</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+          <div class="setting-item"><span class="setting-icon">☁️</span><div class="setting-text"><div class="setting-title">云端降级</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+        </div>
+
+        <div class="settings-group-title">缓存设置</div>
+        <div class="settings-group">
+          <div class="setting-item"><span class="setting-icon">🗑️</span><div class="setting-text"><div class="setting-title">自动清理</div></div><div class="setting-switch on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></div></div>
+          <div class="setting-item"><span class="setting-icon">📊</span><div class="setting-text"><div class="setting-title">缓存大小</div></div><span class="setting-value">128.3 MB</span><span class="setting-arrow">›</span></div>
+          <div class="setting-item" onclick="showToast('缓存已清理')"><span class="setting-icon">🧹</span><div class="setting-text"><div class="setting-title">清理缓存</div></div><span class="setting-arrow">›</span></div>
+        </div>
+
+        <div class="settings-group-title">关于</div>
+        <div class="settings-group">
+          <div class="setting-item"><span class="setting-icon">ℹ️</span><div class="setting-text"><div class="setting-title">版本</div></div><span class="setting-value">1.0.0</span></div>
+          <div class="setting-item" onclick="showToast('已是最新版本')"><span class="setting-icon">🔄</span><div class="setting-text"><div class="setting-title">检查更新</div></div><span class="setting-arrow">›</span></div>
+          <div class="setting-item"><span class="setting-icon">📄</span><div class="setting-text"><div class="setting-title">用户协议</div></div><span class="setting-arrow">›</span></div>
+          <div class="setting-item"><span class="setting-icon">🔒</span><div class="setting-text"><div class="setting-title">隐私政策</div></div><span class="setting-arrow">›</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. Agent -->
+    <div class="page" id="page-agent" style="background:var(--bg);display:flex;flex-direction:column">
+      <div class="model-toolbar">
+        <button class="back-btn" onclick="navigateTo('page-chat')">◀</button>
+        <div class="title">AI Agent</div>
+        <button class="add-btn" onclick="showToast('创建Agent')">＋</button>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input placeholder="搜索 Agent...">
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:12px 16px">
+        <div class="model-card" onclick="showToast('打开Agent')">
+          <div class="model-header">
+            <div class="model-name">🔍 研究助手</div>
+            <div class="model-tags"><span class="tag local">活跃</span></div>
+          </div>
+          <div class="model-info"><span>深度搜索 · 分析总结</span></div>
+        </div>
+        <div class="model-card" onclick="showToast('打开Agent')">
+          <div class="model-header">
+            <div class="model-name">💻 编程助手</div>
+            <div class="model-tags"><span class="tag gpu">运行中</span></div>
+          </div>
+          <div class="model-info"><span>代码生成 · Debug · 重构</span></div>
+        </div>
+        <div class="model-card" onclick="showToast('打开Agent')">
+          <div class="model-header">
+            <div class="model-name">✍️ 写作助手</div>
+            <div class="model-tags"></div>
+          </div>
+          <div class="model-info"><span>文章撰写 · 润色 · 翻译</span></div>
+        </div>
+        <div class="model-card" onclick="showToast('打开Agent')">
+          <div class="model-header">
+            <div class="model-name">📊 数据分析师</div>
+            <div class="model-tags"><span class="tag lora">LoRA</span></div>
+          </div>
+          <div class="model-info"><span>数据分析 · 可视化 · 报告</span></div>
+        </div>
+      </div>
+      <div class="fab" onclick="showToast('创建Agent')">＋</div>
+      <div class="bottom-nav">
+        <div class="nav-item" onclick="navigateTo('page-chat')"><span class="nav-icon">💬</span><span class="nav-label">聊天</span></div>
+        <div class="nav-item active"><span class="nav-icon">🤖</span><span class="nav-label">Agent</span></div>
+        <div class="nav-item" onclick="navigateTo('page-kb')"><span class="nav-icon">📚</span><span class="nav-label">知识库</span></div>
+        <div class="nav-item" onclick="navigateTo('page-model')"><span class="nav-icon">🧠</span><span class="nav-label">模型</span></div>
+        <div class="nav-item" onclick="navigateTo('page-profile')"><span class="nav-icon">👤</span><span class="nav-label">我的</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Page indicator -->
+<div style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.5);font-size:12px;font-family:-apple-system,sans-serif;text-align:center">
+  <div id="pageIndicator">1 / 10 · 启动页</div>
+  <div style="margin-top:4px;opacity:0.6">点击 ◀ ▶ 切换页面</div>
+</div>
+
+<script>
+const pages = [
+  {id:'page-splash', name:'启动页'},
+  {id:'page-login', name:'登录页'},
+  {id:'page-register', name:'注册页'},
+  {id:'page-chat', name:'AI对话'},
+  {id:'page-profile', name:'个人中心'},
+  {id:'page-model', name:'模型管理'},
+  {id:'page-lora', name:'LoRA训练'},
+  {id:'page-kb', name:'知识库'},
+  {id:'page-settings', name:'设置中心'},
+  {id:'page-agent', name:'AI Agent'}
+];
+let currentIndex = 0;
+
+function navigateTo(pageId) {
+  const idx = pages.findIndex(p => p.id === pageId);
+  if (idx >= 0) {
+    currentIndex = idx;
+    showPage(currentIndex);
+  }
+}
+
+function showPage(idx) {
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.classList.remove('slide-left');
+  });
+  const target = document.getElementById(pages[idx].id);
+  if (target) {
+    target.classList.add('active');
+  }
+  toggleSidebar(false);
+  updateIndicator();
+}
+
+function nextPage() {
+  if (currentIndex < pages.length - 1) {
+    currentIndex++;
+    showPage(currentIndex);
+  }
+}
+
+function prevPage() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    showPage(currentIndex);
+  }
+}
+
+function updateIndicator() {
+  document.getElementById('pageIndicator').textContent = `${currentIndex + 1} / ${pages.length} · ${pages[currentIndex].name}`;
+}
+
+function toggleSidebar(open) {
+  document.getElementById('sidebar').classList.toggle('open', open);
+  document.getElementById('sidebarOverlay').classList.toggle('open', open);
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// Auto advance from splash
+setTimeout(() => {
+  if (currentIndex === 0) {
+    currentIndex = 1;
+    showPage(1);
+  }
+}, 2500);
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') nextPage();
+  if (e.key === 'ArrowLeft') prevPage();
+});
+
+// Simulate typing animation
+let typingActive = true;
+const typingEl = document.querySelector('.typing');
+if (typingEl) {
+  setInterval(() => {
+    if (typingActive && document.getElementById('page-chat').classList.contains('active')) {
+      // Animation runs via CSS
+    }
+  }, 1000);
+}
+</script>
+</body>
+</html>
