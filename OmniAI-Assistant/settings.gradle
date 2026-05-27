@@ -14,3 +14,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "OmniAI-Assistant"
 include ':app'
+include ':model_feature'

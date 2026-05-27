@@ -4,13 +4,13 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 
 import com.omniai.assistant.common.Constants;
 import com.omniai.assistant.model.AIModel;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,22 +21,24 @@ public class PreinstalledModelManager {
     private static final String PREF_KEY_MODELS_EXTRACTED = "preinstalled_models_extracted";
     private static final String PREF_KEY_EXTRACTION_VERSION = "preinstalled_models_version";
 
-    private static final int EXTRACTION_VERSION = 2;
+    private static final int EXTRACTION_VERSION = 3;
 
-    private static final String ASSET_TEXT_MODEL = "llama-bin/models/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf";
-    private static final String ASSET_VISION_MODEL = "llama-bin/models/Qwen3-VL-2B-Q4_K_M.gguf";
+    private static final String ASSET_TEXT_MODEL = "models/Qwen2.5-0.5B-Instruct-Q4_K_M.gguf";
+    private static final String ASSET_VISION_MODEL = "models/Qwen3-VL-2B-Q4_K_M.gguf";
 
     private static volatile PreinstalledModelManager instance;
     private final Context context;
     private final SharedPreferences prefs;
     private final ExecutorService executorService;
     private final Handler mainHandler;
+    private final DynamicFeatureManager dynamicFeatureManager;
 
     public interface ExtractionCallback {
         void onProgress(String modelName, float progress);
         void onModelReady(AIModel model);
         void onAllModelsReady();
         void onError(String message);
+        void onRequiresFeatureInstall();
     }
 
     private PreinstalledModelManager(Context context) {
@@ -44,6 +46,7 @@ public class PreinstalledModelManager {
         this.prefs = context.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE);
         this.executorService = Executors.newSingleThreadExecutor();
         this.mainHandler = new Handler(Looper.getMainLooper());
+        this.dynamicFeatureManager = DynamicFeatureManager.getInstance(context);
     }
 
     public static synchronized PreinstalledModelManager getInstance(Context context) {
@@ -59,11 +62,23 @@ public class PreinstalledModelManager {
             verifyAndRegisterModels(callback);
             return;
         }
+
+        if (!dynamicFeatureManager.isFeatureInstalled()) {
+            if (callback != null) {
+                mainHandler.post(() -> callback.onRequiresFeatureInstall());
+            }
+            return;
+        }
+
         extractAllModels(callback);
     }
 
     public boolean areModelsExtracted() {
         return prefs.getInt(PREF_KEY_EXTRACTION_VERSION, 0) >= EXTRACTION_VERSION;
+    }
+
+    public boolean isDynamicFeatureInstalled() {
+        return dynamicFeatureManager.isFeatureInstalled();
     }
 
     private void extractAllModels(ExtractionCallback callback) {
@@ -116,24 +131,19 @@ public class PreinstalledModelManager {
         }
 
         try {
-            String[] assetList = context.getAssets().list("");
-            boolean assetExists = false;
-            if (assetList != null) {
-                for (String asset : assetList) {
-                    if (assetPath.startsWith(asset) || assetPath.contains(asset)) {
-                        assetExists = true;
-                        break;
-                    }
-                }
-            }
-            InputStream is;
+            InputStream is = null;
             try {
-                is = context.getAssets().open(assetPath);
+                Context featureContext = dynamicFeatureManager.getFeatureContext();
+                is = featureContext.getAssets().open(assetPath);
             } catch (IOException e) {
-                mainHandler.post(() -> {
-                    if (callback != null) callback.onError("Assets文件不存在: " + assetPath);
-                });
-                return false;
+                try {
+                    is = context.getAssets().open(assetPath);
+                } catch (IOException e2) {
+                    mainHandler.post(() -> {
+                        if (callback != null) callback.onError("模型文件不存在，请重新安装应用: " + assetPath);
+                    });
+                    return false;
+                }
             }
 
             long assetSize = is.available();
@@ -146,16 +156,7 @@ public class PreinstalledModelManager {
                 return false;
             }
 
-            FileOutputStream fos;
-            try {
-                fos = new FileOutputStream(outputFile);
-            } catch (IOException e) {
-                is.close();
-                mainHandler.post(() -> {
-                    if (callback != null) callback.onError("文件写入失败: " + outputFile.getAbsolutePath());
-                });
-                return false;
-            }
+            FileOutputStream fos = new FileOutputStream(outputFile);
 
             byte[] buffer = new byte[8192];
             long totalRead = 0;
@@ -242,7 +243,7 @@ public class PreinstalledModelManager {
 
         if (!textOk || !visionOk) {
             prefs.edit().putInt(PREF_KEY_EXTRACTION_VERSION, 0).apply();
-            extractAllModels(callback);
+            ensureModelsExtracted(callback);
             return;
         }
 
@@ -342,5 +343,9 @@ public class PreinstalledModelManager {
         if (textModel.exists()) total += textModel.length();
         if (visionModel.exists()) total += visionModel.length();
         return total;
+    }
+
+    public DynamicFeatureManager getDynamicFeatureManager() {
+        return dynamicFeatureManager;
     }
 }
