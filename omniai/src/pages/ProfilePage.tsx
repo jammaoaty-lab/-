@@ -12,11 +12,13 @@ import {
   Cloud,
   Monitor,
   Crown,
+  LogOut,
 } from 'lucide-react'
 import type { Page } from '../App'
 
 interface Props {
   onNavigate: (page: Page) => void
+  onLogout: () => void
 }
 
 const menuSections = [
@@ -38,7 +40,7 @@ const menuSections = [
   },
 ]
 
-export default function ProfilePage({ onNavigate }: Props) {
+export default function ProfilePage({ onNavigate, onLogout }: Props) {
   return (
     <div className="h-full flex flex-col bg-surface-secondary">
       <header className="flex-shrink-0 flex items-center justify-between px-4 h-12 bg-white border-b border-border-light">
@@ -162,6 +164,16 @@ export default function ProfilePage({ onNavigate }: Props) {
             <div className="text-center pt-2 pb-4">
               <span className="text-[11px] text-text-tertiary">OmniAI Assistant v2.5.0</span>
             </div>
+
+            <button
+              onClick={onLogout}
+              className="w-full flex items-center justify-center gap-2 py-3 bg-white rounded-xl text-sm text-danger font-medium hover:bg-danger-light transition-colors"
+            >
+              <LogOut size={16} />
+              退出登录
+            </button>
+
+            <div className="h-4" />
           </div>
         </div>
       </div>
