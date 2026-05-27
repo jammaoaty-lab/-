@@ -77,8 +77,17 @@ public class CreditsCenterActivity extends AppCompatActivity {
     }
 
     private void onRechargeClick(CreditsManager.RechargePlan plan) {
-        if (!debounceClick(copyCodeBtn)) return;
+        new AlertDialog.Builder(this)
+                .setTitle("确认充值")
+                .setMessage("确认购买 " + plan.getName() + " 套餐（¥" + plan.getPrice() + "，" + plan.getCredits() + "积分）？")
+                .setPositiveButton("确认", (dialog, which) -> {
+                    performRecharge(plan);
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
 
+    private void performRecharge(CreditsManager.RechargePlan plan) {
         creditsManager.rechargeCredits(plan.getId(), new CreditsManager.RechargeCallback() {
             @Override
             public void onSuccess(CreditsManager.CreditsRecord record) {
@@ -186,7 +195,22 @@ public class CreditsCenterActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadCreditsData();
-        loadCreditsRecords();
+        creditsManager.refreshCredits(new CreditsManager.SyncCallback() {
+            @Override
+            public void onSuccess() {
+                runOnUiThread(() -> {
+                    loadCreditsData();
+                    loadCreditsRecords();
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThread(() -> {
+                    loadCreditsData();
+                    loadCreditsRecords();
+                });
+            }
+        });
     }
 }

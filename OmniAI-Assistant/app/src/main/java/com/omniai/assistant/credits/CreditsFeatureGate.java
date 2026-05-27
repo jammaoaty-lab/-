@@ -59,14 +59,13 @@ public class CreditsFeatureGate {
 
     public void showInsufficientCreditsDialog(Context context) {
         new AlertDialog.Builder(context)
-                .setTitle("Insufficient Credits")
-                .setMessage("You don't have enough credits for this feature. Please recharge to continue using advanced features.")
-                .setPositiveButton("Recharge", (dialog, which) -> {
-                    Intent intent = new Intent(Intent.ACTION_VIEW,
-                            android.net.Uri.parse("omniai://credits/recharge"));
+                .setTitle("积分不足")
+                .setMessage("您的积分余额不足以使用此功能，请充值后继续使用高级功能。")
+                .setPositiveButton("去充值", (dialog, which) -> {
+                    Intent intent = new Intent(context, com.omniai.assistant.ui.credits.CreditsCenterActivity.class);
                     context.startActivity(intent);
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("取消", null)
                 .show();
     }
 }

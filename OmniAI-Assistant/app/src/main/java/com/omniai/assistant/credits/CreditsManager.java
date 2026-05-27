@@ -206,19 +206,24 @@ public class CreditsManager {
     }
 
     public int getCredits() {
-        currentCredits = prefs.getInt(KEY_CREDITS, 0);
-        syncWithServer(null);
+        if (prefs != null) {
+            currentCredits = prefs.getInt(KEY_CREDITS, 0);
+        }
         return currentCredits;
+    }
+
+    public void refreshCredits(SyncCallback callback) {
+        syncWithServer(callback);
     }
 
     public void setCredits(int credits) {
         this.currentCredits = credits;
-        prefs.edit().putInt(KEY_CREDITS, credits).apply();
+        if (prefs != null) prefs.edit().putInt(KEY_CREDITS, credits).apply();
     }
 
     public void addCredits(int amount, String type, String description) {
         currentCredits += amount;
-        prefs.edit().putInt(KEY_CREDITS, currentCredits).apply();
+        if (prefs != null) prefs.edit().putInt(KEY_CREDITS, currentCredits).apply();
 
         CreditsRecord record = new CreditsRecord(
                 System.currentTimeMillis(),
@@ -235,7 +240,7 @@ public class CreditsManager {
             return false;
         }
         currentCredits -= amount;
-        prefs.edit().putInt(KEY_CREDITS, currentCredits).apply();
+        if (prefs != null) prefs.edit().putInt(KEY_CREDITS, currentCredits).apply();
 
         CreditsRecord record = new CreditsRecord(
                 System.currentTimeMillis(),

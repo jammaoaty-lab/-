@@ -3,6 +3,7 @@ package com.omniai.assistant.credits;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.omniai.assistant.common.Result;
+import com.omniai.assistant.user.AuthInterceptor;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -29,7 +30,14 @@ public class CreditsApiService {
     public CreditsApiService(String apiBaseUrl) {
         this.apiBaseUrl = apiBaseUrl;
         this.gson = new Gson();
+        AuthInterceptor authInterceptor = new AuthInterceptor();
+        try {
+            com.omniai.assistant.user.UserManager userManager = com.omniai.assistant.user.UserManager.getInstance();
+            authInterceptor.setUserManager(userManager);
+        } catch (Exception ignored) {
+        }
         this.client = new OkHttpClient.Builder()
+                .addInterceptor(authInterceptor)
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .writeTimeout(30, TimeUnit.SECONDS)
