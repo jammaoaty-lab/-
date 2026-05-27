@@ -564,7 +564,8 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeVisionChat(JNIEnv *env,
                 input_text.add_special = true;
                 input_text.parse_special = true;
 
-                int err = mtmd_tokenize(vs->mtmd_ctx, chunks, &input_text, &bitmap, 1);
+                const mtmd_bitmap *bitmap_ptr = bitmap;
+                int err = mtmd_tokenize(vs->mtmd_ctx, chunks, &input_text, &bitmap_ptr, 1);
                 if (err == 0) {
                     image_loaded = true;
                     for (size_t i = 0; i < mtmd_input_chunks_size(chunks); i++) {
@@ -582,7 +583,8 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeVisionChat(JNIEnv *env,
                             size_t n_text_tokens = 0;
                             const llama_token *text_tokens = mtmd_input_chunk_get_tokens_text(chunk, &n_text_tokens);
                             if (text_tokens && n_text_tokens > 0) {
-                                llama_batch text_batch = llama_batch_get_one(text_tokens, (int32_t)n_text_tokens);
+                                std::vector<llama_token> tokens_vec(text_tokens, text_tokens + n_text_tokens);
+                                llama_batch text_batch = llama_batch_get_one(tokens_vec.data(), (int32_t)n_text_tokens);
                                 if (llama_decode(vs->ctx, text_batch) != 0) {
                                     LOGW("Failed to decode text chunk %zu", i);
                                 }
@@ -699,7 +701,8 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeImageOcr(JNIEnv *env, j
                 input_text.add_special = true;
                 input_text.parse_special = true;
 
-                int err = mtmd_tokenize(vs->mtmd_ctx, chunks, &input_text, &bitmap, 1);
+                const mtmd_bitmap *bitmap_ptr = bitmap;
+                int err = mtmd_tokenize(vs->mtmd_ctx, chunks, &input_text, &bitmap_ptr, 1);
                 if (err == 0) {
                     image_processed = true;
                     for (size_t i = 0; i < mtmd_input_chunks_size(chunks); i++) {
@@ -711,7 +714,8 @@ Java_com_omniai_assistant_nativebridge_LlamaBridge_nativeImageOcr(JNIEnv *env, j
                             size_t n_text_tokens = 0;
                             const llama_token *text_tokens = mtmd_input_chunk_get_tokens_text(chunk, &n_text_tokens);
                             if (text_tokens && n_text_tokens > 0) {
-                                llama_batch text_batch = llama_batch_get_one(text_tokens, (int32_t)n_text_tokens);
+                                std::vector<llama_token> tokens_vec(text_tokens, text_tokens + n_text_tokens);
+                                llama_batch text_batch = llama_batch_get_one(tokens_vec.data(), (int32_t)n_text_tokens);
                                 llama_decode(vs->ctx, text_batch);
                             }
                         }
