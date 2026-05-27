@@ -293,6 +293,54 @@ public class ChatActivity extends AppCompatActivity {
             });
         }
 
+        TextView navAgent = findViewById(R.id.nav_agent);
+        if (navAgent != null) {
+            navAgent.setOnClickListener(v -> {
+                com.omniai.assistant.ui.agent.AgentActivity.start(this);
+                drawerLayout.closeDrawer(GravityCompat.START);
+            });
+        }
+
+        TextView navKnowledge = findViewById(R.id.nav_knowledge);
+        if (navKnowledge != null) {
+            navKnowledge.setOnClickListener(v -> {
+                startActivity(new Intent(this, com.omniai.assistant.ui.knowledge.KnowledgeBaseActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+            });
+        }
+
+        TextView navModel = findViewById(R.id.nav_model);
+        if (navModel != null) {
+            navModel.setOnClickListener(v -> {
+                startActivity(new Intent(this, com.omniai.assistant.ui.model.ModelManagerActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+            });
+        }
+
+        TextView navLora = findViewById(R.id.nav_lora);
+        if (navLora != null) {
+            navLora.setOnClickListener(v -> {
+                startActivity(new Intent(this, com.omniai.assistant.ui.lora.LoraTrainActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+            });
+        }
+
+        TextView navTerminal = findViewById(R.id.nav_terminal);
+        if (navTerminal != null) {
+            navTerminal.setOnClickListener(v -> {
+                startActivity(new Intent(this, com.omniai.assistant.ui.terminal.TerminalActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+            });
+        }
+
+        TextView navCredits = findViewById(R.id.nav_credits);
+        if (navCredits != null) {
+            navCredits.setOnClickListener(v -> {
+                startActivity(new Intent(this, com.omniai.assistant.ui.credits.CreditsCenterActivity.class));
+                drawerLayout.closeDrawer(GravityCompat.START);
+            });
+        }
+
         TextView tvVersion = findViewById(R.id.tv_version);
         if (tvVersion != null) {
             try {
@@ -1048,6 +1096,8 @@ public class ChatActivity extends AppCompatActivity {
                 creditsGate.showInsufficientCreditsDialog(this);
                 return;
             }
+            com.omniai.assistant.ui.agent.AgentActivity.start(this);
+            return;
         }
 
         command.execute("", new QuickCommand.QuickCommandCallback() {
@@ -1067,18 +1117,30 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void showMoreMenu() {
-        String[] options = {"模型管理", "积分中心", "设置"};
+        String[] options = {"Agent智能体", "知识库", "模型管理", "LoRA训练", "终端", "积分中心", "设置"};
         new AlertDialog.Builder(this)
                 .setTitle("更多")
                 .setItems(options, (dialog, which) -> {
                     switch (which) {
                         case 0:
-                            startActivity(new Intent(this, ModelManagerActivity.class));
+                            com.omniai.assistant.ui.agent.AgentActivity.start(this);
                             break;
                         case 1:
-                            startActivity(new Intent(this, CreditsCenterActivity.class));
+                            startActivity(new Intent(this, com.omniai.assistant.ui.knowledge.KnowledgeBaseActivity.class));
                             break;
                         case 2:
+                            startActivity(new Intent(this, ModelManagerActivity.class));
+                            break;
+                        case 3:
+                            startActivity(new Intent(this, com.omniai.assistant.ui.lora.LoraTrainActivity.class));
+                            break;
+                        case 4:
+                            startActivity(new Intent(this, com.omniai.assistant.ui.terminal.TerminalActivity.class));
+                            break;
+                        case 5:
+                            startActivity(new Intent(this, CreditsCenterActivity.class));
+                            break;
+                        case 6:
                             startActivity(new Intent(this, SettingsActivity.class));
                             break;
                     }

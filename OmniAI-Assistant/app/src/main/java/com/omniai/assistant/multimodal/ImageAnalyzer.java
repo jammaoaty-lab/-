@@ -7,6 +7,8 @@ import com.omniai.assistant.inference.VisionInferenceEngine;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class ImageAnalyzer {
 
@@ -44,35 +46,7 @@ public class ImageAnalyzer {
             throw new IllegalArgumentException("Invalid image file");
         }
         checkMemoryBeforeInference();
-        final String[] result = new String[1];
-        final Exception[] error = new Exception[1];
-        Thread thread = new Thread(() -> {
-            try {
-                result[0] = visionEngine.visionChat(imagePath, question, new VisionInferenceEngine.VisionCallback() {
-                    @Override
-                    public void onSuccess(String res) {
-                        result[0] = res;
-                    }
-
-                    @Override
-                    public void onError(String err) {
-                        error[0] = new RuntimeException(err);
-                    }
-                });
-            } catch (Exception e) {
-                error[0] = e;
-            }
-        });
-        thread.start();
-        try {
-            thread.join(60000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Analysis interrupted", e);
-        }
-        if (error[0] != null) {
-            throw new RuntimeException(error[0].getMessage());
-        }
-        return result[0] != null ? result[0] : "";
+        return callVisionSync(imagePath, question);
     }
 
     public String describe(String imagePath) {
@@ -83,35 +57,46 @@ public class ImageAnalyzer {
             throw new IllegalArgumentException("Invalid image file");
         }
         checkMemoryBeforeInference();
-        final String[] result = new String[1];
-        final Exception[] error = new Exception[1];
-        Thread thread = new Thread(() -> {
-            try {
-                result[0] = visionEngine.visionChat(imagePath, "Describe this image in detail.", new VisionInferenceEngine.VisionCallback() {
-                    @Override
-                    public void onSuccess(String res) {
-                        result[0] = res;
-                    }
+        return callVisionSync(imagePath, "Describe this image in detail.");
+    }
 
-                    @Override
-                    public void onError(String err) {
-                        error[0] = new RuntimeException(err);
-                    }
-                });
-            } catch (Exception e) {
-                error[0] = e;
-            }
-        });
-        thread.start();
+    private String callVisionSync(String imagePath, String prompt) {
         try {
-            thread.join(60000);
+            final String[] resultHolder = new String[1];
+            final boolean[] errorHolder = new boolean[1];
+            CountDownLatch latch = new CountDownLatch(1);
+
+            visionEngine.visionChat(imagePath, prompt, new VisionInferenceEngine.VisionCallback() {
+                @Override
+                public void onProgress(String partialText) {
+                }
+
+                @Override
+                public void onSuccess(String result) {
+                    resultHolder[0] = result;
+                    latch.countDown();
+                }
+
+                @Override
+                public void onError(String error) {
+                    errorHolder[0] = true;
+                    resultHolder[0] = error;
+                    latch.countDown();
+                }
+            });
+
+            boolean completed = latch.await(60, TimeUnit.SECONDS);
+            if (!completed) {
+                throw new RuntimeException("Image analysis timed out");
+            }
+            if (errorHolder[0]) {
+                throw new RuntimeException(resultHolder[0]);
+            }
+            return resultHolder[0] != null ? resultHolder[0] : "";
         } catch (InterruptedException e) {
-            throw new RuntimeException("Description interrupted", e);
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Analysis interrupted", e);
         }
-        if (error[0] != null) {
-            throw new RuntimeException(error[0].getMessage());
-        }
-        return result[0] != null ? result[0] : "";
     }
 
     public void analyzeWithQuestion(String imagePath, String question, ImageCallback callback) {
@@ -129,6 +114,10 @@ public class ImageAnalyzer {
             return;
         }
         visionEngine.visionChat(imagePath, question, new VisionInferenceEngine.VisionCallback() {
+            @Override
+            public void onProgress(String partialText) {
+            }
+
             @Override
             public void onSuccess(String result) {
                 callback.onSuccess(result);

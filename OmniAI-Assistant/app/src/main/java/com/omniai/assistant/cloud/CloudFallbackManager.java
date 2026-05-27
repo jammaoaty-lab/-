@@ -175,8 +175,23 @@ public class CloudFallbackManager {
         }
     }
 
+    private long lastVisionInferenceStartTime = 0;
+    private static final long VISION_INFERENCE_TIMEOUT_MS = 120000L;
+
     private boolean isVisionInferenceTimeout() {
-        return false;
+        if (lastVisionInferenceStartTime == 0) {
+            return false;
+        }
+        long elapsed = System.currentTimeMillis() - lastVisionInferenceStartTime;
+        return elapsed > VISION_INFERENCE_TIMEOUT_MS;
+    }
+
+    public void markVisionInferenceStart() {
+        lastVisionInferenceStartTime = System.currentTimeMillis();
+    }
+
+    public void markVisionInferenceEnd() {
+        lastVisionInferenceStartTime = 0;
     }
 
     private boolean shouldRestoreToLocal() {
