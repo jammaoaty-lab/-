@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   X,
@@ -7,15 +8,17 @@ import {
   Trash2,
   Settings,
   HelpCircle,
+  Search,
 } from 'lucide-react'
 import type { Page } from '../App'
+import { useToast } from '../components/Toast'
 
 interface Props {
   onClose: () => void
   onNavigate: (page: Page) => void
 }
 
-const conversations = [
+const initialConversations = [
   { id: 1, title: 'Python 数据分析脚本', time: '10分钟前', model: 'OmniAI 3B', pinned: true },
   { id: 2, title: 'React 组件优化方案', time: '1小时前', model: 'OmniAI 7B', pinned: false },
   { id: 3, title: '机器学习模型调参', time: '3小时前', model: 'OmniAI 3B', pinned: false },
@@ -26,6 +29,31 @@ const conversations = [
 ]
 
 export default function Sidebar({ onClose, onNavigate }: Props) {
+  const { showToast } = useToast()
+  const [activeId, setActiveId] = useState<number | null>(null)
+  const [conversationsList, setConversationsList] = useState(initialConversations)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
+
+  const filteredConversations = conversationsList.filter((conv) =>
+    conv.title.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const handleNewConversation = () => {
+    showToast('已创建新对话', 'success')
+  }
+
+  const handleDelete = (id: number) => {
+    if (confirmDeleteId === id) {
+      setConversationsList((prev) => prev.filter((c) => c.id !== id))
+      setConfirmDeleteId(null)
+      if (activeId === id) setActiveId(null)
+      showToast('对话已删除', 'success')
+    } else {
+      setConfirmDeleteId(id)
+    }
+  }
+
   return (
     <>
       <motion.div
@@ -74,25 +102,46 @@ export default function Sidebar({ onClose, onNavigate }: Props) {
         </div>
 
         <div className="px-3 py-2">
-          <button className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-primary/5 text-primary text-sm font-medium hover:bg-primary/10 transition-colors">
+          <button
+            onClick={handleNewConversation}
+            className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-primary/5 text-primary text-sm font-medium hover:bg-primary/10 transition-colors"
+          >
             <Plus size={16} />
             新建对话
           </button>
+        </div>
+
+        <div className="px-3 pb-1">
+          <div className="relative">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-tertiary" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="搜索对话..."
+              className="w-full pl-8 pr-3 py-2 text-sm bg-surface-secondary rounded-xl border border-transparent focus:border-primary/30 focus:outline-none text-text-primary placeholder:text-text-tertiary transition-colors"
+            />
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-3">
           <div className="flex items-center justify-between px-1 py-2">
             <span className="text-[11px] font-medium text-text-tertiary uppercase tracking-wider">对话历史</span>
           </div>
-          {conversations.map((conv) => (
+          {filteredConversations.map((conv) => (
             <div
               key={conv.id}
-              className="group flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-surface-secondary transition-colors cursor-pointer mb-0.5"
+              onClick={() => setActiveId(conv.id)}
+              className={`group flex items-start gap-3 px-3 py-2.5 rounded-xl transition-colors cursor-pointer mb-0.5 ${
+                activeId === conv.id
+                  ? 'bg-primary/10 border border-primary/20'
+                  : 'hover:bg-surface-secondary border border-transparent'
+              }`}
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   {conv.pinned && <Pin size={10} className="text-text-tertiary flex-shrink-0" />}
-                  <span className="text-sm text-text-primary truncate">{conv.title}</span>
+                  <span className={`text-sm truncate ${activeId === conv.id ? 'text-primary font-medium' : 'text-text-primary'}`}>{conv.title}</span>
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-[11px] text-text-tertiary">{conv.time}</span>
@@ -101,11 +150,25 @@ export default function Sidebar({ onClose, onNavigate }: Props) {
                   </span>
                 </div>
               </div>
-              <button className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-surface-tertiary rounded-lg">
-                <Trash2 size={13} className="text-text-tertiary" />
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleDelete(conv.id)
+                }}
+                className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-surface-tertiary rounded-lg flex-shrink-0 ${
+                  confirmDeleteId === conv.id ? 'opacity-100 bg-danger/10' : ''
+                }`}
+              >
+                <Trash2 size={13} className={confirmDeleteId === conv.id ? 'text-danger' : 'text-text-tertiary'} />
               </button>
+              {confirmDeleteId === conv.id && (
+                <span className="text-[10px] text-danger font-medium self-center flex-shrink-0">确认?</span>
+              )}
             </div>
           ))}
+          {filteredConversations.length === 0 && (
+            <div className="text-center py-8 text-text-tertiary text-sm">未找到匹配的对话</div>
+          )}
         </div>
 
         <div className="border-t border-border-light p-3 space-y-1">

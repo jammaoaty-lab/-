@@ -11,6 +11,7 @@ import {
   Info,
   ChevronRight,
 } from 'lucide-react'
+import { useToast } from '../components/Toast'
 
 interface Props {
   onBack: () => void
@@ -56,15 +57,44 @@ const sections: { title: string; items: SettingItem[] }[] = [
   },
 ]
 
+const modelOptions = ['OmniAI 3B', 'OmniAI 7B', 'OmniAI 1.5B']
+
 export default function SettingsPage({ onBack }: Props) {
   const [toggles, setToggles] = useState<Record<string, boolean>>({
     'GPU 加速': true,
     '自动清理缓存': false,
     '开发者模式': false,
   })
+  const [currentModel, setCurrentModel] = useState(0)
+  const { showToast } = useToast()
 
   const handleToggle = (label: string) => {
     setToggles((prev) => ({ ...prev, [label]: !prev[label] }))
+  }
+
+  const handleNavigate = (label: string) => {
+    if (label === '账号信息') {
+      showToast('账号信息页面即将上线')
+    } else if (label === '隐私设置') {
+      showToast('隐私设置页面即将上线')
+    } else if (label === '关于 OmniAI') {
+      showToast('OmniAI Assistant v2.5.0')
+    }
+  }
+
+  const handleInfoClick = (item: SettingItem) => {
+    if (item.label === '默认模型') {
+      const next = (currentModel + 1) % modelOptions.length
+      setCurrentModel(next)
+      showToast(`默认模型已切换为 ${modelOptions[next]}`)
+    } else if (item.label === '缓存大小') {
+      showToast('缓存已清除')
+    }
+  }
+
+  const getDisplayValue = (item: SettingItem) => {
+    if (item.label === '默认模型') return modelOptions[currentModel]
+    return item.value as string
   }
 
   return (
@@ -98,6 +128,13 @@ export default function SettingsPage({ onBack }: Props) {
                     <div
                       key={iIdx}
                       className="flex items-center gap-3 px-4 py-3 hover:bg-surface-secondary/50 transition-colors"
+                      onClick={() => {
+                        if (item.type === 'navigate') handleNavigate(item.label)
+                        if (item.type === 'info') handleInfoClick(item)
+                      }}
+                      style={{
+                        cursor: item.type === 'navigate' || item.type === 'info' ? 'pointer' : 'default',
+                      }}
                     >
                       <div className="w-8 h-8 rounded-lg bg-surface-secondary flex items-center justify-center flex-shrink-0">
                         <Icon size={16} className="text-text-secondary" />
@@ -105,22 +142,22 @@ export default function SettingsPage({ onBack }: Props) {
                       <span className="flex-1 text-sm text-text-primary">{item.label}</span>
                       {item.type === 'toggle' && (
                         <button
-                          onClick={() => handleToggle(item.label)}
-                          className="transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleToggle(item.label)
+                          }}
+                          className={`w-11 h-6 rounded-full relative transition-colors duration-200 ${toggles[item.label] ? 'bg-primary' : 'bg-gray-200'}`}
                         >
-                          {toggles[item.label] ? (
-                            <div className="w-11 h-6 bg-primary rounded-full relative transition-colors">
-                              <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm transition-all" />
-                            </div>
-                          ) : (
-                            <div className="w-11 h-6 bg-gray-200 rounded-full relative transition-colors">
-                              <div className="w-5 h-5 bg-white rounded-full absolute left-0.5 top-0.5 shadow-sm transition-all" />
-                            </div>
-                          )}
+                          <div
+                            className="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow-sm transition-transform duration-200"
+                            style={{
+                              transform: toggles[item.label] ? 'translateX(20px)' : 'translateX(0)',
+                            }}
+                          />
                         </button>
                       )}
                       {item.type === 'info' && (
-                        <span className="text-sm text-text-tertiary">{item.value}</span>
+                        <span className="text-sm text-text-tertiary">{getDisplayValue(item)}</span>
                       )}
                       {item.type === 'navigate' && (
                         <ChevronRight size={16} className="text-text-tertiary" />

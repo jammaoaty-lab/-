@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState, useRef, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   Cpu,
   HardDrive,
@@ -12,6 +12,7 @@ import {
   Flame,
 } from 'lucide-react'
 import type { Page } from '../App'
+import { useToast } from '../components/Toast'
 
 interface Props {
   onNavigate?: (page: Page) => void
@@ -27,7 +28,7 @@ interface Model {
   lora?: boolean
 }
 
-const models: Model[] = [
+const initialModels: Model[] = [
   { id: 1, name: 'OmniAI-3B-Instruct', size: '1.8 GB', quant: 'Q4_K_M', status: 'running', gpu: true },
   { id: 2, name: 'OmniAI-7B-Instruct', size: '4.1 GB', quant: 'Q5_K_M', status: 'loaded', gpu: true, lora: true },
   { id: 3, name: 'OmniAI-1.5B-Chat', size: '0.9 GB', quant: 'Q8_0', status: 'idle', gpu: false },
@@ -42,30 +43,103 @@ const statusConfig: Record<string, { label: string; color: string }> = {
 }
 
 export default function ModelsPage({ onNavigate }: Props) {
+  const [models, setModels] = useState<Model[]>(initialModels)
   const [enabledModels, setEnabledModels] = useState<Set<number>>(new Set([1, 2]))
+  const [searchVisible, setSearchVisible] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [downloadProgress, setDownloadProgress] = useState(67)
+  const [isDownloading, setIsDownloading] = useState(false)
+  const downloadTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const { showToast } = useToast()
 
-  const toggleModel = (id: number) => {
+  const toggleModel = useCallback((id: number) => {
     setEnabledModels((prev) => {
       const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
+      const wasEnabled = next.has(id)
+      if (wasEnabled) next.delete(id)
       else next.add(id)
+      const model = models.find((m) => m.id === id)
+      if (model) {
+        showToast(wasEnabled ? `${model.name} 已禁用` : `${model.name} 已启用`, wasEnabled ? 'info' : 'success')
+      }
       return next
     })
-  }
+  }, [models, showToast])
+
+  const handleDownloadClick = useCallback(() => {
+    if (isDownloading) return
+    setIsDownloading(true)
+    setDownloadProgress(67)
+
+    downloadTimerRef.current = setInterval(() => {
+      setDownloadProgress((prev) => {
+        const next = prev + 1
+        if (next >= 100) {
+          if (downloadTimerRef.current) clearInterval(downloadTimerRef.current)
+          setIsDownloading(false)
+          setModels((prevModels) =>
+            prevModels.map((m) => (m.status === 'download' ? { ...m, status: 'idle' as const } : m))
+          )
+          const downloadingModel = models.find((m) => m.status === 'download')
+          if (downloadingModel) {
+            showToast(`${downloadingModel.name} 下载完成`, 'success')
+          }
+          return 100
+        }
+        return next
+      })
+    }, 50)
+  }, [isDownloading, models, showToast])
+
+  const filteredModels = models.filter((m) =>
+    m.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   return (
     <div className="h-full flex flex-col bg-surface-secondary">
       <header className="flex-shrink-0 flex items-center justify-between px-4 h-12 bg-white border-b border-border-light">
         <h1 className="text-base font-semibold text-text-primary">模型管理</h1>
         <div className="flex items-center gap-2">
-          <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-tertiary transition-colors">
-            <Search size={18} className="text-text-secondary" />
+          <button
+            onClick={() => {
+              setSearchVisible((v) => !v)
+              if (searchVisible) setSearchQuery('')
+            }}
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-tertiary transition-colors"
+          >
+            <Search size={18} className={searchVisible ? 'text-primary' : 'text-text-secondary'} />
           </button>
-          <button className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-tertiary transition-colors">
+          <button
+            onClick={() => showToast('添加模型功能即将上线', 'info')}
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface-tertiary transition-colors"
+          >
             <Plus size={18} className="text-text-secondary" />
           </button>
         </div>
       </header>
+
+      <AnimatePresence>
+        {searchVisible && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden bg-white border-b border-border-light"
+          >
+            <div className="px-4 py-2">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="搜索模型..."
+                className="w-full px-3 py-1.5 text-sm bg-surface-secondary rounded-lg border border-border-light focus:outline-none focus:border-primary transition-colors"
+                autoFocus
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="flex-1 overflow-y-auto">
         <div className="px-4 pt-4">
@@ -93,7 +167,7 @@ export default function ModelsPage({ onNavigate }: Props) {
           </div>
 
           <div className="space-y-2 pb-6">
-            {models.map((model, idx) => {
+            {filteredModels.map((model, idx) => {
               const status = statusConfig[model.status]
               const enabled = enabledModels.has(model.id)
               return (
@@ -149,18 +223,22 @@ export default function ModelsPage({ onNavigate }: Props) {
                     </div>
                   </div>
                   {model.status === 'download' && (
-                    <div className="mt-3 ml-12">
+                    <div className="mt-3 ml-12 cursor-pointer" onClick={handleDownloadClick}>
                       <div className="h-1 bg-surface-tertiary rounded-full overflow-hidden">
                         <motion.div
                           className="h-full bg-primary rounded-full"
                           initial={{ width: '0%' }}
-                          animate={{ width: '67%' }}
-                          transition={{ duration: 1.5, ease: 'easeOut' }}
+                          animate={{ width: `${downloadProgress}%` }}
+                          transition={{ duration: 0.3, ease: 'easeOut' }}
                         />
                       </div>
                       <div className="flex items-center justify-between mt-1">
-                        <span className="text-[10px] text-text-tertiary">4.9 / 7.3 GB</span>
-                        <span className="text-[10px] text-text-tertiary">2.4 MB/s</span>
+                        <span className="text-[10px] text-text-tertiary">
+                          {isDownloading ? `${((downloadProgress / 100) * 7.3).toFixed(1)}` : '4.9'} / 7.3 GB
+                        </span>
+                        <span className="text-[10px] text-text-tertiary">
+                          {isDownloading ? `${downloadProgress}% · 2.4 MB/s` : '点击继续下载'}
+                        </span>
                       </div>
                     </div>
                   )}

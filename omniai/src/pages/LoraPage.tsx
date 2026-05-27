@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
@@ -10,12 +10,13 @@ import {
   FileText,
   Activity,
 } from 'lucide-react'
+import { useToast } from '../components/Toast'
 
 interface Props {
   onBack: () => void
 }
 
-const trainParams = [
+const initialParams = [
   { label: '基础模型', value: 'OmniAI-3B-Instruct' },
   { label: '学习率', value: '2e-4' },
   { label: 'Epochs', value: '3' },
@@ -25,7 +26,7 @@ const trainParams = [
   { label: '数据集', value: 'custom_data.jsonl' },
 ]
 
-const logLines = [
+const initialLogLines = [
   '[INFO] Loading base model: OmniAI-3B-Instruct',
   '[INFO] Applying LoRA adapter (r=16, alpha=32)',
   '[INFO] Dataset loaded: 1,247 samples',
@@ -41,9 +42,87 @@ const logLines = [
   '[TRAIN] Epoch 2/3 - Step 100/312 - Loss: 0.856',
 ]
 
+function generateLogLine(step: number): string {
+  const epoch = Math.floor(step / 312) + 2
+  const stepInEpoch = (step % 312) + 1
+  const loss = Math.max(0.1, 1.2 - step * 0.0015 + (Math.random() - 0.5) * 0.06).toFixed(3)
+  if (stepInEpoch === 312) {
+    return `[INFO] Epoch ${epoch} completed. Avg Loss: ${(parseFloat(loss) + 0.08).toFixed(3)}`
+  }
+  return `[TRAIN] Epoch ${epoch}/3 - Step ${stepInEpoch}/312 - Loss: ${loss}`
+}
+
 export default function LoraPage({ onBack }: Props) {
   const [training, setTraining] = useState<'idle' | 'running' | 'paused'>('running')
-  const [progress] = useState(54)
+  const [progress, setProgress] = useState(54)
+  const [params, setParams] = useState(initialParams)
+  const [logs, setLogs] = useState(initialLogLines)
+  const [editingIdx, setEditingIdx] = useState<number | null>(null)
+  const [editValue, setEditValue] = useState('')
+  const { showToast } = useToast()
+  const stepRef = useRef(100)
+  const logEndRef = useRef<HTMLDivElement>(null)
+  const completedRef = useRef(false)
+
+  useEffect(() => {
+    if (training !== 'running') return
+    completedRef.current = false
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          completedRef.current = true
+          return 100
+        }
+        return prev + 1
+      })
+      if (completedRef.current) {
+        setTraining('idle')
+        completedRef.current = false
+      }
+    }, 500)
+    return () => clearInterval(timer)
+  }, [training])
+
+  useEffect(() => {
+    if (training !== 'running') return
+    const timer = setInterval(() => {
+      const line = generateLogLine(stepRef.current)
+      stepRef.current += 50
+      setLogs((prev) => [...prev, line])
+    }, 2000)
+    return () => clearInterval(timer)
+  }, [training])
+
+  useEffect(() => {
+    logEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [logs])
+
+  const handleStop = useCallback(() => {
+    setTraining('idle')
+    setProgress(0)
+    setLogs(initialLogLines)
+    stepRef.current = 100
+  }, [])
+
+  const handleExport = useCallback(() => {
+    showToast('LoRA 权重已导出', 'success')
+  }, [showToast])
+
+  const startEditing = (idx: number) => {
+    setEditingIdx(idx)
+    setEditValue(params[idx].value)
+  }
+
+  const commitEdit = () => {
+    if (editingIdx !== null) {
+      setParams((prev) => {
+        const next = [...prev]
+        next[editingIdx] = { ...next[editingIdx], value: editValue }
+        return next
+      })
+      setEditingIdx(null)
+    }
+  }
 
   return (
     <div className="h-full flex flex-col bg-surface-secondary">
@@ -70,10 +149,29 @@ export default function LoraPage({ onBack }: Props) {
               <span className="text-sm font-medium text-text-primary">训练参数</span>
             </div>
             <div className="space-y-2">
-              {trainParams.map((param) => (
+              {params.map((param, idx) => (
                 <div key={param.label} className="flex items-center justify-between py-1">
                   <span className="text-xs text-text-secondary">{param.label}</span>
-                  <span className="text-xs text-text-primary font-mono">{param.value}</span>
+                  {editingIdx === idx ? (
+                    <input
+                      className="text-xs text-text-primary font-mono text-right w-36 px-1.5 py-0.5 border border-primary rounded outline-none focus:ring-1 focus:ring-primary"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={commitEdit}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') commitEdit()
+                        if (e.key === 'Escape') setEditingIdx(null)
+                      }}
+                      autoFocus
+                    />
+                  ) : (
+                    <span
+                      className="text-xs text-text-primary font-mono cursor-pointer hover:text-primary hover:underline underline-offset-2 transition-colors"
+                      onClick={() => startEditing(idx)}
+                    >
+                      {param.value}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
@@ -142,13 +240,14 @@ export default function LoraPage({ onBack }: Props) {
               <span className="text-sm font-medium text-text-primary">训练日志</span>
             </div>
             <div className="bg-[#1E1E2E] rounded-lg p-3 max-h-40 overflow-y-auto">
-              {logLines.map((line, i) => (
+              {logs.map((line, i) => (
                 <div key={i} className="text-[11px] font-mono leading-5">
                   <span className={line.startsWith('[INFO]') ? 'text-blue-400' : line.startsWith('[TRAIN]') ? 'text-emerald-400' : 'text-gray-400'}>
                     {line}
                   </span>
                 </div>
               ))}
+              <div ref={logEndRef} />
             </div>
           </motion.div>
 
@@ -180,10 +279,16 @@ export default function LoraPage({ onBack }: Props) {
                 <Play size={16} /> 开始训练
               </button>
             )}
-            <button className="flex items-center justify-center gap-2 px-4 py-2.5 bg-danger-light text-danger rounded-xl text-sm font-medium hover:bg-red-100 transition-colors">
+            <button
+              onClick={handleStop}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-danger-light text-danger rounded-xl text-sm font-medium hover:bg-red-100 transition-colors"
+            >
               <Square size={16} /> 停止
             </button>
-            <button className="flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-tertiary text-text-secondary rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors">
+            <button
+              onClick={handleExport}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 bg-surface-tertiary text-text-secondary rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
+            >
               <Download size={16} /> 导出
             </button>
           </motion.div>
