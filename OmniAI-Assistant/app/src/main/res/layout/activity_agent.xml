@@ -1,83 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
-    android:fitsSystemWindows="true">
+    android:orientation="vertical"
+    android:background="#F8FAFC">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/surface"
-        app:elevation="0dp">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/toolbar_height"
-            app:title="AI Agent"
-            app:titleTextAppearance="@style/OmniAI.TextView.Title" />
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_agents"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingHorizontal="@dimen/spacing_lg"
-        android:paddingTop="@dimen/spacing_sm"
-        android:paddingBottom="@dimen/spacing_xxxl"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/item_conversation" />
+        android:layout_height="?attr/actionBarSize"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        android:titleTextColor="#1E293B" />
 
     <LinearLayout
-        android:id="@+id/ll_empty_state"
-        android:layout_width="wrap_content"
+        android:id="@+id/layout_agent_header"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="#FFFFFF">
 
-        <ImageView
-            android:layout_width="@dimen/icon_xxl"
-            android:layout_height="@dimen/icon_xxl"
-            android:contentDescription="@string/tab_agent"
-            android:src="@android:drawable/ic_menu_agenda"
-            android:tint="@color/text_tertiary" />
+        <ProgressBar
+            android:id="@+id/progress_agent"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:visibility="gone"
+            android:indeterminateTint="#2563EB" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tv_agent_status"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_md"
-            android:text="暂无Agent"
-            android:textColor="@color/text_secondary"
-            android:textSize="@dimen/text_size_body" />
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="就绪"
+            android:textColor="#64748B"
+            android:textSize="13sp" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_create_agent"
-            style="@style/OmniAI.Button.Primary"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/btn_height"
-            android:layout_marginTop="@dimen/spacing_lg"
-            android:text="创建Agent" />
-
+        <ImageButton
+            android:id="@+id/btn_agent_abort"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:visibility="gone"
+            android:background="?selectableItemBackground"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:contentDescription="中止"
+            android:tint="#DC2626" />
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_create"
-        android:layout_width="@dimen/fab_size"
-        android:layout_height="@dimen/fab_size"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/spacing_lg"
-        android:contentDescription="创建Agent"
-        android:src="@android:drawable/ic_menu_add"
-        app:backgroundTint="@color/primary"
-        app:fabCustomSize="@dimen/fab_size"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
-        app:tint="@color/surface" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E2E8F0" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <ScrollView
+        android:id="@+id/scroll_agent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_agent_steps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:clipToPadding="false" />
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/layout_tool_approval"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#FFFBEB"
+        android:padding="12dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="⚠️ 工具执行确认"
+            android:textColor="#D97706"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_tool_request"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="#334155"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="end">
+
+            <ImageButton
+                android:id="@+id/btn_reject_tool"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?selectableItemBackground"
+                android:src="@android:drawable/ic_delete"
+                android:contentDescription="拒绝"
+                android:tint="#DC2626" />
+
+            <ImageButton
+                android:id="@+id/btn_approve_tool"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:background="?selectableItemBackground"
+                android:src="@android:drawable/ic_media_play"
+                android:contentDescription="批准"
+                android:tint="#16A34A" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#E2E8F0" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:padding="8dp"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/et_agent_input"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:textColor="#1E293B"
+            android:textSize="14sp"
+            android:hint="输入任务指令..."
+            android:hintTextColor="#94A3B8"
+            android:inputType="textMultiLine"
+            android:maxLines="4"
+            android:imeOptions="actionDone|flagNoExtractUi"
+            android:padding="8dp" />
+
+        <ImageButton
+            android:id="@+id/btn_agent_send"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="8dp"
+            android:background="@null"
+            android:src="@drawable/ic_send"
+            android:contentDescription="发送"
+            android:tint="#2563EB" />
+    </LinearLayout>
+</LinearLayout>
