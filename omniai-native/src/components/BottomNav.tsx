@@ -21,7 +21,7 @@ export default function BottomNav({ current, onNavigate }: BottomNavProps) {
   return (
     <View
       className="bg-white border-t border-border-light flex-row items-start justify-around"
-      style={{ paddingBottom: insets.bottom }}
+      style={{ paddingBottom: Math.max(insets.bottom, 4) }}
     >
       {tabs.map(({ key, label, Icon }) => {
         const active = current === key;

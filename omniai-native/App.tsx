@@ -1,6 +1,7 @@
 import './src/global.css'
 import { useState, useCallback } from 'react'
 import { SafeAreaView, StatusBar, KeyboardAvoidingView, Platform, View, StyleSheet } from 'react-native'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { ToastProvider } from './src/components/Toast'
 import BottomNav from './src/components/BottomNav'
 import Sidebar from './src/components/Sidebar'
@@ -123,8 +124,10 @@ const styles = StyleSheet.create({
 
 export default function App() {
   return (
-    <ToastProvider>
-      <AppContent />
-    </ToastProvider>
+    <SafeAreaProvider>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </SafeAreaProvider>
   )
 }
