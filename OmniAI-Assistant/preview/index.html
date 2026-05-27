@@ -288,6 +288,110 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
+        .code-block {
+            background: #1e1e2e;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+        }
+
+        .code-block-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            background: #313244;
+        }
+
+        .code-block-lang {
+            font-size: 12px;
+            font-weight: 600;
+            color: #cdd6f4;
+            letter-spacing: 0.5px;
+        }
+
+        .code-block-copy {
+            background: transparent;
+            border: 1px solid #585b70;
+            color: #a6adc8;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .code-block-copy:hover {
+            background: #45475a;
+            color: #cdd6f4;
+        }
+
+        .code-block-copy.copied {
+            background: #a6e3a1;
+            color: #1e1e2e;
+            border-color: #a6e3a1;
+        }
+
+        .code-block-body {
+            display: flex;
+            overflow-x: auto;
+            padding: 12px 0;
+        }
+
+        .code-block-body::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .code-block-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .code-block-body::-webkit-scrollbar-thumb {
+            background: #585b70;
+            border-radius: 2px;
+        }
+
+        .code-line-numbers {
+            padding: 0 10px 0 12px;
+            text-align: right;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .code-line-numbers span {
+            display: block;
+            font-size: 12px;
+            line-height: 1.7;
+            color: #585b70;
+        }
+
+        .code-line-content {
+            padding: 0 14px 0 0;
+            flex: 1;
+        }
+
+        .code-line-content pre {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .code-line-content pre span {
+            display: block;
+            white-space: pre;
+        }
+
+        .hl-keyword { color: #c678dd; }
+        .hl-string { color: #98c379; }
+        .hl-function { color: #61afef; }
+        .hl-number { color: #d19a66; }
+        .hl-comment { color: #5c6370; font-style: italic; }
+        .hl-plain { color: #abb2bf; }
+
         .message.user .bubble {
             background: var(--primary);
             color: white;
@@ -1096,17 +1200,49 @@
                                     <div class="message ai">
                                         <div class="avatar ai">O</div>
                                         <div class="bubble">
-                                            好的！这里是一个快速排序的实现：<br><br>
-                                            <code style="font-family:monospace;background:#1e1e2e;color:#a6e3a1;padding:2px 6px;border-radius:4px;font-size:12px;">
-                                                def quicksort(arr):<br>
-                                                &nbsp;&nbsp;if len(arr) &lt;= 1:<br>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;return arr<br>
-                                                &nbsp;&nbsp;pivot = arr[len(arr)//2]<br>
-                                                &nbsp;&nbsp;left = [x for x in arr if x &lt; pivot]<br>
-                                                &nbsp;&nbsp;middle = [x for x in arr if x == pivot]<br>
-                                                &nbsp;&nbsp;right = [x for x in arr if x &gt; pivot]<br>
-                                                &nbsp;&nbsp;return quicksort(left) + middle + quicksort(right)
-                                            </code>
+                                            好的！这里是一个快速排序的实现：
+                                            <div class="code-block">
+                                                <div class="code-block-header">
+                                                    <span class="code-block-lang">Python</span>
+                                                    <button class="code-block-copy" onclick="copyCode(this)">复制</button>
+                                                </div>
+                                                <div class="code-block-body">
+                                                    <div class="code-line-numbers">
+                                                        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+                                                    </div>
+                                                    <div class="code-line-content">
+                                                        <pre><span><span class="hl-keyword">def</span> <span class="hl-function">quicksort</span><span class="hl-plain">(arr):</span></span><span><span class="hl-plain">    </span><span class="hl-keyword">if</span> <span class="hl-function">len</span><span class="hl-plain">(arr) &lt;=</span> <span class="hl-number">1</span><span class="hl-plain">:</span></span><span><span class="hl-plain">        </span><span class="hl-keyword">return</span> <span class="hl-plain">arr</span></span><span><span class="hl-plain">    pivot = arr[</span><span class="hl-function">len</span><span class="hl-plain">(arr)</span> <span class="hl-plain">//</span> <span class="hl-number">2</span><span class="hl-plain">]</span></span><span><span class="hl-plain">    left = [x </span><span class="hl-keyword">for</span> <span class="hl-plain">x </span><span class="hl-keyword">in</span> <span class="hl-plain">arr </span><span class="hl-keyword">if</span> <span class="hl-plain">x &lt; pivot]</span></span><span><span class="hl-plain">    middle = [x </span><span class="hl-keyword">for</span> <span class="hl-plain">x </span><span class="hl-keyword">in</span> <span class="hl-plain">arr </span><span class="hl-keyword">if</span> <span class="hl-plain">x == pivot]</span></span><span><span class="hl-plain">    right = [x </span><span class="hl-keyword">for</span> <span class="hl-plain">x </span><span class="hl-keyword">in</span> <span class="hl-plain">arr </span><span class="hl-keyword">if</span> <span class="hl-plain">x &gt; pivot]</span></span><span><span class="hl-plain">    </span><span class="hl-keyword">return</span> <span class="hl-function">quicksort</span><span class="hl-plain">(left) + middle +</span> <span class="hl-function">quicksort</span><span class="hl-plain">(right)</span></span></pre>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            时间复杂度为 O(n log n)，是高效的排序算法。
+                                        </div>
+                                    </div>
+                                    <div class="message user">
+                                        <div class="avatar user">👤</div>
+                                        <div class="bubble">
+                                            用Java实现单例模式
+                                        </div>
+                                    </div>
+                                    <div class="message ai">
+                                        <div class="avatar ai">O</div>
+                                        <div class="bubble">
+                                            以下是线程安全的双重检查锁定单例模式实现：
+                                            <div class="code-block">
+                                                <div class="code-block-header">
+                                                    <span class="code-block-lang">Java</span>
+                                                    <button class="code-block-copy" onclick="copyCode(this)">复制</button>
+                                                </div>
+                                                <div class="code-block-body">
+                                                    <div class="code-line-numbers">
+                                                        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span>
+                                                    </div>
+                                                    <div class="code-line-content">
+                                                        <pre><span><span class="hl-keyword">public class</span> <span class="hl-function">Singleton</span> <span class="hl-plain">{</span></span><span><span class="hl-plain">    </span><span class="hl-keyword">private static volatile</span> <span class="hl-plain">Singleton instance;</span></span><span><span class="hl-plain">    </span><span class="hl-keyword">private</span> <span class="hl-function">Singleton</span><span class="hl-plain">() {}</span></span><span></span><span><span class="hl-plain">    </span><span class="hl-keyword">public static</span> <span class="hl-plain">Singleton</span> <span class="hl-function">getInstance</span><span class="hl-plain">() {</span></span><span><span class="hl-plain">        </span><span class="hl-keyword">if</span> <span class="hl-plain">(instance ==</span> <span class="hl-keyword">null</span><span class="hl-plain">) {</span></span><span><span class="hl-plain">            </span><span class="hl-keyword">synchronized</span> <span class="hl-plain">(Singleton.</span><span class="hl-keyword">class</span><span class="hl-plain">) {</span></span><span><span class="hl-plain">                </span><span class="hl-keyword">if</span> <span class="hl-plain">(instance ==</span> <span class="hl-keyword">null</span><span class="hl-plain">) {</span></span><span><span class="hl-plain">                    instance =</span> <span class="hl-keyword">new</span> <span class="hl-function">Singleton</span><span class="hl-plain">();</span></span><span><span class="hl-plain">                }</span></span><span><span class="hl-plain">            }</span></span><span><span class="hl-plain">        }</span></span><span><span class="hl-plain">        </span><span class="hl-keyword">return</span> <span class="hl-plain">instance;</span></span><span><span class="hl-plain">    }</span></span><span><span class="hl-plain">}</span></span></pre>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            使用 volatile 关键字防止指令重排序，双重检查锁定保证线程安全且高效。
                                         </div>
                                     </div>
                                 </div>
@@ -1579,7 +1715,20 @@
     </div>
 
     <script>
-        // 简单的交互效果
+        function copyCode(btn) {
+            var codeBlock = btn.closest('.code-block');
+            var pre = codeBlock.querySelector('pre');
+            var text = pre.textContent;
+            navigator.clipboard.writeText(text).then(function() {
+                btn.textContent = '已复制';
+                btn.classList.add('copied');
+                setTimeout(function() {
+                    btn.textContent = '复制';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
         document.querySelectorAll('.menu-item').forEach(item => {
             item.addEventListener('click', function() {
                 document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
