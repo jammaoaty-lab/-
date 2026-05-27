@@ -30,6 +30,7 @@ import com.omniai.assistant.ui.login.LoginActivity;
 import com.omniai.assistant.ui.lora.LoraTrainActivity;
 import com.omniai.assistant.ui.model.ModelManagerActivity;
 import com.omniai.assistant.ui.settings.SettingsActivity;
+import com.omniai.assistant.ui.terminal.TerminalActivity;
 
 import java.io.File;
 
@@ -243,6 +244,10 @@ public class ProfileActivity extends AppCompatActivity {
 
         addMenuItem(menuContainer, "多模态", v -> {
             showMultimodalDialog();
+        });
+
+        addMenuItem(menuContainer, "终端", v -> {
+            startActivity(new Intent(this, TerminalActivity.class));
         });
 
         addDivider(menuContainer);

@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -52,6 +53,7 @@
         <activity android:name=".ui.settings.SettingsActivity" android:exported="false" />
         <activity android:name=".ui.agent.AgentActivity" android:exported="false" />
         <activity android:name=".ui.credits.CreditsCenterActivity" android:exported="false" />
+        <activity android:name=".ui.terminal.TerminalActivity" android:exported="false" />
 
         <service
             android:name=".service.InferenceService"
@@ -67,6 +69,16 @@
             android:name=".service.EmbeddingService"
             android:foregroundServiceType="dataSync"
             android:exported="false" />
+
+        <service
+            android:name=".service.LlamaCppService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="llamacpp" />
+        </service>
 
     </application>
 </manifest>

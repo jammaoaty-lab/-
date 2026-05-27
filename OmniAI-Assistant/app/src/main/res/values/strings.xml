@@ -212,4 +212,13 @@
         <item>Qwen2.5-VL-7B</item>
         <item>SmolVLM2-256M</item>
     </string-array>
+
+    <string name="terminal_title">OmniAI Terminal</string>
+    <string name="terminal_prompt">llama&gt; </string>
+    <string name="terminal_input_hint">Enter command...</string>
+    <string name="terminal_menu">终端</string>
+    <string name="terminal_service_start">启动后台服务</string>
+    <string name="terminal_service_stop">停止后台服务</string>
+    <string name="profile_menu_terminal">终端</string>
+
 </resources>
