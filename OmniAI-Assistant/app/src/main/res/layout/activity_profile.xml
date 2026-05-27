@@ -24,7 +24,7 @@
                 android:id="@+id/iv_avatar"
                 android:layout_width="@dimen/avatar_xl"
                 android:layout_height="@dimen/avatar_xl"
-                android:background="@drawable/bg_card"
+                android:background="@drawable/bg_avatar_gradient"
                 android:contentDescription="@string/tab_profile"
                 android:src="@android:drawable/ic_menu_myplaces"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -75,7 +75,7 @@
                     android:paddingHorizontal="@dimen/spacing_sm"
                     android:text="VIP"
                     android:textColor="@color/surface"
-                    android:textSize="10sp"
+                    android:textSize="@dimen/text_size_tag"
                     android:visibility="visible" />
 
                 <TextView
@@ -93,37 +93,39 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cv_vip"
-            style="@style/OmniAI.CardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_lg"
-            android:layout_marginTop="@dimen/spacing_md">
+            android:layout_marginTop="@dimen/spacing_md"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="@dimen/card_radius"
+            app:cardElevation="@dimen/card_elevation"
+            app:cardPreventCornerOverlap="false">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/bg_vip_card"
                 android:padding="@dimen/spacing_lg">
 
                 <TextView
                     android:id="@+id/tv_vip_plan"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:textColor="@color/vip_gold"
+                    android:textColor="@color/surface"
                     android:textSize="@dimen/text_size_subtitle"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
                     tools:text="Pro会员" />
 
                 <TextView
                     android:id="@+id/tv_vip_expiry"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:layout_marginTop="@dimen/spacing_xs"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#B3FFFFFF"
                     android:textSize="@dimen/text_size_caption"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tv_vip_plan"
                     tools:text="有效期至 2026-12-31" />
 
                 <com.google.android.material.button.MaterialButton
@@ -137,7 +139,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 

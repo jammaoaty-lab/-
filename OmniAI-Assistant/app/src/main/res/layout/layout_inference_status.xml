@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/spacing_xs"
         android:textColor="@color/text_secondary"
-        android:textSize="11sp"
+        android:textSize="@dimen/text_size_label"
         tools:text="本地推理中" />
 
 </LinearLayout>

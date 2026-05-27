@@ -8,9 +8,9 @@
 
     <TextView
         android:id="@+id/tv_logo"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:background="@drawable/bg_tag_gpu"
+        android:layout_width="@dimen/avatar_xl"
+        android:layout_height="@dimen/avatar_xl"
+        android:background="@drawable/bg_avatar_gradient"
         android:fontFamily="sans-serif-medium"
         android:gravity="center"
         android:text="O"
@@ -24,13 +24,11 @@
 
     <TextView
         android:id="@+id/tv_app_name"
+        style="@style/OmniAI.TextView.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_lg"
-        android:fontFamily="sans-serif-medium"
         android:text="OmniAI"
-        android:textColor="@color/text_primary"
-        android:textSize="@dimen/text_size_headline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_logo" />

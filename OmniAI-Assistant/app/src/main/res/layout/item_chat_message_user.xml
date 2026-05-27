@@ -26,7 +26,7 @@
             android:paddingTop="@dimen/spacing_md"
             android:paddingEnd="@dimen/spacing_lg"
             android:paddingBottom="@dimen/spacing_md"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/chat_bubble_user_text"
             android:textSize="@dimen/text_size_body"
             tools:text="你好，请帮我写一段代码" />
 

@@ -71,7 +71,7 @@
             android:gravity="center"
             android:paddingHorizontal="@dimen/spacing_xs"
             android:textColor="@color/surface"
-            android:textSize="8sp"
+            android:textSize="@dimen/text_size_tag"
             tools:text="本地" />
 
     </LinearLayout>

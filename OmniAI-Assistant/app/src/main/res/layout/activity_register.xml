@@ -14,13 +14,11 @@
 
         <TextView
             android:id="@+id/tv_title"
+            style="@style/OmniAI.TextView.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_xxxl"
-            android:fontFamily="sans-serif-medium"
             android:text="@string/register_title"
-            android:textColor="@color/text_primary"
-            android:textSize="@dimen/text_size_headline"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

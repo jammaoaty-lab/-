@@ -69,13 +69,15 @@
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_create"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/fab_size"
+        android:layout_height="@dimen/fab_size"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/spacing_lg"
         android:contentDescription="创建Agent"
         android:src="@android:drawable/ic_menu_add"
         app:backgroundTint="@color/primary"
+        app:fabCustomSize="@dimen/fab_size"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
         app:tint="@color/surface" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

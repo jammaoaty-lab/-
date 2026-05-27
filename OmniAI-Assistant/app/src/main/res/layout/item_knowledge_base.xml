@@ -67,7 +67,7 @@
                 android:gravity="center"
                 android:paddingHorizontal="@dimen/spacing_sm"
                 android:textColor="@color/surface"
-                android:textSize="10sp"
+                android:textSize="@dimen/text_size_tag"
                 tools:text="已就绪" />
 
             <TextView

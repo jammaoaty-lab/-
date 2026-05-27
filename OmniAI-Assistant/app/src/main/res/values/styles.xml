@@ -24,22 +24,24 @@
         <item name="android:textColor">@color/surface</item>
         <item name="android:textSize">15sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:letterSpacing">0.02</item>
-        <item name="android:minHeight">44dp</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:minHeight">50dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
-        <item name="cornerRadius">10dp</item>
+        <item name="cornerRadius">14dp</item>
     </style>
 
     <style name="OmniAI.Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:background">@drawable/bg_btn_secondary</item>
-        <item name="android:textColor">@color/text_primary</item>
-        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textSize">13sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:minHeight">44dp</item>
+        <item name="android:minHeight">50dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
-        <item name="cornerRadius">10dp</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="strokeColor">@color/primary</item>
+        <item name="strokeWidth">1.5dp</item>
     </style>
 
     <style name="OmniAI.Button.Danger" parent="Widget.Material3.Button">
@@ -47,14 +49,14 @@
         <item name="android:textColor">@color/danger</item>
         <item name="android:textSize">15sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:minHeight">44dp</item>
+        <item name="android:minHeight">48dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
-        <item name="cornerRadius">10dp</item>
+        <item name="cornerRadius">14dp</item>
     </style>
 
     <style name="OmniAI.CardView" parent="Widget.Material3.CardView.Filled">
-        <item name="cardCornerRadius">12dp</item>
+        <item name="cardCornerRadius">18dp</item>
         <item name="cardElevation">0dp</item>
         <item name="cardBackgroundColor">@color/card_background</item>
         <item name="strokeColor">@color/border</item>
@@ -74,15 +76,15 @@
     </style>
 
     <style name="OmniAI.TextView.Title" parent="Widget.Material3.TextView">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">26sp</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:letterSpacing">-0.01</item>
+        <item name="android:letterSpacing">-0.6</item>
     </style>
 
     <style name="OmniAI.TextView.Subtitle" parent="Widget.Material3.TextView">
-        <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
@@ -91,6 +93,7 @@
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:lineSpacingExtra">4dp</item>
         <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">-0.1</item>
     </style>
 
     <style name="OmniAI.TextView.Caption" parent="Widget.Material3.TextView">
@@ -100,11 +103,18 @@
     </style>
 
     <style name="OmniAI.TextView.Label" parent="Widget.Material3.TextView">
-        <item name="android:textSize">13sp</item>
-        <item name="android:textColor">@color/text_secondary</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:letterSpacing">0.04</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/text_tertiary</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0.8</item>
         <item name="android:textAllCaps">true</item>
+    </style>
+
+    <style name="OmniAI.TextView.SectionTitle" parent="Widget.Material3.TextView">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:letterSpacing">-0.2</item>
     </style>
 
     <style name="OmniAI.Switch" parent="Widget.Material3.CompoundButton.Switch">
@@ -117,9 +127,23 @@
         <item name="android:textColor">@color/quick_btn_text</item>
         <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-        <item name="android:minHeight">32dp</item>
+        <item name="android:minHeight">30dp</item>
         <item name="android:paddingStart">12dp</item>
         <item name="android:paddingEnd">12dp</item>
-        <item name="cornerRadius">16dp</item>
+        <item name="cornerRadius">999dp</item>
+    </style>
+
+    <style name="OmniAI.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/surface</item>
+        <item name="android:elevation">0dp</item>
+        <item name="titleTextAppearance">@style/OmniAI.TextView.SectionTitle</item>
+    </style>
+
+    <style name="OmniAI.MenuItem" parent="">
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 </resources>

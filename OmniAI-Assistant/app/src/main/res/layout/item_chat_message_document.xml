@@ -11,12 +11,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/spacing_sm"
-        app:cardBackgroundColor="@color/card_background"
-        app:cardCornerRadius="@dimen/card_radius"
+        app:cardBackgroundColor="@color/chat_bubble_user"
+        app:cardCornerRadius="@dimen/bubble_radius"
         app:cardElevation="@dimen/card_elevation"
-        app:cardPreventCornerOverlap="false"
-        app:strokeColor="@color/border"
-        app:strokeWidth="@dimen/card_stroke">
+        app:cardPreventCornerOverlap="false">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -32,7 +30,7 @@
                 android:layout_height="@dimen/icon_xl"
                 android:contentDescription="@string/tab_chat"
                 android:src="@android:drawable/ic_menu_agenda"
-                android:tint="@color/primary" />
+                android:tint="@color/surface" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -47,7 +45,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="middle"
                     android:maxLines="1"
-                    android:textColor="@color/text_primary"
+                    android:textColor="@color/surface"
                     android:textSize="@dimen/text_size_body"
                     tools:text="report.pdf" />
 
@@ -56,7 +54,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_xs"
-                    android:textColor="@color/text_secondary"
+                    android:textColor="#B3FFFFFF"
                     android:textSize="@dimen/text_size_caption"
                     tools:text="2.4 MB" />
 

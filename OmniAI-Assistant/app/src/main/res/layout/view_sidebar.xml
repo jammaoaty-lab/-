@@ -22,6 +22,7 @@
             android:id="@+id/iv_user_avatar"
             android:layout_width="@dimen/avatar_md"
             android:layout_height="@dimen/avatar_md"
+            android:background="@drawable/bg_avatar_gradient"
             android:contentDescription="@string/tab_chat"
             android:src="@android:drawable/ic_menu_myplaces" />
 
@@ -52,12 +53,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/spacing_xs"
-                    android:background="@drawable/bg_tag_local"
+                    android:background="@drawable/bg_tag_gpu"
                     android:paddingHorizontal="@dimen/spacing_xs"
                     android:paddingVertical="@dimen/spacing_xs"
                     android:text="VIP"
-                    android:textColor="@color/vip_gold"
-                    android:textSize="8sp"
+                    android:textColor="@color/surface"
+                    android:textSize="@dimen/text_size_tag"
                     android:visibility="gone" />
 
             </LinearLayout>

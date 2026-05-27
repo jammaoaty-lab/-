@@ -32,7 +32,7 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="@string/quick_voice"
                 android:src="@android:drawable/ic_media_play"
-                android:tint="@color/primary" />
+                android:tint="@color/surface" />
 
             <LinearLayout
                 android:id="@+id/layout_waveform"
@@ -48,55 +48,55 @@
                     android:layout_width="2dp"
                     android:layout_height="8dp"
                     android:layout_marginHorizontal="@dimen/spacing_xs"
-                    android:background="@color/primary" />
+                    android:background="@color/surface" />
 
                 <View
                     android:layout_width="2dp"
                     android:layout_height="14dp"
                     android:layout_marginHorizontal="@dimen/spacing_xs"
-                    android:background="@color/primary" />
+                    android:background="@color/surface" />
 
                 <View
                     android:layout_width="2dp"
                     android:layout_height="10dp"
                     android:layout_marginHorizontal="@dimen/spacing_xs"
-                    android:background="@color/primary" />
+                    android:background="@color/surface" />
 
                 <View
                     android:layout_width="2dp"
                     android:layout_height="18dp"
                     android:layout_marginHorizontal="@dimen/spacing_xs"
-                    android:background="@color/primary" />
+                    android:background="@color/surface" />
 
                 <View
                     android:layout_width="2dp"
                     android:layout_height="12dp"
                     android:layout_marginHorizontal="@dimen/spacing_xs"
-                    android:background="@color/primary" />
+                    android:background="@color/surface" />
 
                 <View
                     android:layout_width="2dp"
                     android:layout_height="16dp"
                     android:layout_marginHorizontal="@dimen/spacing_xs"
-                    android:background="@color/primary" />
+                    android:background="@color/surface" />
 
                 <View
                     android:layout_width="2dp"
                     android:layout_height="8dp"
                     android:layout_marginHorizontal="@dimen/spacing_xs"
-                    android:background="@color/primary" />
+                    android:background="@color/surface" />
 
                 <View
                     android:layout_width="2dp"
                     android:layout_height="14dp"
                     android:layout_marginHorizontal="@dimen/spacing_xs"
-                    android:background="@color/primary" />
+                    android:background="@color/surface" />
 
                 <View
                     android:layout_width="2dp"
                     android:layout_height="6dp"
                     android:layout_marginHorizontal="@dimen/spacing_xs"
-                    android:background="@color/primary" />
+                    android:background="@color/surface" />
 
             </LinearLayout>
 
@@ -105,7 +105,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/spacing_md"
-                android:textColor="@color/text_secondary"
+                android:textColor="#B3FFFFFF"
                 android:textSize="@dimen/text_size_caption"
                 tools:text="0:12" />
 

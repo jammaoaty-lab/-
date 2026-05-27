@@ -8,13 +8,22 @@
     android:orientation="horizontal"
     android:paddingHorizontal="@dimen/spacing_lg">
 
-    <ImageView
-        android:id="@+id/iv_icon"
-        android:layout_width="@dimen/icon_lg"
-        android:layout_height="@dimen/icon_lg"
-        android:contentDescription="@string/tab_profile"
-        android:src="@android:drawable/ic_menu_preferences"
-        android:tint="@color/primary" />
+    <FrameLayout
+        android:id="@+id/fl_icon_container"
+        android:layout_width="@dimen/icon_container_sm"
+        android:layout_height="@dimen/icon_container_sm"
+        android:background="@drawable/bg_icon_blue">
+
+        <ImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="@dimen/icon_md"
+            android:layout_height="@dimen/icon_md"
+            android:layout_gravity="center"
+            android:contentDescription="@string/tab_profile"
+            android:src="@android:drawable/ic_menu_preferences"
+            android:tint="@color/primary" />
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="0dp"
@@ -28,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_primary"
-            android:textSize="15sp"
+            android:textSize="@dimen/text_size_subtitle"
             tools:text="设置项" />
 
         <TextView
