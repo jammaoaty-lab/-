@@ -136,13 +136,51 @@ public class ModelManager {
         return verifier.verifyGguf(model.getFilePath());
     }
 
-    public void quantizeModel(String modelId, String quantType) {
+    public void quantizeModel(String modelId, GgufQuantizer.QuantizationType quantType, 
+                            GgufQuantizer.QuantizationCallback callback) {
         AIModel model = getModel(modelId);
-        if (model == null) return;
-        executorService.execute(() -> {
-            model.setQuantType(quantType);
-            mainHandler.post(this::saveModels);
-        });
+        if (model == null) {
+            if (callback != null) {
+                mainHandler.post(() -> callback.onError("Model not found"));
+            }
+            return;
+        }
+
+        GgufQuantizer quantizer = GgufQuantizer.getInstance();
+        String outputPath = quantizer.generateOutputPath(model.getFilePath(), quantType);
+        
+        quantizer.quantizeModel(null, model.getFilePath(), outputPath, quantType, 
+            new GgufQuantizer.QuantizationCallback() {
+                @Override
+                public void onProgress(float progress) {
+                    if (callback != null) {
+                        callback.onProgress(progress);
+                    }
+                }
+
+                @Override
+                public void onComplete(String path) {
+                    AIModel quantizedModel = new AIModel();
+                    quantizedModel.setId(generateModelId());
+                    quantizedModel.setName(model.getName() + " (" + quantType.getType().toUpperCase() + ")");
+                    quantizedModel.setFilePath(path);
+                    quantizedModel.setQuantType(quantType.getType().toUpperCase());
+                    quantizedModel.setFileSize(new java.io.File(path).length());
+                    models.add(quantizedModel);
+                    saveModels();
+                    
+                    if (callback != null) {
+                        callback.onComplete(path);
+                    }
+                }
+
+                @Override
+                public void onError(String message) {
+                    if (callback != null) {
+                        callback.onError(message);
+                    }
+                }
+            });
     }
 
     public boolean repairModel(String modelId) {
