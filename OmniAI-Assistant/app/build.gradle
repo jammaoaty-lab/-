@@ -20,7 +20,15 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++17"
-                arguments "-DANDROID_STL=c++_shared"
+                arguments "-DANDROID_STL=c++_shared",
+                          "-DGGML_VULKAN=OFF",
+                          "-DGGML_CUDA=OFF",
+                          "-DGGML_METAL=OFF",
+                          "-DGGML_OPENCL=OFF",
+                          "-DGGML_BLAS=OFF",
+                          "-DLLAMA_CURL=OFF",
+                          "-DCMAKE_BUILD_TYPE=Release"
+                cFlags "-O3", "-DNDEBUG"
             }
         }
     }
