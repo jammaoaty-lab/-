@@ -85,7 +85,7 @@ public class ProfileActivity extends AppCompatActivity {
         if (profile != null) {
             Glide.with(this)
                     .load(profile.getAvatar())
-                    .placeholder(R.drawable.ic_avatar_placeholder)
+                    .placeholder(R.mipmap.ic_launcher)
                     .circleCrop()
                     .into(avatarView);
 

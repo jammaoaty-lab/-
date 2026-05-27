@@ -6,16 +6,12 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
-    <TextView
-        android:id="@+id/tv_logo"
+    <ImageView
+        android:id="@+id/iv_splash_logo"
         android:layout_width="@dimen/avatar_xl"
         android:layout_height="@dimen/avatar_xl"
-        android:background="@drawable/bg_avatar_gradient"
-        android:fontFamily="sans-serif-medium"
-        android:gravity="center"
-        android:text="O"
-        android:textColor="@color/surface"
-        android:textSize="@dimen/text_size_display"
+        android:contentDescription="@string/tab_chat"
+        android:src="@drawable/ic_splash_logo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,7 +27,7 @@
         android:text="Senta AI"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_logo" />
+        app:layout_constraintTop_toBottomOf="@id/iv_splash_logo" />
 
     <TextView
         android:id="@+id/tv_welcome"
