@@ -106,6 +106,10 @@ public class CloudInferenceClient {
                             if (callback != null) callback.onError(classifyHttpError(response.code()));
                             return;
                         }
+                        if (response.body() == null) {
+                            if (callback != null) callback.onError("Empty response body");
+                            return;
+                        }
                         String responseBody = response.body().string();
                         JSONObject json = new JSONObject(responseBody);
                         JSONArray choices = json.getJSONArray("choices");
@@ -217,6 +221,10 @@ public class CloudInferenceClient {
                             callback.onError(classifyHttpError(response.code()));
                             return;
                         }
+                        if (response.body() == null) {
+                            callback.onError("Empty response body");
+                            return;
+                        }
                         String responseBody = response.body().string();
                         JSONObject json = new JSONObject(responseBody);
                         JSONArray choices = json.getJSONArray("choices");
@@ -272,6 +280,10 @@ public class CloudInferenceClient {
                     try {
                         if (!response.isSuccessful()) {
                             callback.onError(classifyHttpError(response.code()));
+                            return;
+                        }
+                        if (response.body() == null) {
+                            callback.onError("Empty response body");
                             return;
                         }
                         String responseBody = response.body().string();

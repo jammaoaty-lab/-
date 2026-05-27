@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.util.Base64;
 
+import com.omniai.assistant.security.DataEncryptor;
+
 import org.json.JSONObject;
 
 import java.util.concurrent.ExecutorService;
@@ -24,6 +26,7 @@ public class UserManager {
     private final AuthInterceptor authInterceptor;
     private final DeviceManager deviceManager;
     private final ExecutorService executor;
+    private final DataEncryptor dataEncryptor;
 
     private static final String PREFS_NAME = "omniai_user_prefs";
     private static final String KEY_AUTH_TOKEN = "auth_token";
@@ -33,6 +36,7 @@ public class UserManager {
 
     private UserManager(Context context) {
         this.prefs = context.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        this.dataEncryptor = new DataEncryptor(context);
         this.authInterceptor = new AuthInterceptor();
         this.authInterceptor.setUserManager(this);
         this.apiService = new UserApiService(new okhttp3.OkHttpClient(), authInterceptor);
@@ -296,9 +300,11 @@ public class UserManager {
         this.authToken = accessToken;
         this.refreshToken = newRefreshToken;
         this.tokenExpiry = expiry;
+        String encAccess = dataEncryptor.encryptString(accessToken);
+        String encRefresh = dataEncryptor.encryptString(newRefreshToken);
         prefs.edit()
-                .putString(KEY_AUTH_TOKEN, accessToken)
-                .putString(KEY_REFRESH_TOKEN, newRefreshToken)
+                .putString(KEY_AUTH_TOKEN, encAccess)
+                .putString(KEY_REFRESH_TOKEN, encRefresh)
                 .putLong(KEY_TOKEN_EXPIRY, expiry)
                 .apply();
     }
@@ -338,8 +344,15 @@ public class UserManager {
     }
 
     private void loadToken() {
-        authToken = prefs.getString(KEY_AUTH_TOKEN, null);
-        refreshToken = prefs.getString(KEY_REFRESH_TOKEN, null);
+        String encAccess = prefs.getString(KEY_AUTH_TOKEN, null);
+        String encRefresh = prefs.getString(KEY_REFRESH_TOKEN, null);
+        try {
+            authToken = encAccess != null ? dataEncryptor.decryptString(encAccess) : null;
+            refreshToken = encRefresh != null ? dataEncryptor.decryptString(encRefresh) : null;
+        } catch (Exception e) {
+            authToken = null;
+            refreshToken = null;
+        }
         tokenExpiry = prefs.getLong(KEY_TOKEN_EXPIRY, 0);
     }
 

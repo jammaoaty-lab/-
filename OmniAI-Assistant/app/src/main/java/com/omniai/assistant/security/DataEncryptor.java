@@ -66,6 +66,9 @@ public class DataEncryptor {
         if (plainText == null || plainText.isEmpty()) {
             return plainText;
         }
+        if (masterKey == null) {
+            throw new SecurityException("Encryption key not initialized");
+        }
         try {
             byte[] keyBytes = hexToBytes(masterKey);
             SecretKeySpec secretKey = new SecretKeySpec(keyBytes, "AES");
@@ -82,7 +85,7 @@ public class DataEncryptor {
 
             return bytesToHex(combined);
         } catch (Exception e) {
-            return plainText;
+            throw new SecurityException("Encryption failed", e);
         }
     }
 
@@ -90,10 +93,13 @@ public class DataEncryptor {
         if (cipherText == null || cipherText.isEmpty()) {
             return cipherText;
         }
+        if (masterKey == null) {
+            throw new SecurityException("Encryption key not initialized");
+        }
         try {
             byte[] combined = hexToBytes(cipherText);
             if (combined.length < GCM_IV_LENGTH) {
-                return cipherText;
+                throw new SecurityException("Invalid cipher text length");
             }
 
             byte[] iv = new byte[GCM_IV_LENGTH];
@@ -110,8 +116,10 @@ public class DataEncryptor {
 
             byte[] decrypted = cipher.doFinal(encrypted);
             return new String(decrypted, "UTF-8");
+        } catch (SecurityException e) {
+            throw e;
         } catch (Exception e) {
-            return cipherText;
+            throw new SecurityException("Decryption failed", e);
         }
     }
 
@@ -200,7 +208,7 @@ public class DataEncryptor {
         }
     }
 
-    public String getMasterKey() {
+    private String getMasterKey() {
         return masterKey;
     }
 
