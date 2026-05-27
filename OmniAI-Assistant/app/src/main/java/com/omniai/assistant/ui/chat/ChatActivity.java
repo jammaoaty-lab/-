@@ -52,6 +52,7 @@ import com.omniai.assistant.inference.VisionInferenceEngine;
 import com.omniai.assistant.model.AIModel;
 import com.omniai.assistant.model.ChatMessage;
 import com.omniai.assistant.model.Conversation;
+import com.omniai.assistant.modelmgmt.PreinstalledModelManager;
 import com.omniai.assistant.scheduler.AIScheduler;
 import com.omniai.assistant.scheduler.InferenceParams;
 import com.omniai.assistant.ui.credits.CreditsCenterActivity;
@@ -154,6 +155,52 @@ public class ChatActivity extends AppCompatActivity {
         exceptionHandler = GlobalExceptionHandler.getInstance();
         markdownRenderer = MarkdownRenderer.getInstance();
         chatRepository = new ChatRepository(this);
+
+        ensurePreinstalledModelsLoaded();
+    }
+
+    private void ensurePreinstalledModelsLoaded() {
+        PreinstalledModelManager preinstalledMgr = PreinstalledModelManager.getInstance(this);
+        preinstalledMgr.ensureModelsExtracted(new PreinstalledModelManager.ExtractionCallback() {
+            @Override
+            public void onProgress(String modelName, float progress) {}
+
+            @Override
+            public void onModelReady(AIModel model) {}
+
+            @Override
+            public void onAllModelsReady() {
+                runOnUiThread(() -> {
+                    if (!InferenceEngine.getInstance().isModelLoaded()) {
+                        AIModel textModel = PreinstalledModelManager.getInstance(ChatActivity.this).getPreinstalledTextModel();
+                        InferenceEngine.getInstance().loadModel(textModel, new InferenceEngine.LoadCallback() {
+                            @Override
+                            public void onLoaded(AIModel model) {
+                                runOnUiThread(() -> updateModelDisplay());
+                            }
+
+                            @Override
+                            public void onError(String error) {}
+                        });
+                    }
+                    if (!visionEngine.isVisionModelLoaded()) {
+                        AIModel visionModel = PreinstalledModelManager.getInstance(ChatActivity.this).getPreinstalledVisionModel();
+                        visionEngine.loadVisionModel(visionModel, new VisionInferenceEngine.LoadCallback() {
+                            @Override
+                            public void onLoaded(AIModel model) {
+                                runOnUiThread(() -> updateVisionModelStatus());
+                            }
+
+                            @Override
+                            public void onError(String error) {}
+                        });
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String message) {}
+        });
     }
 
     private void initViews() {
