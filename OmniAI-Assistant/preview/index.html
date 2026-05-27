@@ -667,16 +667,71 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   </div>
 </div>
 
+</div>
+
+<!-- TERMINAL --><div class="P" id="p13" style="background:#000;display:flex;flex-direction:column">
+  <div class="chat-bar" style="background:#0a0a0a;border-bottom:1px solid #1a1a1a"><button class="ib" onclick="go('p4')"><svg viewBox="0 0 20 20" fill="none" stroke="#00ff00" stroke-width="2" stroke-linecap="round"><path d="M15 10H5M10 15l-5-5 5-5"/></svg></button><div class="mid"><div class="model" style="color:#00ff00">OmniAI Terminal</div></div><div style="width:38px"></div></div>
+  <div style="flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column">
+    <div style="font-family:monospace;color:#00ff00;font-size:11.5px;line-height:1.5">
+      OmniAI Terminal v1.0<br>
+      =========================<br>
+      llama.cpp command shell ready<br>
+      Type 'help' for available commands<br><br>
+      [Initializing llama.cpp binaries...]<br>
+      - Copying main...done<br>
+      - Copying server...done<br>
+      - Copying llama-cli...done<br>
+      - chmod +x main: OK<br>
+      - chmod +x server: OK<br>
+      - chmod +x llama-cli: OK<br>
+      [Binaries ready]<br>
+      Working directory: /data/user/0/com.omni.assistant/files/bin<br><br>
+      <span style="color:#00ff00">llama&gt;</span> <span style="color:#fff">ls -la</span><br>
+      total 4096<br>
+      drwx------ 2 u0_a123 u0_a123 4096 May 27 10:30 .<br>
+      drwx------ 3 u0_a123 u0_a123 4096 May 27 10:28 ..<br>
+      -rwxr-xr-x 1 u0_a123 u0_a123 2048 May 27 10:29 main*<br>
+      -rwxr-xr-x 1 u0_a123 u0_a123 1024 May 27 10:29 server*<br>
+      -rwxr-xr-x 1 u0_a123 u0_a123  512 May 27 10:29 llama-cli*<br>
+      drwx------ 2 u0_a123 u0_a123 4096 May 27 10:30 models/<br><br>
+      <span style="color:#00ff00">llama&gt;</span> <span style="color:#fff">demo</span><br>
+      =========================================<br>
+      OmniAI Terminal Demo<br>
+      =========================================<br><br>
+      [1] Listing available files...<br><br>
+      [2] Running demo inference...<br>
+      =========================================<br>
+      OmniAI llama.cpp (Simulated) v1.0<br>
+      =========================================<br><br>
+      [Prompt] Hello from OmniAI!<br><br>
+      [Output]<br>
+      Hello! I'm OmniAI, a simulated response from llama.cpp.<br>
+      This demonstrates the terminal interface is working!<br><br>
+      [Done] Generation completed (simulated)<br><br>
+      <span style="color:#00ff00">llama&gt;</span> <span style="color:#fff">_</span>
+    </div>
+  </div>
+  <div style="background:#0a0a0a;border-top:1px solid #1a1a1a;display:flex;align-items:center;padding:10px;gap:8px">
+    <span style="font-family:monospace;color:#00ff00;font-size:13px;white-space:nowrap">llama&gt;</span>
+    <div style="flex:1;height:40px;background:#000;border:1px solid #1a1a1a;border-radius:10px;padding:0 12px;display:flex;align-items:center">
+      <span style="font-family:monospace;color:#666;font-size:12px">Enter command...</span>
+    </div>
+    <button style="width:40px;height:40px;background:transparent;border:1px solid #1a1a1a;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer">
+      <svg viewBox="0 0 14 14" fill="none" stroke="#00ff00" stroke-width="1.3" stroke-linecap="round"><path d="M4 10l6-7-6-3v10z"/></svg>
+    </button>
+  </div>
+</div>
+
 </div></div>
 
 <div style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.35);font-size:11px;font-family:var(--font);text-align:center;letter-spacing:.3px">
-  <div id="pl">1 / 13 · 启动页</div>
+  <div id="pl">1 / 14 · 启动页</div>
   <div style="margin-top:3px;opacity:.6">点击 ‹ › 或键盘 ← → 切换</div>
 </div>
 
 <script>
-const P=['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','p12'];
-const N=['启动页','登录','注册','AI对话','个人中心','模型管理','LoRA训练','知识库','设置','Agent','积分中心','视觉模型','多模态'];
+const P=['p0','p1','p2','p3','p4','p5','p6','p7','p8','p9','p10','p11','p12','p13'];
+const N=['启动页','登录','注册','AI对话','个人中心','模型管理','LoRA训练','知识库','设置','Agent','积分中心','视觉模型','多模态','终端'];
 let ci=0;
 function go(id){const i=P.indexOf(id);if(i>=0){ci=i;show()}}
 function show(){document.querySelectorAll('.P').forEach(p=>p.classList.remove('on'));document.getElementById(P[ci]).classList.add('on');SB(false);document.getElementById('pl').textContent=`${ci+1} / ${P.length} · ${N[ci]}`;document.getElementById('pn').textContent=`${ci+1}/${P.length}`}

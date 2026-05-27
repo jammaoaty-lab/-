@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat;
 
 import com.omniai.assistant.R;
 import com.omniai.assistant.common.Constants;
+import com.omniai.assistant.service.LlamaCppService;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -239,6 +240,15 @@ public class TerminalActivity extends AppCompatActivity {
                     case "pwd":
                         showWorkingDir();
                         break;
+                    case "start-service":
+                        startLlamaService();
+                        break;
+                    case "stop-service":
+                        stopLlamaService();
+                        break;
+                    case "demo":
+                        runDemo();
+                        break;
                     case "main":
                     case "server":
                     case "llama-cli":
@@ -265,10 +275,13 @@ public class TerminalActivity extends AppCompatActivity {
                      "  clear         - Clear terminal screen\n" +
                      "  ls [path]     - List directory contents\n" +
                      "  pwd           - Show current directory\n" +
+                     "  start-service  - Start background service\n" +
+                     "  stop-service  - Stop background service\n" +
                      "  main ...      - Run llama.cpp main\n" +
                      "  server ...    - Run llama.cpp server\n" +
                      "  llama-cli ... - Run llama-cli\n" +
                      "  llama-server ... - Run llama-server\n" +
+                     "  demo          - Run demo command demo\n" +
                      "  exit/quit     - Exit terminal\n";
         appendOutput(help);
     }
@@ -379,6 +392,38 @@ public class TerminalActivity extends AppCompatActivity {
                 scrollView.fullScroll(View.FOCUS_DOWN);
             });
         });
+    }
+
+    private void startLlamaService() {
+        appendOutput("[Service] Starting LlamaCpp background service...\n");
+        try {
+            LlamaCppService.start(this);
+            appendOutput("[Service] Service started successfully\n");
+        } catch (Exception e) {
+            appendOutput(String.format("[Service] Error starting service: %s\n", e.getMessage()));
+        }
+    }
+
+    private void stopLlamaService() {
+        appendOutput("[Service] Stopping LlamaCpp background service...\n");
+        try {
+            LlamaCppService.stop(this);
+            appendOutput("[Service] Service stopped\n");
+        } catch (Exception e) {
+            appendOutput(String.format("[Service] Error stopping service: %s\n", e.getMessage()));
+        }
+    }
+
+    private void runDemo() {
+        appendOutput("=========================================\n");
+        appendOutput("OmniAI Terminal Demo\n");
+        appendOutput("=========================================\n\n");
+        
+        appendOutput("[1] Listing available files...\n");
+        listFiles(new String[]{"ls"});
+        
+        appendOutput("\n[2] Running demo inference...\n");
+        executeShellCommand("./main -p \"Hello from OmniAI!\" -n 128 --temp 0.7");
     }
 
     @Override
