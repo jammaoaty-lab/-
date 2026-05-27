@@ -1215,10 +1215,20 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
+    private boolean isValidImageMimeType(Uri uri) {
+        String mimeType = getContentResolver().getType(uri);
+        if (mimeType == null) return false;
+        return mimeType.startsWith("image/");
+    }
+
     private void handleImagePickResult(Intent data) {
         if (data == null || data.getData() == null) return;
 
         Uri imageUri = data.getData();
+        if (!isValidImageMimeType(imageUri)) {
+            showSnackbar("请选择有效的图片文件");
+            return;
+        }
         String localPath = copyUriToFile(imageUri);
         if (localPath == null) {
             showSnackbar("图片读取失败");
@@ -1334,6 +1344,10 @@ public class ChatActivity extends AppCompatActivity {
         if (data == null || data.getData() == null) return;
 
         Uri imageUri = data.getData();
+        if (!isValidImageMimeType(imageUri)) {
+            showSnackbar("请选择有效的图片文件");
+            return;
+        }
         String localPath = copyUriToFile(imageUri);
         if (localPath == null) {
             showSnackbar("图片读取失败");

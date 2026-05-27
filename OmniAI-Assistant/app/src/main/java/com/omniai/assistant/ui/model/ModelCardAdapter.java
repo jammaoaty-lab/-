@@ -10,6 +10,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.AsyncDifferConfig;
+import androidx.recyclerview.widget.AsyncListDiffer;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.omniai.assistant.R;
@@ -17,10 +20,11 @@ import com.omniai.assistant.model.AIModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 public class ModelCardAdapter extends RecyclerView.Adapter<ModelCardAdapter.ViewHolder> {
 
-    private List<AIModel> models;
+    private final AsyncListDiffer<AIModel> differ;
     private OnModelActionListener listener;
 
     public interface OnModelActionListener {
@@ -49,8 +53,26 @@ public class ModelCardAdapter extends RecyclerView.Adapter<ModelCardAdapter.View
     }
 
     public ModelCardAdapter(List<AIModel> models, OnModelActionListener listener) {
-        this.models = models != null ? models : new ArrayList<>();
         this.listener = listener;
+
+        DiffUtil.ItemCallback<AIModel> itemCallback = new DiffUtil.ItemCallback<AIModel>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull AIModel oldItem, @NonNull AIModel newItem) {
+                return oldItem.getId() != null && oldItem.getId().equals(newItem.getId());
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull AIModel oldItem, @NonNull AIModel newItem) {
+                return oldItem.equals(newItem);
+            }
+        };
+
+        AsyncDifferConfig<AIModel> config = new AsyncDifferConfig.Builder<>(itemCallback)
+                .setBackgroundThreadExecutor(Executors.newSingleThreadExecutor())
+                .build();
+
+        this.differ = new AsyncListDiffer<>(this, config);
+        this.differ.submitList(models != null ? models : new ArrayList<>());
     }
 
     @NonNull
@@ -63,7 +85,7 @@ public class ModelCardAdapter extends RecyclerView.Adapter<ModelCardAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        AIModel model = models.get(position);
+        AIModel model = differ.getCurrentList().get(position);
 
         holder.name.setText(model.getName());
         holder.fileSize.setText(formatFileSize(model.getFileSize()));
@@ -186,12 +208,11 @@ public class ModelCardAdapter extends RecyclerView.Adapter<ModelCardAdapter.View
 
     @Override
     public int getItemCount() {
-        return models.size();
+        return differ.getCurrentList().size();
     }
 
     public void updateData(List<AIModel> newModels) {
-        models = newModels != null ? newModels : new ArrayList<>();
-        notifyDataSetChanged();
+        differ.submitList(newModels != null ? newModels : new ArrayList<>());
     }
 
     private String formatFileSize(long size) {
