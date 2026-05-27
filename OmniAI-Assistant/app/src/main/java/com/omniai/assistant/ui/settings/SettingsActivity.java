@@ -575,7 +575,7 @@ public class SettingsActivity extends AppCompatActivity {
                 + "版本号：" + versionName + "\n"
                 + "版本代码：" + versionCode + "\n"
                 + "推理架构：llama.cpp + JNI\n\n"
-                + "OmniAI 是一款基于 llama.cpp 的本地 AI 助手，\n"
+                + "Senta AI 是一款基于 llama.cpp 的本地 AI 助手，\n"
                 + "支持多模态视觉推理、LoRA 微调、\n"
                 + "知识库构建、云端加速等高级功能。";
 

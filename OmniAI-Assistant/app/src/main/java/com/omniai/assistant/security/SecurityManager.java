@@ -106,7 +106,7 @@ public class SecurityManager {
 
         BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
                 .setTitle("Biometric Authentication")
-                .setSubtitle("Verify your identity to access OmniAI")
+                .setSubtitle("Verify your identity to access Senta AI")
                 .setNegativeButtonText("Cancel")
                 .build();
 

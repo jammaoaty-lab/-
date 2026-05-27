@@ -108,7 +108,7 @@ public class LlamaCppService extends Service {
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_settings)
-                .setContentTitle("OmniAI LlamaCpp")
+                .setContentTitle("Senta AI LlamaCpp")
                 .setContentText("LlamaCpp is running in background")
                 .setContentIntent(pendingIntent)
                 .setOngoing(true)

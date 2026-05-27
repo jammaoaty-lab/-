@@ -290,7 +290,7 @@ public class CreditsManager {
     public Intent shareInviteLink() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
-        String shareText = "Join OmniAI Assistant! Use my invite code: " + inviteCode + "\nhttps://omniai.com/invite/" + inviteCode;
+        String shareText = "Join Senta AI! Use my invite code: " + inviteCode + "\nhttps://senta-ai.com/invite/" + inviteCode;
         shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
         return Intent.createChooser(shareIntent, "Share Invite Link");
     }

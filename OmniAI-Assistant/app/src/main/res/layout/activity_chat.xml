@@ -51,7 +51,7 @@
                         android:fontFamily="sans-serif-medium"
                         android:textColor="@color/text_primary"
                         android:textSize="@dimen/text_size_subtitle"
-                        tools:text="OmniAI-7B" />
+                        tools:text="Senta-7B" />
 
                     <LinearLayout
                         android:id="@+id/vision_chip"
@@ -141,7 +141,7 @@
                     android:layout_marginStart="@dimen/spacing_xs"
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_size_caption"
-                    tools:text="视觉模型: OmniAI-Vision-2B · 就绪" />
+                    tools:text="视觉模型: Senta-Vision-2B · 就绪" />
 
             </LinearLayout>
 
@@ -228,7 +228,7 @@
 
                     <EditText
                         android:id="@+id/et_message"
-                        style="@style/OmniAI.EditText"
+                        style="@style/Senta.EditText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/spacing_sm"

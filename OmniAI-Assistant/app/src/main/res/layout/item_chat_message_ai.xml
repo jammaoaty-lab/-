@@ -26,7 +26,7 @@
 
             <TextView
                 android:id="@+id/tv_message_content"
-                style="@style/OmniAI.TextView.Body"
+                style="@style/Senta.TextView.Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:lineSpacingExtra="@dimen/spacing_xs"
@@ -59,7 +59,7 @@
 
         <TextView
             android:id="@+id/text_message_time"
-            style="@style/OmniAI.TextView.Caption"
+            style="@style/Senta.TextView.Caption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_xs"

@@ -427,8 +427,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void showAboutDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("关于 OmniAI")
-                .setMessage("OmniAI Assistant\n"
+                .setTitle("关于 Senta AI")
+                .setMessage("Senta AI\n"
                         + "基于 llama.cpp + JNI 架构\n"
                         + "本地AI推理，隐私安全\n\n"
                         + "版本: 1.0.0")

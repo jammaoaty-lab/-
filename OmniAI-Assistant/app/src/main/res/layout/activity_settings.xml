@@ -20,7 +20,7 @@
             android:background="@color/surface"
             app:navigationIcon="?attr/homeAsUpIndicator"
             app:title="设置"
-            app:titleTextAppearance="@style/OmniAI.TextView.Title" />
+            app:titleTextAppearance="@style/Senta.TextView.Title" />
 
         <include layout="@layout/item_setting_group_header"
             android:id="@+id/header_account" />

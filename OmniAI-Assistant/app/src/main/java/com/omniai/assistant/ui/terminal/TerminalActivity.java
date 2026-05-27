@@ -112,7 +112,7 @@ public class TerminalActivity extends AppCompatActivity {
 
     private void setupToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("OmniAI Terminal");
+        toolbar.setTitle("Senta AI Terminal");
         toolbar.setTitleTextColor(0xFF00FF00);
         toolbar.setNavigationOnClickListener(v -> finish());
     }
@@ -340,7 +340,7 @@ public class TerminalActivity extends AppCompatActivity {
     }
 
     private void appendWelcomeMessage() {
-        String welcome = "OmniAI Terminal v1.0\n" +
+        String welcome = "Senta AI Terminal v1.0\n" +
                         "======================\n" +
                         "llama.cpp command shell ready\n" +
                         "Type 'help' for available commands\n" +
@@ -679,14 +679,14 @@ public class TerminalActivity extends AppCompatActivity {
 
     private void runDemo() {
         appendOutput("=========================================\n");
-        appendOutput("OmniAI Terminal Demo\n");
+        appendOutput("Senta AI Terminal Demo\n");
         appendOutput("=========================================\n\n");
         
         appendOutput("[1] Listing available files...\n");
         listFiles(new String[]{"ls"});
         
         appendOutput("\n[2] Running demo inference...\n");
-        executeShellCommand("./main -p \"Hello from OmniAI!\" -n 128 --temp 0.7");
+        executeShellCommand("./main -p \"Hello from Senta AI!\" -n 128 --temp 0.7");
     }
 
     private String formatSize(long bytes) {

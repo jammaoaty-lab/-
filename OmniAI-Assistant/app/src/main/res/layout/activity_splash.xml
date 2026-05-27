@@ -24,11 +24,11 @@
 
     <TextView
         android:id="@+id/tv_app_name"
-        style="@style/OmniAI.TextView.Title"
+        style="@style/Senta.TextView.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/spacing_lg"
-        android:text="OmniAI"
+        android:text="Senta AI"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_logo" />

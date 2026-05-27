@@ -21,7 +21,7 @@
 #include "mtmd.h"
 #include "mtmd-image.h"
 
-#define LOG_TAG "OmniAI-Native"
+#define LOG_TAG "Senta-Native"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__)
@@ -58,7 +58,7 @@ static VisionState *get_vision_state(jlong handle) {
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     g_jvm = vm;
-    LOGI("OmniAI Native Library Loaded - llama.cpp backend");
+    LOGI("Senta AI Native Library Loaded - llama.cpp backend");
     return JNI_VERSION_1_6;
 }
 

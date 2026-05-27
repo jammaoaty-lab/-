@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">OmniAI</string>
-    <string name="welcome_title">欢迎使用 OmniAI</string>
+    <string name="app_name">Senta AI</string>
+    <string name="welcome_title">欢迎使用 Senta AI</string>
     <string name="register_title">创建你的AI空间</string>
     <string name="hint_phone_or_email">请输入手机号或邮箱</string>
     <string name="hint_password">请输入登录密码</string>
@@ -213,7 +213,7 @@
         <item>SmolVLM2-256M</item>
     </string-array>
 
-    <string name="terminal_title">OmniAI Terminal</string>
+    <string name="terminal_title">Senta AI Terminal</string>
     <string name="terminal_prompt">llama&gt; </string>
     <string name="terminal_input_hint">Enter command...</string>
     <string name="terminal_menu">终端</string>

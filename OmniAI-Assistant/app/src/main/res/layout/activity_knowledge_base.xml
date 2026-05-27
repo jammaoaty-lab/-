@@ -18,13 +18,13 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height"
             app:title="知识库"
-            app:titleTextAppearance="@style/OmniAI.TextView.Title" />
+            app:titleTextAppearance="@style/Senta.TextView.Title" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <EditText
         android:id="@+id/et_search"
-        style="@style/OmniAI.EditText"
+        style="@style/Senta.EditText"
         android:layout_width="match_parent"
         android:layout_height="@dimen/input_height"
         android:layout_marginHorizontal="@dimen/spacing_lg"

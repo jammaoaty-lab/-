@@ -40,7 +40,7 @@
                         android:background="@android:color/transparent"
                         app:navigationIconTint="@color/surface"
                         app:title="@string/credits_center"
-                        app:titleTextAppearance="@style/OmniAI.TextView.SectionTitle"
+                        app:titleTextAppearance="@style/Senta.TextView.SectionTitle"
                         app:titleTextColor="@color/surface" />
 
                     <TextView
@@ -138,7 +138,7 @@
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btn_copy_code"
-                                style="@style/OmniAI.Credits.GhostButton"
+                                style="@style/Senta.Credits.GhostButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="36dp"
                                 android:text="@string/credits_copy_code"
@@ -149,7 +149,7 @@
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btn_share_invite"
-                                style="@style/OmniAI.Credits.GhostButton"
+                                style="@style/Senta.Credits.GhostButton"
                                 android:layout_width="wrap_content"
                                 android:layout_height="36dp"
                                 android:layout_marginStart="@dimen/spacing_sm"
@@ -190,7 +190,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/spacing_lg"
                 android:text="@string/credits_recharge"
-                style="@style/OmniAI.TextView.SectionTitle" />
+                style="@style/Senta.TextView.SectionTitle" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_recharge_plans"
@@ -208,7 +208,7 @@
                 android:layout_marginStart="@dimen/spacing_lg"
                 android:layout_marginTop="@dimen/spacing_xxl"
                 android:text="@string/credits_records"
-                style="@style/OmniAI.TextView.SectionTitle" />
+                style="@style/Senta.TextView.SectionTitle" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -231,7 +231,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_invite_records"
-                style="@style/OmniAI.Button.Secondary"
+                style="@style/Senta.Button.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/btn_height"
                 android:layout_marginHorizontal="@dimen/spacing_lg"

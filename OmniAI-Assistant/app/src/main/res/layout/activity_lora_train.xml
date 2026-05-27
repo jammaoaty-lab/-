@@ -18,10 +18,10 @@
             android:layout_height="@dimen/toolbar_height"
             android:background="@color/surface"
             app:title="LoRA训练"
-            app:titleTextAppearance="@style/OmniAI.TextView.Title" />
+            app:titleTextAppearance="@style/Senta.TextView.Title" />
 
         <TextView
-            style="@style/OmniAI.TextView.Label"
+            style="@style/Senta.TextView.Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_lg"
@@ -38,7 +38,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_import_dataset"
-                style="@style/OmniAI.Button.Secondary"
+                style="@style/Senta.Button.Secondary"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/btn_height"
                 android:text="导入数据集"
@@ -70,7 +70,7 @@
 
         <TextView
             android:id="@+id/tv_params_header"
-            style="@style/OmniAI.TextView.Label"
+            style="@style/Senta.TextView.Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_lg"
@@ -78,7 +78,7 @@
             android:text="训练参数" />
 
         <androidx.cardview.widget.CardView
-            style="@style/OmniAI.CardView"
+            style="@style/Senta.CardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_lg"
@@ -157,7 +157,7 @@
 
                 <EditText
                     android:id="@+id/et_learning_rate"
-                    style="@style/OmniAI.EditText"
+                    style="@style/Senta.EditText"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/input_height"
                     android:layout_marginTop="@dimen/spacing_md"
@@ -266,7 +266,7 @@
 
                 <EditText
                     android:id="@+id/et_context_length"
-                    style="@style/OmniAI.EditText"
+                    style="@style/Senta.EditText"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/input_height"
                     android:layout_marginTop="@dimen/spacing_md"
@@ -279,7 +279,7 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
-            style="@style/OmniAI.TextView.Label"
+            style="@style/Senta.TextView.Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_lg"
@@ -306,7 +306,7 @@
             android:visibility="gone">
 
             <TextView
-                style="@style/OmniAI.TextView.Label"
+                style="@style/Senta.TextView.Label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="视觉模型" />
@@ -323,7 +323,7 @@
         </LinearLayout>
 
         <TextView
-            style="@style/OmniAI.TextView.Label"
+            style="@style/Senta.TextView.Label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_lg"
@@ -331,7 +331,7 @@
             android:text="训练进度" />
 
         <androidx.cardview.widget.CardView
-            style="@style/OmniAI.CardView"
+            style="@style/Senta.CardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_lg"
@@ -410,7 +410,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_start"
-                style="@style/OmniAI.Button.Primary"
+                style="@style/Senta.Button.Primary"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/btn_height"
                 android:layout_marginEnd="@dimen/spacing_xs"
@@ -420,7 +420,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_pause"
-                style="@style/OmniAI.Button.Secondary"
+                style="@style/Senta.Button.Secondary"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/btn_height"
                 android:layout_marginEnd="@dimen/spacing_xs"
@@ -430,7 +430,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_resume"
-                style="@style/OmniAI.Button.Secondary"
+                style="@style/Senta.Button.Secondary"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/btn_height"
                 android:layout_marginEnd="@dimen/spacing_xs"
@@ -440,7 +440,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_stop"
-                style="@style/OmniAI.Button.Danger"
+                style="@style/Senta.Button.Danger"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/btn_height"
                 android:layout_marginEnd="@dimen/spacing_xs"
@@ -450,7 +450,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_export"
-                style="@style/OmniAI.Button.Primary"
+                style="@style/Senta.Button.Primary"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/btn_height"
                 android:layout_weight="1"

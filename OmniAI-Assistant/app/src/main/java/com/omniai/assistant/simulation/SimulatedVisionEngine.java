@@ -49,7 +49,7 @@ public class SimulatedVisionEngine {
         sampleOcrTexts.put("default", """
                 这是一张演示图片的 OCR 识别结果。
                 
-                标题：OmniAI 视觉识别
+                标题：Senta AI 视觉识别
                 
                 正文：
                 这是一个模拟的 OCR 文字提取演示。
@@ -223,7 +223,7 @@ public class SimulatedVisionEngine {
         if (prompt.contains("文字") || prompt.contains("OCR")) {
             sb.append(sampleOcrTexts.get("default"));
         } else if (prompt.contains("描述") || prompt.contains("介绍")) {
-            sb.append("这张图片展示了 OmniAI 应用的界面。顶部是工具栏，中间是聊天区域，底部是输入框。整体设计采用了简洁的 Material Design 风格。");
+            sb.append("这张图片展示了 Senta AI 应用的界面。顶部是工具栏，中间是聊天区域，底部是输入框。整体设计采用了简洁的 Material Design 风格。");
         } else if (prompt.contains("颜色")) {
             sb.append("图片主要颜色：蓝色（#2563EB）、白色、浅灰色。整体配色简洁、专业。");
         } else {

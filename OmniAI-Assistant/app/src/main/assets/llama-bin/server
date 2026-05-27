@@ -1,7 +1,7 @@
 #!/system/bin/sh
 # Simulated llama.cpp server
 echo "========================================="
-echo "OmniAI llama.cpp Server (Simulated)"
+echo "Senta AI llama.cpp Server (Simulated)"
 echo "========================================="
 
 PORT=8080

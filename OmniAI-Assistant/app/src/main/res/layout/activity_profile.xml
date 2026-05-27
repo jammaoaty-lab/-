@@ -42,7 +42,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/iv_avatar"
-                tools:text="OmniAI用户" />
+                tools:text="Senta AI用户" />
 
             <TextView
                 android:id="@+id/tv_uid"
@@ -188,7 +188,7 @@
                 android:layout_weight="1"
                 android:textColor="@color/primary"
                 android:textSize="@dimen/text_size_caption"
-                tools:text="OmniAI-Vision-2B · 本地视觉推理" />
+                tools:text="Senta-Vision-2B · 本地视觉推理" />
 
             <ImageView
                 android:layout_width="@dimen/icon_sm"
@@ -275,7 +275,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_logout"
-            style="@style/OmniAI.Button.Danger"
+            style="@style/Senta.Button.Danger"
             android:layout_width="match_parent"
             android:layout_height="@dimen/btn_height"
             android:layout_marginHorizontal="@dimen/spacing_lg"

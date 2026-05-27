@@ -43,8 +43,8 @@ public class SimulatedInferenceEngine {
     }
 
     private void initQuickResponses() {
-        quickResponses.put("你好", "你好！我是 OmniAI，很高兴为你服务。我可以帮你回答问题、创作内容、编写代码。");
-        quickResponses.put("你是谁", "我是 OmniAI，一款本地运行的 AI 助手，基于 llama.cpp 和 Qwen 模型。我的对话完全在本地处理，保护你的隐私。");
+        quickResponses.put("你好", "你好！我是 Senta AI，很高兴为你服务。我可以帮你回答问题、创作内容、编写代码。");
+        quickResponses.put("你是谁", "我是 Senta AI，一款本地运行的 AI 助手，基于 llama.cpp 和 Qwen 模型。我的对话完全在本地处理，保护你的隐私。");
         quickResponses.put("天气", "很抱歉，我无法获取实时天气信息。不过你可以检查系统天气应用，或者打开浏览器搜索。");
         quickResponses.put("代码", "当然！我可以帮你编写各种编程语言的代码。请告诉我你需要什么功能，比如 \"帮我写一个 Android Activity\"。");
         quickResponses.put("翻译", "翻译功能已就绪！请输入需要翻译的文字，我可以在中文、英文、日文、韩文等多种语言间互译。");
@@ -177,7 +177,7 @@ public class SimulatedInferenceEngine {
         if (prompt.contains("Android") || prompt.contains("Activity")) {
             return "```java\npublic class MainActivity extends AppCompatActivity {\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        setContentView(R.layout.activity_main);\n        // TODO: 初始化 UI 和逻辑\n    }\n}\n```\n这是一个标准的 Android Activity 模板。请告诉我你需要添加什么功能。";
         } else if (prompt.contains("Python")) {
-            return "```python\ndef main():\n    print(\"Hello, OmniAI!\")\n    # 你的 Python 代码\n\nif __name__ == \"__main__\":\n    main()\n```\n这是一个简单的 Python 程序模板。请告诉我具体需求。";
+            return "```python\ndef main():\n    print(\"Hello, Senta AI!\")\n    # 你的 Python 代码\n\nif __name__ == \"__main__\":\n    main()\n```\n这是一个简单的 Python 程序模板。请告诉我具体需求。";
         } else {
             return "代码生成功能已准备就绪！我支持多种编程语言：\n- Java/Kotlin (Android)\n- Python\n- JavaScript/TypeScript\n- C/C++\n- Go\n\n请告诉我你需要什么功能。";
         }
@@ -188,7 +188,7 @@ public class SimulatedInferenceEngine {
     }
 
     private String getArticleResponse() {
-        return "## 标题\n\n这是一篇模拟生成的文章，展示 OmniAI 的创作能力。在真实环境中，你可以创作：\n\n- 产品描述\n- 技术文章\n- 邮件内容\n- 营销文案\n- 教学材料\n\n请告诉我你想写什么主题。";
+        return "## 标题\n\n这是一篇模拟生成的文章，展示 Senta AI 的创作能力。在真实环境中，你可以创作：\n\n- 产品描述\n- 技术文章\n- 邮件内容\n- 营销文案\n- 教学材料\n\n请告诉我你想写什么主题。";
     }
 
     private String getQuestionResponse(String prompt) {

@@ -138,7 +138,7 @@ public class InferenceService extends Service {
         );
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("OmniAI Assistant")
+                .setContentTitle("Senta AI")
                 .setContentText(contentText)
                 .setSmallIcon(R.drawable.ic_inference_notification)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
@@ -154,7 +154,7 @@ public class InferenceService extends Service {
                     "AI推理服务",
                     NotificationManager.IMPORTANCE_LOW
             );
-            channel.setDescription("OmniAI推理引擎后台运行状态");
+            channel.setDescription("Senta AI推理引擎后台运行状态");
             channel.setShowBadge(false);
             NotificationManager nm = getSystemService(NotificationManager.class);
             if (nm != null) {

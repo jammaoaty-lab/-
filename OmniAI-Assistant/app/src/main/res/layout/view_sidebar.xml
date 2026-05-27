@@ -70,7 +70,7 @@
                 android:layout_marginTop="@dimen/spacing_xs"
                 android:textColor="@color/text_secondary"
                 android:textSize="@dimen/text_size_caption"
-                tools:text="OmniAI-7B · 已同步" />
+                tools:text="Senta-7B · 已同步" />
 
         </LinearLayout>
 

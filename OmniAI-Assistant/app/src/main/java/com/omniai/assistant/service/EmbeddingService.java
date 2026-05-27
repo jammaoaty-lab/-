@@ -116,7 +116,7 @@ public class EmbeddingService extends Service {
         );
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle("OmniAI Assistant")
+                .setContentTitle("Senta AI")
                 .setContentText(contentText)
                 .setSmallIcon(R.drawable.ic_inference_notification)
                 .setPriority(NotificationCompat.PRIORITY_LOW)

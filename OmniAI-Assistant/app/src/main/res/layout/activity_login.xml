@@ -18,7 +18,7 @@
 
         <TextView
             android:id="@+id/tv_title"
-            style="@style/OmniAI.TextView.Title"
+            style="@style/Senta.TextView.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/welcome_title" />
@@ -34,7 +34,7 @@
 
         <EditText
             android:id="@+id/input_account"
-            style="@style/OmniAI.EditText"
+            style="@style/Senta.EditText"
             android:layout_width="match_parent"
             android:layout_height="@dimen/input_height"
             android:layout_marginTop="@dimen/spacing_xxl"
@@ -51,7 +51,7 @@
 
             <EditText
                 android:id="@+id/input_password"
-                style="@style/OmniAI.EditText"
+                style="@style/Senta.EditText"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/input_height"
                 android:layout_marginTop="@dimen/spacing_md"
@@ -81,7 +81,7 @@
 
             <EditText
                 android:id="@+id/input_phone"
-                style="@style/OmniAI.EditText"
+                style="@style/Senta.EditText"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/input_height"
                 android:layout_marginTop="@dimen/spacing_md"
@@ -97,7 +97,7 @@
 
                 <EditText
                     android:id="@+id/input_code"
-                    style="@style/OmniAI.EditText"
+                    style="@style/Senta.EditText"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/input_height"
                     android:layout_weight="1"
@@ -134,7 +134,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_login"
-            style="@style/OmniAI.Button.Primary"
+            style="@style/Senta.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="@dimen/btn_height"
             android:layout_marginTop="@dimen/spacing_xl"

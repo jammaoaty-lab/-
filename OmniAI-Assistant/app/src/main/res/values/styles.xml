@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.OmniAI" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Theme.Senta" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
@@ -15,11 +15,11 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="Theme.OmniAI.Splash" parent="Theme.OmniAI">
+    <style name="Theme.Senta.Splash" parent="Theme.Senta">
         <item name="android:windowBackground">@color/background</item>
     </style>
 
-    <style name="OmniAI.Button.Primary" parent="Widget.Material3.Button">
+    <style name="Senta.Button.Primary" parent="Widget.Material3.Button">
         <item name="android:background">@drawable/bg_btn_primary</item>
         <item name="android:textColor">@color/surface</item>
         <item name="android:textSize">15sp</item>
@@ -31,7 +31,7 @@
         <item name="cornerRadius">14dp</item>
     </style>
 
-    <style name="OmniAI.Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
+    <style name="Senta.Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:background">@drawable/bg_btn_secondary</item>
         <item name="android:textColor">@color/primary</item>
         <item name="android:textSize">13sp</item>
@@ -44,7 +44,7 @@
         <item name="strokeWidth">1.5dp</item>
     </style>
 
-    <style name="OmniAI.Button.Danger" parent="Widget.Material3.Button">
+    <style name="Senta.Button.Danger" parent="Widget.Material3.Button">
         <item name="android:background">@drawable/bg_btn_danger</item>
         <item name="android:textColor">@color/danger</item>
         <item name="android:textSize">15sp</item>
@@ -55,7 +55,7 @@
         <item name="cornerRadius">14dp</item>
     </style>
 
-    <style name="OmniAI.CardView" parent="Widget.Material3.CardView.Filled">
+    <style name="Senta.CardView" parent="Widget.Material3.CardView.Filled">
         <item name="cardCornerRadius">18dp</item>
         <item name="cardElevation">0dp</item>
         <item name="cardBackgroundColor">@color/card_background</item>
@@ -63,7 +63,7 @@
         <item name="strokeWidth">0.5dp</item>
     </style>
 
-    <style name="OmniAI.EditText" parent="Widget.Material3.EditText">
+    <style name="Senta.EditText" parent="Widget.Material3.EditText">
         <item name="android:background">@drawable/bg_input</item>
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/text_primary</item>
@@ -75,20 +75,20 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="OmniAI.TextView.Title" parent="Widget.Material3.TextView">
+    <style name="Senta.TextView.Title" parent="Widget.Material3.TextView">
         <item name="android:textSize">26sp</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:letterSpacing">-0.6</item>
     </style>
 
-    <style name="OmniAI.TextView.Subtitle" parent="Widget.Material3.TextView">
+    <style name="Senta.TextView.Subtitle" parent="Widget.Material3.TextView">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="OmniAI.TextView.Body" parent="Widget.Material3.TextView">
+    <style name="Senta.TextView.Body" parent="Widget.Material3.TextView">
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:lineSpacingExtra">4dp</item>
@@ -96,13 +96,13 @@
         <item name="android:letterSpacing">-0.1</item>
     </style>
 
-    <style name="OmniAI.TextView.Caption" parent="Widget.Material3.TextView">
+    <style name="Senta.TextView.Caption" parent="Widget.Material3.TextView">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
-    <style name="OmniAI.TextView.Label" parent="Widget.Material3.TextView">
+    <style name="Senta.TextView.Label" parent="Widget.Material3.TextView">
         <item name="android:textSize">11sp</item>
         <item name="android:textColor">@color/text_tertiary</item>
         <item name="android:fontFamily">sans-serif</item>
@@ -110,19 +110,19 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
-    <style name="OmniAI.TextView.SectionTitle" parent="Widget.Material3.TextView">
+    <style name="Senta.TextView.SectionTitle" parent="Widget.Material3.TextView">
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:letterSpacing">-0.2</item>
     </style>
 
-    <style name="OmniAI.Switch" parent="Widget.Material3.CompoundButton.Switch">
+    <style name="Senta.Switch" parent="Widget.Material3.CompoundButton.Switch">
         <item name="android:thumbTint">@color/switch_thumb_color</item>
         <item name="android:trackTint">@color/switch_track_color</item>
     </style>
 
-    <style name="OmniAI.QuickButton" parent="Widget.Material3.Button.TextButton">
+    <style name="Senta.QuickButton" parent="Widget.Material3.Button.TextButton">
         <item name="android:background">@drawable/bg_quick_btn</item>
         <item name="android:textColor">@color/quick_btn_text</item>
         <item name="android:textSize">12sp</item>
@@ -133,13 +133,13 @@
         <item name="cornerRadius">999dp</item>
     </style>
 
-    <style name="OmniAI.Toolbar" parent="Widget.Material3.Toolbar">
+    <style name="Senta.Toolbar" parent="Widget.Material3.Toolbar">
         <item name="android:background">@color/surface</item>
         <item name="android:elevation">0dp</item>
-        <item name="titleTextAppearance">@style/OmniAI.TextView.SectionTitle</item>
+        <item name="titleTextAppearance">@style/Senta.TextView.SectionTitle</item>
     </style>
 
-    <style name="OmniAI.MenuItem" parent="">
+    <style name="Senta.MenuItem" parent="">
         <item name="android:paddingTop">14dp</item>
         <item name="android:paddingBottom">14dp</item>
         <item name="android:paddingStart">16dp</item>
@@ -147,7 +147,7 @@
         <item name="android:background">?attr/selectableItemBackground</item>
     </style>
 
-    <style name="OmniAI.Credits.GhostButton" parent="Widget.Material3.Button.TextButton">
+    <style name="Senta.Credits.GhostButton" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">12sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
@@ -161,7 +161,7 @@
         <item name="strokeWidth">0.5dp</item>
     </style>
 
-    <style name="OmniAI.VisionChip" parent="Widget.Material3.Button.TextButton">
+    <style name="Senta.VisionChip" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">11sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
@@ -173,7 +173,7 @@
         <item name="backgroundTint">#33FFFFFF</item>
     </style>
 
-    <style name="OmniAI.CreditsBalance" parent="Widget.Material3.TextView">
+    <style name="Senta.CreditsBalance" parent="Widget.Material3.TextView">
         <item name="android:textSize">40sp</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:fontFamily">sans-serif-medium</item>

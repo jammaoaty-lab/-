@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height"
             app:title="模型中心"
-            app:titleTextAppearance="@style/OmniAI.TextView.Title" />
+            app:titleTextAppearance="@style/Senta.TextView.Title" />
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
@@ -28,7 +28,7 @@
             app:tabIndicatorColor="@color/primary"
             app:tabSelectedTextColor="@color/primary"
             app:tabTextColor="@color/text_secondary"
-            app:tabTextAppearance="@style/OmniAI.TextView.Body">
+            app:tabTextAppearance="@style/Senta.TextView.Body">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"

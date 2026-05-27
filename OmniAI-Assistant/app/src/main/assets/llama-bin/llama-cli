@@ -1,7 +1,7 @@
 #!/system/bin/sh
 # Simulated llama-cli
 echo "========================================="
-echo "OmniAI llama-cli (Simulated)"
+echo "Senta AI llama-cli (Simulated)"
 echo "========================================="
 echo ""
 echo "Usage: llama-cli -m model.gguf [options]"

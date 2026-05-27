@@ -444,7 +444,7 @@ public class ChatActivity extends AppCompatActivity {
                 modelInfoText.setText(loadedModel.getName() + " · 已就绪");
             }
         } else {
-            modelNameText.setText("OmniAI");
+            modelNameText.setText("Senta AI");
             if (modelInfoText != null) {
                 modelInfoText.setText("未加载模型");
             }
