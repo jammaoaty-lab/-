@@ -20,6 +20,8 @@ import com.google.android.material.tabs.TabLayout;
 import com.omniai.assistant.R;
 import com.omniai.assistant.credits.CreditsFeatureGate;
 import com.omniai.assistant.credits.CreditsManager;
+import com.omniai.assistant.manager.UserManager;
+import com.omniai.assistant.ui.login.LoginActivity;
 import com.omniai.assistant.inference.VisionInferenceEngine;
 import com.omniai.assistant.model.AIModel;
 import com.omniai.assistant.modelmgmt.ModelManager;
@@ -438,6 +440,17 @@ public class ModelManagerActivity extends AppCompatActivity {
     }
 
     private void downloadModel(AIModel model) {
+        UserManager userManager = UserManager.getInstance(this);
+        if (!userManager.isLoggedIn()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.login_required))
+                    .setMessage(getString(R.string.login_required_download))
+                    .setPositiveButton(getString(R.string.login), (d, w) -> startActivity(new Intent(this, LoginActivity.class)))
+                    .setNegativeButton(getString(R.string.cancel), null)
+                    .show();
+            return;
+        }
+
         long requiredSize = model.getDownloadSize() > 0 ? model.getDownloadSize() : model.getFileSize();
         if (!checkStorageSpace(requiredSize)) {
             new AlertDialog.Builder(this)
@@ -504,6 +517,17 @@ public class ModelManagerActivity extends AppCompatActivity {
     }
 
     private void startVisionModelDownload(AIModel model) {
+        UserManager userManager = UserManager.getInstance(this);
+        if (!userManager.isLoggedIn()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.login_required))
+                    .setMessage(getString(R.string.login_required_download))
+                    .setPositiveButton(getString(R.string.login), (d, w) -> startActivity(new Intent(this, LoginActivity.class)))
+                    .setNegativeButton(getString(R.string.cancel), null)
+                    .show();
+            return;
+        }
+
         long requiredSize = model.getDownloadSize() > 0 ? model.getDownloadSize() : model.getFileSize();
         if (!checkStorageSpace(requiredSize)) {
             new AlertDialog.Builder(this)

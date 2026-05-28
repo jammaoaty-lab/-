@@ -296,6 +296,15 @@ public class ChatActivity extends AppCompatActivity {
         TextView navAgent = findViewById(R.id.nav_agent);
         if (navAgent != null) {
             navAgent.setOnClickListener(v -> {
+                if (!userManager.isLoggedIn()) {
+                    new AlertDialog.Builder(this)
+                            .setTitle(getString(R.string.login_required))
+                            .setMessage(getString(R.string.login_required_deep_think))
+                            .setPositiveButton(getString(R.string.login), (d, w) -> startActivity(new Intent(this, LoginActivity.class)))
+                            .setNegativeButton(getString(R.string.cancel), null)
+                            .show();
+                    return;
+                }
                 com.omniai.assistant.ui.agent.AgentActivity.start(this);
                 drawerLayout.closeDrawer(GravityCompat.START);
             });
@@ -1094,6 +1103,15 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         if ("Agent".equals(name)) {
+            if (!userManager.isLoggedIn()) {
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.login_required))
+                        .setMessage(getString(R.string.login_required_deep_think))
+                        .setPositiveButton(getString(R.string.login), (d, w) -> startActivity(new Intent(this, LoginActivity.class)))
+                        .setNegativeButton(getString(R.string.cancel), null)
+                        .show();
+                return;
+            }
             if (!creditsGate.canUseAdvancedAgent()) {
                 creditsGate.showInsufficientCreditsDialog(this);
                 return;
@@ -1129,6 +1147,15 @@ public class ChatActivity extends AppCompatActivity {
                 .setItems(options, (dialog, which) -> {
                     switch (which) {
                         case 0:
+                            if (!userManager.isLoggedIn()) {
+                                new AlertDialog.Builder(ChatActivity.this)
+                                        .setTitle(getString(R.string.login_required))
+                                        .setMessage(getString(R.string.login_required_deep_think))
+                                        .setPositiveButton(getString(R.string.login), (d, w) -> startActivity(new Intent(ChatActivity.this, LoginActivity.class)))
+                                        .setNegativeButton(getString(R.string.cancel), null)
+                                        .show();
+                                return;
+                            }
                             com.omniai.assistant.ui.agent.AgentActivity.start(this);
                             break;
                         case 1:
@@ -1419,10 +1446,9 @@ public class ChatActivity extends AppCompatActivity {
                 UserManager.init(this);
                 userManager = UserManager.getInstance();
             } catch (Exception e) {
-                Log.w("ChatActivity", "Token refresh failed", e);
+                android.util.Log.w("ChatActivity", "Token refresh failed", e);
                 Toast.makeText(this, R.string.error_token_expired, Toast.LENGTH_LONG).show();
             }
-        }
         }
 
         if (userManager != null && userManager.isLoggedIn()) {

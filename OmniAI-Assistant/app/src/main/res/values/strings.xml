@@ -312,5 +312,9 @@
     <string name="empty_phone">请输入手机号</string>
     <string name="empty_code">请输入验证码</string>
     <string name="invalid_phone_format">手机号格式不正确</string>
+    <string name="login_required">需要登录</string>
+    <string name="login_required_download">下载模型需要登录账号，是否前往登录？</string>
+    <string name="login_required_deep_think">深度思考模式需要登录账号，是否前往登录？</string>
+    <string name="login">登录</string>
 
 </resources>

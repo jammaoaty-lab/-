@@ -48,12 +48,7 @@ public class SplashActivity extends AppCompatActivity {
 
     private void scheduleNavigation() {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Intent intent;
-            if (userManager.isLoggedIn()) {
-                intent = new Intent(SplashActivity.this, ChatActivity.class);
-            } else {
-                intent = new Intent(SplashActivity.this, LoginActivity.class);
-            }
+            Intent intent = new Intent(SplashActivity.this, ChatActivity.class);
             startActivity(intent);
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             finish();

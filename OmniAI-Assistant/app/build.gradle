@@ -6,6 +6,15 @@ android {
     namespace 'com.omniai.assistant'
     compileSdk 34
 
+    signingConfigs {
+        release {
+            storeFile file('../release.jks')
+            storePassword '123456'
+            keyAlias 'myappkey'
+            keyPassword '123456'
+        }
+    }
+
     defaultConfig {
         applicationId "com.omniai.assistant"
         minSdk 26
@@ -45,6 +54,7 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
         debug {
             minifyEnabled false
