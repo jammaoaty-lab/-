@@ -31,10 +31,11 @@ const Profile = () => {
     { icon: FileCheck, label: '隐私政策' },
   ];
 
-  // 点击状态卡片跳转
+  // 点击状态卡片跳转 - 统一跳转到我参与的任务列表页，带筛选参数
   const handleStatusClick = (statusId: string) => {
-    // 这里可以传递状态参数，示例直接跳转到任务广场
-    navigate('/');
+    navigate('/my-tasks', { 
+      state: { status: statusId } 
+    });
   };
 
   return (
@@ -111,8 +112,8 @@ const Profile = () => {
             {/* 第一行：左右均分两大功能入口卡片 */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <button
-                onClick={() => navigate('/')}
-                className="p-5 bg-white rounded-2xl card-shadow hover:scale-[1.02] transition-all duration-300 text-left relative"
+                onClick={() => navigate('/my-tasks', { state: { status: 'all' } })}
+                className="p-5 bg-white rounded-2xl card-shadow hover:scale-[1.02] transition-all duration-300 text-left relative active:scale-[0.97]"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="w-12 h-12 primary-gradient rounded-xl flex items-center justify-center">
@@ -149,7 +150,7 @@ const Profile = () => {
                   <button
                     key={status.id}
                     onClick={() => handleStatusClick(status.id)}
-                    className="glass-effect p-4 rounded-2xl neon-border hover:scale-[1.05] transition-all duration-300 text-center"
+                    className="glass-effect p-4 rounded-2xl neon-border hover:scale-[1.05] transition-all duration-300 text-center active:scale-[0.97]"
                   >
                     <Icon size={24} style={{ color: status.color }} className="mx-auto mb-2" />
                     <p className="text-xs font-bold text-slate-800 mb-1">{status.label}</p>
