@@ -1,6 +1,6 @@
-import { Home, Users, PlusSquare, User } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useStore } from '../hooks/useStore';
+import { BottomNavIcon } from './BottomNavIcons';
 
 const BottomNav = () => {
   const navigate = useNavigate();
@@ -8,10 +8,10 @@ const BottomNav = () => {
   const { currentTab, setCurrentTab } = useStore();
 
   const tabs = [
-    { id: 0, icon: Home, label: '任务广场', path: '/' },
-    { id: 1, icon: Users, label: '好友邀约', path: '/invite' },
-    { id: 2, icon: PlusSquare, label: '发布管理', path: '/publish' },
-    { id: 3, icon: User, label: '个人中心', path: '/profile' }
+    { id: 0, type: 'tasks' as const, label: '任务广场', path: '/' },
+    { id: 1, type: 'invite' as const, label: '好友邀约', path: '/invite' },
+    { id: 2, type: 'publish' as const, label: '发布管理', path: '/publish' },
+    { id: 3, type: 'profile' as const, label: '个人中心', path: '/profile' }
   ];
 
   const getCurrentTab = () => {
@@ -31,7 +31,6 @@ const BottomNav = () => {
       <div className="glass-effect">
         <div className="flex justify-around items-center py-3 px-2">
           {tabs.map((tab) => {
-            const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             
             return (
@@ -46,13 +45,10 @@ const BottomNav = () => {
                 }`}
               >
                 <div className={`relative ${isActive ? 'glow-effect' : ''}`}>
-                  <Icon
-                    size={24}
-                    className={`transition-all duration-300 ${
-                      isActive 
-                        ? 'text-[#36B0FF] fill-[#36B0FF]' 
-                        : 'text-gray-400'
-                    }`}
+                  <BottomNavIcon
+                    type={tab.type}
+                    size={40}
+                    active={isActive}
                   />
                 </div>
                 <span

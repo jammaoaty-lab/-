@@ -2,6 +2,7 @@ import { Task } from '../types';
 import { formatCurrency } from '../utils/format';
 import GlassCard from './GlassCard';
 import { Zap, Flame } from 'lucide-react';
+import { TaskCategoryIcon } from './TaskCategoryIcons';
 
 interface TaskCardProps {
   task: Task;
@@ -9,17 +10,6 @@ interface TaskCardProps {
 }
 
 const TaskCard = ({ task, onClick }: TaskCardProps) => {
-  const getCategoryColor = (category: string) => {
-    const colors: Record<string, string> = {
-      'APP注册': 'bg-purple-100 text-purple-600',
-      '问卷调研': 'bg-blue-100 text-blue-600',
-      '游戏任务': 'bg-green-100 text-green-600',
-      '简单任务': 'bg-orange-100 text-orange-600',
-      '高额赏金': 'bg-red-100 text-red-600'
-    };
-    return colors[category] || 'bg-gray-100 text-gray-600';
-  };
-
   const progress = (task.currentUsers / task.minUsers) * 100;
 
   return (
@@ -76,16 +66,14 @@ const TaskCard = ({ task, onClick }: TaskCardProps) => {
           </div>
         </div>
 
-        {/* 第二行：分类 + 标题 */}
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(task.category)}`}>
-              {task.category}
-            </span>
+        {/* 第二行：分类图标 + 标题 */}
+        <div className="flex items-start gap-3">
+          <TaskCategoryIcon category={task.category} size={36} />
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-semibold text-slate-800 line-clamp-2">
+              {task.title}
+            </h3>
           </div>
-          <h3 className="text-lg font-semibold text-slate-800 line-clamp-2">
-            {task.title}
-          </h3>
         </div>
 
         {/* 第三行：进度条 */}
