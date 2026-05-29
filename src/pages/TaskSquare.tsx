@@ -18,8 +18,7 @@ const TaskSquare = () => {
   const [signedDays, setSignedDays] = useState([1, 2, 3]);
   const [showToast, setShowToast] = useState(false);
   const [todaySigned, setTodaySigned] = useState(false);
-  const [showAnnouncement, setShowAnnouncement] = useState(false);
-  const [showAnnouncementDetail, setShowAnnouncementDetail] = useState(false);
+  const [showAnnouncement, setShowAnnouncement] = useState(true);
   const [showNewUserBanner, setShowNewUserBanner] = useState(true);
   const [hasClaimedNewUserReward, setHasClaimedNewUserReward] = useState(false);
   const touchStartY = useRef(0);
@@ -185,7 +184,7 @@ const TaskSquare = () => {
           <div 
             className="mb-5 rounded-2xl glass-effect neon-border p-4 cursor-pointer hover:scale-[1.01] transition-transform duration-300"
             style={{ background: 'linear-gradient(135deg, rgba(54,176,255,0.15), rgba(15,86,232,0.08))' }}
-            onClick={() => setShowAnnouncementDetail(true)}
+            onClick={() => navigate('/announcement')}
           >
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
@@ -235,6 +234,16 @@ const TaskSquare = () => {
           </button>
 
           <button 
+            onClick={() => navigate('/announcement')}
+            className="glass-effect neon-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300 active:scale-95"
+          >
+            <div className="w-12 h-12 rounded-full flex items-center justify-center glow-effect" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
+              <Bell size={22} className="text-white" />
+            </div>
+            <span className="text-xs font-medium text-slate-700">公告中心</span>
+          </button>
+
+          <button 
             onClick={() => navigate('/invite')}
             className="glass-effect neon-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300 active:scale-95"
           >
@@ -242,16 +251,6 @@ const TaskSquare = () => {
               <Users size={22} className="text-white" />
             </div>
             <span className="text-xs font-medium text-slate-700">邀请好友</span>
-          </button>
-
-          <button 
-            onClick={() => {}}
-            className="glass-effect neon-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300 active:scale-95"
-          >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center glow-effect" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
-              <MessageSquare size={22} className="text-white" />
-            </div>
-            <span className="text-xs font-medium text-slate-700">在线客服</span>
           </button>
         </div>
 
@@ -352,57 +351,6 @@ const TaskSquare = () => {
             <span className="text-slate-700 font-medium">
               {hasClaimedNewUserReward ? '新人奖励领取成功，¥50已到账！' : '签到成功，¥10已到账！'}
             </span>
-          </div>
-        </div>
-      )}
-
-      {/* 公告详情弹窗 */}
-      {showAnnouncementDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-          <div 
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setShowAnnouncementDetail(false)}
-          />
-          <div className="relative w-full max-w-md glass-effect rounded-[26px] neon-border glass-card-shadow p-6 animate-fade-in">
-            {/* 关闭按钮 */}
-            <button 
-              onClick={() => setShowAnnouncementDetail(false)}
-              className="absolute top-4 right-4 w-8 h-8 glass-effect rounded-full flex items-center justify-center neon-border hover:bg-slate-100 transition-colors"
-            >
-              <X size={18} className="text-slate-500" />
-            </button>
-            
-            <h2 className="text-xl font-bold text-slate-800 mb-4">系统公告</h2>
-            
-            <div className="space-y-4 text-slate-600">
-              <p className="text-sm">
-                🎉 欢迎加入众包任务平台！
-              </p>
-              <p className="text-sm">
-                我们为新用户准备了丰富的福利：
-              </p>
-              <ul className="list-disc list-inside space-y-2 text-sm">
-                <li>新用户专享¥50现金奖励</li>
-                <li>每日签到可领取¥10现金</li>
-                <li>邀请好友注册可获得丰厚奖励</li>
-                <li>完成任务即可获得赏金，直接提现</li>
-              </ul>
-              <p className="text-sm text-slate-400">
-                活动时间：长期有效
-              </p>
-            </div>
-            
-            <div className="mt-6">
-              <Button 
-                variant="primary" 
-                size="lg" 
-                isGlow
-                className="w-full"
-                onClick={() => setShowAnnouncementDetail(false)}
-              >
-                我知道了
-              </Button>
-            </div>
           </div>
         </div>
       )}

@@ -7,6 +7,7 @@ import Profile from "@/pages/Profile";
 import Wallet from "@/pages/Wallet";
 import CreateTask from "@/pages/CreateTask";
 import MyTasks from "@/pages/MyTasks";
+import Announcement from "@/pages/Announcement";
 import BottomNav from "@/components/BottomNav";
 
 // 充值页面
@@ -127,6 +128,7 @@ const AppLayout = () => {
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/create-task" element={<CreateTask />} />
         <Route path="/my-tasks" element={<MyTasks />} />
+        <Route path="/announcement" element={<Announcement />} />
         <Route path="/recharge" element={<RechargePage />} />
         <Route path="/withdraw" element={<WithdrawPage />} />
       </Routes>
