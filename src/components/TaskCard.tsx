@@ -27,7 +27,7 @@ const TaskCard = ({ task, onClick }: TaskCardProps) => {
       className="p-5 cursor-pointer hover:scale-[1.01] transition-transform duration-300 relative"
       onClick={onClick}
     >
-      {/* 置顶标签 */}
+      {/* 置顶标签 - 固定在左上角外侧 */}
       {task.isPinned && (
         <div className="absolute -top-2 -left-2 z-10">
           <span className="inline-block px-3 py-1 bg-gradient-to-r from-[#36B0FF] to-[#0F56E8] text-white text-xs font-bold rounded-xl shadow-md">
@@ -36,21 +36,11 @@ const TaskCard = ({ task, onClick }: TaskCardProps) => {
         </div>
       )}
       
-      {/* 热门标签 */}
-      {task.isHot && !task.isPinned && (
-        <div className="absolute -top-2 -right-2 z-10">
+      {/* 热门标签 - 固定在右下角外侧 */}
+      {task.isHot && (
+        <div className="absolute -bottom-2 -right-2 z-10">
           <span className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-orange-400 to-orange-500 text-white text-xs font-bold rounded-xl shadow-md">
             <Flame size={12} fill="currentColor" />
-            热门
-          </span>
-        </div>
-      )}
-      
-      {/* 热门标签 - 同时有置顶时放在左下角 */}
-      {task.isHot && task.isPinned && (
-        <div className="absolute bottom-2 left-2 z-10">
-          <span className="inline-flex items-center gap-1 px-2 py-1 bg-gradient-to-r from-orange-400 to-orange-500 text-white text-xs font-bold rounded-lg shadow-md">
-            <Flame size={10} fill="currentColor" />
             热门
           </span>
         </div>
