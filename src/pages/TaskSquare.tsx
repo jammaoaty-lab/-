@@ -282,6 +282,47 @@ const TaskSquare = () => {
           </div>
         )}
 
+        {/* 4. 深色科技风运营Banner */}
+        <div className="mb-5 dark-banner p-5 card-scroll relative overflow-hidden">
+          {/* 微弱粒子光点背景 */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-3 left-8 w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+            <div className="absolute top-6 right-12 w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+            <div className="absolute bottom-8 left-20 w-1 h-1 rounded-full bg-primary animate-pulse"></div>
+            <div className="absolute bottom-4 right-6 w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
+            <div className="absolute top-12 right-24 w-1 h-1 rounded-full bg-primary animate-pulse"></div>
+          </div>
+          
+          <div className="relative z-10 flex items-center justify-between">
+            {/* 左侧文案 */}
+            <div className="flex-1">
+              <h3 className="text-title font-bold text-lime-400 mb-2">全民悬赏接单平台</h3>
+              <p className="text-body text-gray-400">海量正规任务，完成即可现金结算提现</p>
+            </div>
+            
+            {/* 右侧科技简约配图 */}
+            <div className="ml-4 flex items-center gap-3">
+              <div className="w-16 h-16 rounded-card-large bg-primary/10 flex items-center justify-center border border-primary/30">
+                <div className="flex flex-col items-center gap-1">
+                  <div className="flex gap-1">
+                    <div className="w-3 h-3 rounded-full bg-primary"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                  </div>
+                  <div className="flex gap-1">
+                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                    <div className="w-3 h-3 rounded-full bg-primary"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-gray-500">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* 分类筛选横向胶囊标签栏 */}
         <div className="mb-5 overflow-x-auto pb-2 -mx-5 px-5">
           <div className="flex gap-2 min-w-max">
