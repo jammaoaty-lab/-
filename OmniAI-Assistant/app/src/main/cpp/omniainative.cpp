@@ -15,7 +15,6 @@
 #include "ggml-alloc.h"
 #include "gguf.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 #include "mtmd.h"

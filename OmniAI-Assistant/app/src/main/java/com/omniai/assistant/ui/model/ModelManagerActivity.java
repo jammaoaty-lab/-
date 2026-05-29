@@ -20,7 +20,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.omniai.assistant.R;
 import com.omniai.assistant.credits.CreditsFeatureGate;
 import com.omniai.assistant.credits.CreditsManager;
-import com.omniai.assistant.manager.UserManager;
+import com.omniai.assistant.user.UserManager;
 import com.omniai.assistant.ui.login.LoginActivity;
 import com.omniai.assistant.inference.VisionInferenceEngine;
 import com.omniai.assistant.model.AIModel;

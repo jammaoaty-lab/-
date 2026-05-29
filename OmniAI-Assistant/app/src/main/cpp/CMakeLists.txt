@@ -6,6 +6,7 @@ set(CMAKE_C_STANDARD 11)
 
 set(LLAMA_CPP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/llama.cpp)
 set(STB_DIR ${LLAMA_CPP_DIR}/vendor/stb)
+set(MINIAUDIO_DIR ${LLAMA_CPP_DIR}/vendor)
 
 set(GGML_DIR ${LLAMA_CPP_DIR}/ggml)
 set(LLAMA_SRC_DIR ${LLAMA_CPP_DIR}/src)
@@ -13,6 +14,7 @@ set(LLAMA_INC_DIR ${LLAMA_CPP_DIR}/include)
 set(GGML_INC_DIR ${GGML_DIR}/include)
 set(GGML_SRC_DIR ${GGML_DIR}/src)
 set(MTMD_DIR ${LLAMA_CPP_DIR}/tools/mtmd)
+set(MODELS_DIR ${LLAMA_CPP_DIR}/src/models)
 set(COMMON_DIR ${LLAMA_CPP_DIR}/common)
 
 option(GGML_VULKAN "Enable Vulkan GPU backend" OFF)
@@ -55,6 +57,9 @@ set(GGML_CPU_SOURCES
     ${GGML_SRC_DIR}/ggml-cpu/repack.cpp
     ${GGML_SRC_DIR}/ggml-cpu/binary-ops.cpp
     ${GGML_SRC_DIR}/ggml-cpu/unary-ops.cpp
+    ${GGML_SRC_DIR}/ggml-cpu/arch/arm/quants.c
+    ${GGML_SRC_DIR}/ggml-cpu/arch/arm/repack.cpp
+    ${GGML_SRC_DIR}/ggml-cpu/arch/arm/cpu-feats.cpp
 )
 
 set(LLAMA_SOURCES
@@ -131,13 +136,18 @@ configure_file(
     @ONLY
 )
 
+file(GLOB MODEL_SOURCES ${MODELS_DIR}/*.cpp)
+file(GLOB MTMD_MODEL_SOURCES ${MTMD_DIR}/models/*.cpp)
+
 add_library(omniainative SHARED
     omniainative.cpp
     ${CMAKE_BINARY_DIR}/build-info.cpp
     ${GGML_CPU_SOURCES}
     ${LLAMA_SOURCES}
     ${MTMD_SOURCES}
+    ${MTMD_MODEL_SOURCES}
     ${COMMON_SOURCES}
+    ${MODEL_SOURCES}
 )
 
 target_include_directories(omniainative PRIVATE
@@ -145,12 +155,15 @@ target_include_directories(omniainative PRIVATE
     ${GGML_INC_DIR}
     ${GGML_INC_DIR}/ggml-cpu
     ${LLAMA_SRC_DIR}
+    ${MODELS_DIR}
     ${MTMD_DIR}
     ${COMMON_DIR}
     ${STB_DIR}
+    ${MINIAUDIO_DIR}
     ${LLAMA_CPP_DIR}
     ${GGML_SRC_DIR}
     ${GGML_SRC_DIR}/ggml-cpu
+    ${GGML_SRC_DIR}/ggml-cpu/arch/arm
     ${CMAKE_BINARY_DIR}
 )
 

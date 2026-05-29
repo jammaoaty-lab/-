@@ -105,7 +105,7 @@
             android:inputType="text"
             android:imeOptions="actionDone|flagNoExtractUi"
             android:hint="@string/terminal_input_hint"
-            android:hintTextColor="#666666" />
+            android:textColorHint="#666666" />
 
         <ImageButton
             android:id="@+id/btnSend"

@@ -316,5 +316,7 @@
     <string name="login_required_download">下载模型需要登录账号，是否前往登录？</string>
     <string name="login_required_deep_think">深度思考模式需要登录账号，是否前往登录？</string>
     <string name="login">登录</string>
+    <string name="switch_to_code_login">切换到验证码登录</string>
+    <string name="send">发送</string>
 
 </resources>

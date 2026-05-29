@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.omniai.assistant.R;
-import com.omniai.assistant.manager.UserManager;
+import com.omniai.assistant.user.UserManager;
 import com.omniai.assistant.ui.chat.ChatActivity;
 
 public class RegisterActivity extends AppCompatActivity {

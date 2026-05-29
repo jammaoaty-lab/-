@@ -58,14 +58,14 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_add_document"
-                style="@style/Widget.Material3.Button.TextButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="添加文档" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_delete_kb"
-                style="@style/Widget.Material3.Button.TextButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="删除知识库"

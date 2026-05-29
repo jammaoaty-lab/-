@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.application' version '7.3.1' apply false
+    id 'com.android.application'
 }
 
 android {
@@ -63,8 +63,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     externalNativeBuild {
@@ -83,6 +83,10 @@ android {
     lint {
         abortOnError false
     }
+}
+
+configurations.configureEach {
+    exclude group: 'org.jetbrains', module: 'annotations-java5'
 }
 
 dependencies {
@@ -104,11 +108,15 @@ dependencies {
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.work:work-runtime:2.9.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-    implementation 'com.markodejcic:markdown-edit:0.1.0'
     implementation 'io.noties.markwon:core:4.6.2'
-    implementation 'io.noties.markwon:syntax-highlight:4.6.2'
-    implementation 'io.noties.markwon:html:4.6.2'
-    implementation 'io.noties.markwon:image-glide:4.6.2'
+    implementation 'io.noties.markwon:ext-strikethrough:4.6.2'
+    implementation 'io.noties.markwon:ext-tables:4.6.2'
+    implementation 'io.noties.markwon:ext-tasklist:4.6.2'
+    implementation 'io.noties.markwon:image:4.6.2'
+    implementation 'io.noties.markwon:linkify:4.6.2'
+    implementation 'io.noties:prism4j:2.0.0'
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation 'com.google.android.gms:play-services-base:18.3.0'
     implementation 'com.google.android.play:core:1.10.3'
 
     testImplementation 'junit:junit:4.13.2'
