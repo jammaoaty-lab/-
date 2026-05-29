@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { Search, Bell, Wallet, RefreshCw, Loader2 } from 'lucide-react';
+import { Search, Bell, Wallet, RefreshCw, Loader2, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency } from '../utils/format';
@@ -10,11 +10,14 @@ import Button from '../components/Button';
 
 const TaskSquare = () => {
   const navigate = useNavigate();
-  const { user, tasks } = useStore();
+  const { user, tasks, setUser } = useStore();
   const [selectedCategory, setSelectedCategory] = useState('全部悬赏');
   const [showSignIn, setShowSignIn] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [displayTasks, setDisplayTasks] = useState<Task[]>([]);
+  const [signedDays, setSignedDays] = useState([1, 2, 3]);
+  const [showToast, setShowToast] = useState(false);
+  const [todaySigned, setTodaySigned] = useState(false);
   const touchStartY = useRef(0);
 
   const categories = ['全部悬赏', '简单任务', 'APP注册', '问卷调研', '游戏任务', '高额赏金'];
@@ -51,6 +54,30 @@ const TaskSquare = () => {
   useEffect(() => {
     setDisplayTasks(sortTasks(filteredTasks));
   }, [selectedCategory, filteredTasks, sortTasks]);
+
+  // 签到功能
+  const handleSignIn = () => {
+    if (todaySigned) return;
+    
+    const newSignedDays = [...signedDays, Math.max(...signedDays) + 1];
+    setSignedDays(newSignedDays);
+    setTodaySigned(true);
+    
+    // 签到成功，增加余额
+    if (user) {
+      setUser({
+        ...user,
+        balance: user.balance + 10
+      });
+    }
+    
+    // 显示Toast提示
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
+    
+    // 关闭弹窗
+    setTimeout(() => setShowSignIn(false), 1500);
+  };
 
   // 刷新功能
   const handleRefresh = useCallback(async () => {
@@ -190,49 +217,72 @@ const TaskSquare = () => {
         </div>
       </div>
 
+      {/* Toast提示 */}
+      {showToast && (
+        <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-[60]">
+          <div className="glass-effect neon-border px-6 py-3 rounded-xl flex items-center gap-2">
+            <div className="w-6 h-6 primary-gradient rounded-full flex items-center justify-center">
+              <span className="text-white text-xs">✓</span>
+            </div>
+            <span className="text-slate-700 font-medium">签到成功，¥10已到账！</span>
+          </div>
+        </div>
+      )}
+
       {/* 签到弹窗 */}
       {showSignIn && (
         <div className="fixed inset-0 z-50 flex items-end justify-center">
           <div 
-            className="absolute inset-0 bg-black/50"
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowSignIn(false)}
           />
-          <div className="relative w-full max-w-md bg-white rounded-t-[28px] p-6 animate-slide-up">
-            <div className="w-12 h-1 bg-slate-300 rounded-full mx-auto mb-6" />
+          <div className="relative w-full max-w-md glass-effect rounded-t-[26px] neon-border glass-card-shadow p-6 animate-slide-up">
+            {/* 关闭按钮 */}
+            <button 
+              onClick={() => setShowSignIn(false)}
+              className="absolute top-4 right-4 w-8 h-8 glass-effect rounded-full flex items-center justify-center neon-border hover:bg-slate-100 transition-colors"
+            >
+              <X size={18} className="text-slate-500" />
+            </button>
+            
+            {/* 顶部装饰条 */}
+            <div className="w-12 h-1 bg-slate-300/50 rounded-full mx-auto mb-6" />
             
             <h2 className="text-xl font-bold text-slate-800 text-center mb-6">每日签到</h2>
             
             {/* 日历签到 */}
-            <div className="grid grid-cols-7 gap-2 mb-6">
+            <div className="grid grid-cols-7 gap-3 mb-6">
               {[1, 2, 3, 4, 5, 6, 7].map((day) => (
                 <div 
                   key={day}
-                  className={`aspect-square rounded-xl flex flex-col items-center justify-center ${
-                    day <= 3 
+                  className={`aspect-square rounded-[12px] flex flex-col items-center justify-center transition-all duration-300 ${
+                    signedDays.includes(day) 
                       ? 'primary-gradient text-white' 
-                      : 'glass-effect text-slate-400'
+                      : 'glass-effect neon-border text-slate-400'
                   }`}
                 >
-                  <span className="text-xs">周{['一', '二', '三', '四', '五', '六', '日'][day-1]}</span>
-                  <span className="font-bold">{day}</span>
+                  <span className="text-[10px] opacity-80">周{['一', '二', '三', '四', '五', '六', '日'][day-1]}</span>
+                  <span className="font-bold text-lg">{day}</span>
                 </div>
               ))}
             </div>
             
             {/* 连续签到奖励 */}
-            <GlassCard className="p-4 mb-6 text-center">
-              <p className="text-sm text-slate-500 mb-2">连续签到7天可获得</p>
-              <p className="text-2xl font-bold gold-text">¥10.00</p>
-            </GlassCard>
+            <div className="p-5 mb-6 text-center">
+              <p className="text-sm text-slate-500 mb-2">连续签到7天可领取现金奖励</p>
+              <p className="text-3xl font-bold gold-text">¥10.00</p>
+            </div>
             
+            {/* 签到按钮 */}
             <Button 
               variant="primary" 
               size="lg" 
               isGlow
               className="w-full"
-              onClick={() => setShowSignIn(false)}
+              disabled={todaySigned}
+              onClick={handleSignIn}
             >
-              立即签到
+              {todaySigned ? '今日已签到' : '立即签到'}
             </Button>
           </div>
         </div>
