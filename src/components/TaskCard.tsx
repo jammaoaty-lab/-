@@ -36,9 +36,9 @@ const TaskCard = ({ task, onClick }: TaskCardProps) => {
         </div>
       )}
       
-      {/* 热门标签 - 固定在右下角外侧 */}
+      {/* 热门标签 - 固定在右上角内侧 */}
       {task.isHot && (
-        <div className="absolute -bottom-2 -right-2 z-10">
+        <div className="absolute top-4 right-4 z-10">
           <span className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-orange-400 to-orange-500 text-white text-xs font-bold rounded-xl shadow-md">
             <Flame size={12} fill="currentColor" />
             热门
