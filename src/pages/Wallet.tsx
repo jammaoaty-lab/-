@@ -32,7 +32,7 @@ const Wallet = () => {
 
   return (
     <div className="min-h-screen page-background pb-8">
-      <div className="px-5 pt-14 pb-6">
+      <div className="safe-area pt-14 pb-6">
         <div className="flex items-center justify-between">
           <button 
             onClick={() => navigate(-1)}
@@ -47,15 +47,15 @@ const Wallet = () => {
         </div>
       </div>
 
-      <div className="px-5">
-        <div className="dark-banner p-6 mb-5 card-scroll">
+      <div className="safe-area">
+        <div className="dark-banner p-6 module-spacing card-scroll">
           <p className="text-caption text-gray-400 mb-2">总资产</p>
           <p className="text-4xl font-bold text-white mb-6">{formatCurrency(user?.balance || 0)}</p>
           
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.05) 100%)' }}>
-              <p className="text-[11px] text-emerald-300 mb-1">可用余额</p>
-              <p className="text-xl font-semibold text-white mb-3">
+            <div className="p-4 rounded-2xl flex flex-col items-center" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.05) 100%)' }}>
+              <p className="text-[11px] text-emerald-300 mb-1 w-full">可用余额</p>
+              <p className="text-xl font-semibold text-white mb-3 w-full text-center">
                 {formatCurrency((user?.balance || 0) - (user?.frozenBalance || 0))}
               </p>
               <Button 
@@ -67,9 +67,9 @@ const Wallet = () => {
                 提现
               </Button>
             </div>
-            <div className="p-4 rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(0,200,224,0.15) 0%, rgba(0,200,224,0.05) 100%)' }}>
-              <p className="text-[11px] text-cyan-300 mb-1">冻结金额</p>
-              <p className="text-xl font-semibold text-gray-400 mb-3">
+            <div className="p-4 rounded-2xl flex flex-col items-center" style={{ background: 'linear-gradient(135deg, rgba(0,200,224,0.15) 0%, rgba(0,200,224,0.05) 100%)' }}>
+              <p className="text-[11px] text-cyan-300 mb-1 w-full">冻结金额</p>
+              <p className="text-xl font-semibold text-gray-400 mb-3 w-full text-center">
                 {formatCurrency(user?.frozenBalance || 0)}
               </p>
               <div className="w-full py-2 px-4 bg-white/5 text-gray-500 rounded-2xl text-caption text-center">
@@ -79,11 +79,11 @@ const Wallet = () => {
           </div>
         </div>
 
-        <div className="flex gap-3 mb-5">
+        <div className="flex gap-4 module-spacing">
           <Button 
             variant="primary" 
             size="lg"
-            className="flex-1"
+            className="flex-1 btn-height-lg"
             onClick={() => navigate('/recharge')}
           >
             <Plus size={20} className="mr-2" />
@@ -92,7 +92,7 @@ const Wallet = () => {
           <Button 
             variant="primary" 
             size="lg"
-            className="flex-1"
+            className="flex-1 btn-height-lg"
             onClick={() => navigate('/withdraw')}
           >
             <Minus size={20} className="mr-2" />
@@ -100,13 +100,13 @@ const Wallet = () => {
           </Button>
         </div>
 
-        <div className="mb-5 overflow-x-auto pb-2 -mx-5 px-5">
-          <div className="flex gap-2 min-w-max">
+        <div className="module-spacing overflow-x-auto pb-2 -mx-[16px] px-[16px]">
+          <div className="flex gap-3 min-w-max">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setSelectedTab(tab)}
-                className={`px-5 py-2 capsule-btn text-body font-medium transition-all duration-200 whitespace-nowrap ${
+                className={`px-5 py-3 capsule-btn text-body font-medium transition-all duration-200 whitespace-nowrap h-[44px] ${
                   selectedTab === tab
                     ? 'primary-gradient text-white shadow-float'
                     : 'bg-white text-text-tertiary shadow-card'
@@ -118,7 +118,7 @@ const Wallet = () => {
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4 module-spacing">
           {transactionList.map((transaction) => {
             // 根据类别设置颜色
             let iconBg, iconColor, amountColor;
@@ -145,8 +145,8 @@ const Wallet = () => {
             }
             
             return (
-              <div key={transaction.id} className="white-card p-4">
-                <div className="flex items-center justify-between">
+              <div key={transaction.id} className="white-card p-5">
+                <div className="flex items-center justify-between h-[60px]">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-task flex items-center justify-center" style={{ background: iconBg }}>
                       {transaction.type === 'income' ? <Plus size={18} strokeWidth={2} style={{ color: iconColor }} /> : <Minus size={18} strokeWidth={2} style={{ color: iconColor }} />}
@@ -156,7 +156,7 @@ const Wallet = () => {
                       <p className="text-caption text-text-tertiary">{transaction.time}</p>
                     </div>
                   </div>
-                  <p className="text-lg font-bold" style={{ color: amountColor }}>
+                  <p className="text-lg font-bold flex-shrink-0" style={{ color: amountColor }}>
                     {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
                   </p>
                 </div>
@@ -172,7 +172,7 @@ const Wallet = () => {
         )}
       </div>
       
-      <div className="px-5 pb-24 mt-6">
+      <div className="safe-area pb-24 mt-6">
         <button
           onClick={() => navigate('/invite')}
           className="w-full white-card p-5 flex items-center justify-between card-scroll"

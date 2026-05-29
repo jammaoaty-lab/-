@@ -34,24 +34,24 @@ const Profile = () => {
   return (
     <div className="min-h-screen page-background pb-28">
       {/* 顶部头像昵称栏 */}
-      <div className="px-5 pt-14 pb-6">
+      <div className="safe-area pt-14 pb-5 module-spacing">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-16 h-16 rounded-card-large overflow-hidden bg-white shadow-card">
+              <div className="w-14 h-14 rounded-card-large overflow-hidden bg-white shadow-card">
                 <img
                   src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'}
                   alt="头像"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 primary-gradient rounded-full flex items-center justify-center shadow-float">
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 primary-gradient rounded-full flex items-center justify-center shadow-float">
                 <span className="text-white text-xs font-bold">✓</span>
               </div>
             </div>
             <div>
               <h2 className="text-title font-bold text-text-primary">{user?.name || '用户'}</h2>
-              <p className="text-body text-text-secondary">入驻 {user?.joinDate || '2024'}</p>
+              <p className="text-caption text-text-secondary mt-0.5">入驻 {user?.joinDate || '2024'}</p>
             </div>
           </div>
           
@@ -64,29 +64,29 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="px-5">
+      <div className="safe-area">
         {/* 四栏数据卡片 */}
-        <div className="grid grid-cols-4 gap-3 mb-5">
-          <div className="p-4 text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(245,63,63,0.12) 0%, rgba(245,63,63,0.04) 100%)' }}>
-            <p className="text-caption text-text-secondary mb-1">总资产</p>
-            <p className="text-xl font-bold" style={{ color: '#F53F3F' }}>{formatCurrency(user?.balance || 0)}</p>
+        <div className="grid grid-cols-4 gap-3 module-spacing">
+          <div className="h-24 flex flex-col items-center justify-center text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(245,63,63,0.12) 0%, rgba(245,63,63,0.04) 100%)' }}>
+            <p className="text-caption text-text-secondary">总资产</p>
+            <p className="text-xl font-bold mt-1" style={{ color: '#F53F3F' }}>{formatCurrency(user?.balance || 0)}</p>
           </div>
-          <div className="p-4 text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.04) 100%)' }}>
-            <p className="text-caption text-text-secondary mb-1">可用余额</p>
-            <p className="text-xl font-bold" style={{ color: '#10B981' }}>{formatCurrency((user?.balance || 0) - (user?.frozenBalance || 0))}</p>
+          <div className="h-24 flex flex-col items-center justify-center text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.04) 100%)' }}>
+            <p className="text-caption text-text-secondary">可用余额</p>
+            <p className="text-xl font-bold mt-1" style={{ color: '#10B981' }}>{formatCurrency((user?.balance || 0) - (user?.frozenBalance || 0))}</p>
           </div>
-          <div className="p-4 text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(0,200,224,0.12) 0%, rgba(0,200,224,0.04) 100%)' }}>
-            <p className="text-caption text-text-secondary mb-1">冻结金额</p>
-            <p className="text-xl font-bold" style={{ color: '#00C8E0' }}>{formatCurrency(user?.frozenBalance || 0)}</p>
+          <div className="h-24 flex flex-col items-center justify-center text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(0,200,224,0.12) 0%, rgba(0,200,224,0.04) 100%)' }}>
+            <p className="text-caption text-text-secondary">冻结金额</p>
+            <p className="text-xl font-bold mt-1" style={{ color: '#00C8E0' }}>{formatCurrency(user?.frozenBalance || 0)}</p>
           </div>
-          <div className="p-4 text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(245,158,11,0.04) 100%)' }}>
-            <p className="text-caption text-text-secondary mb-1">累计收益</p>
-            <p className="text-xl font-bold" style={{ color: '#F59E0B' }}>¥888</p>
+          <div className="h-24 flex flex-col items-center justify-center text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(245,158,11,0.04) 100%)' }}>
+            <p className="text-caption text-text-secondary">累计收益</p>
+            <p className="text-xl font-bold mt-1" style={{ color: '#F59E0B' }}>¥888</p>
           </div>
         </div>
 
         {/* 接单状态横向卡片 */}
-        <div className="white-card p-5 mb-5 card-scroll">
+        <div className="white-card p-5 card-spacing card-scroll">
           <h3 className="text-subtitle font-medium text-text-primary mb-4">接单状态</h3>
           <div className="grid grid-cols-4 gap-3">
             {taskStatuses.map((status) => {
@@ -95,15 +95,15 @@ const Profile = () => {
                 <button
                   key={status.id}
                   onClick={() => handleStatusClick(status.id)}
-                  className="flex flex-col items-center gap-2 btn-press"
+                  className="flex flex-col items-center justify-center h-24 btn-press"
                 >
                   <div 
-                    className="w-10 h-10 rounded-card-large flex items-center justify-center"
+                    className="w-10 h-10 rounded-card-large flex items-center justify-center mb-1.5"
                     style={{ backgroundColor: `${status.color}15` }}
                   >
                     <Icon size={20} style={{ color: status.color }} />
                   </div>
-                  <p className="text-caption text-text-secondary">{status.label}</p>
+                  <p className="text-caption text-text-secondary mb-0.5">{status.label}</p>
                   <p className="text-body font-bold" style={{ color: status.color }}>{status.count}</p>
                 </button>
               );
@@ -112,12 +112,12 @@ const Profile = () => {
         </div>
 
         {/* 我的工作台四宫格 */}
-        <div className="mb-5">
+        <div className="module-spacing">
           <h3 className="text-subtitle font-medium text-text-primary mb-4">我的工作台</h3>
           <div className="grid grid-cols-2 gap-3">
             <button 
               onClick={() => navigate('/my-tasks', { state: { status: 'all' } })}
-              className="white-card p-5 flex flex-col gap-3 btn-press"
+              className="white-card p-5 flex flex-col justify-between h-36 btn-press"
             >
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 primary-gradient rounded-card-large flex items-center justify-center">
@@ -130,7 +130,7 @@ const Profile = () => {
 
             <button 
               onClick={() => navigate('/invite')}
-              className="white-card p-5 flex flex-col gap-3 btn-press"
+              className="white-card p-5 flex flex-col justify-between h-36 btn-press"
             >
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 bg-orange-500 rounded-card-large flex items-center justify-center">
@@ -138,13 +138,15 @@ const Profile = () => {
                 </div>
                 <span className="px-3 py-1 bg-orange-500/10 text-orange-500 text-caption font-medium tag-round">¥256</span>
               </div>
-              <p className="text-body font-medium text-text-primary">邀请好友</p>
-              <p className="text-caption text-text-tertiary">已邀12人</p>
+              <div>
+                <p className="text-body font-medium text-text-primary">邀请好友</p>
+                <p className="text-caption text-text-tertiary mt-1">已邀12人</p>
+              </div>
             </button>
 
             <button 
               onClick={() => navigate('/publish')}
-              className="white-card p-5 flex flex-col gap-3 btn-press"
+              className="white-card p-5 flex flex-col justify-between h-36 btn-press"
             >
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 bg-green-500 rounded-card-large flex items-center justify-center">
@@ -157,7 +159,7 @@ const Profile = () => {
 
             <button 
               onClick={() => navigate('/wallet')}
-              className="white-card p-5 flex flex-col gap-3 btn-press"
+              className="white-card p-5 flex flex-col justify-between h-36 btn-press"
             >
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 bg-purple-500 rounded-card-large flex items-center justify-center">
@@ -171,7 +173,7 @@ const Profile = () => {
         </div>
 
         {/* 深色Banner */}
-        <div className="dark-banner p-5 mb-5 card-scroll">
+        <div className="dark-banner p-5 card-spacing card-scroll">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 primary-gradient rounded-card-large flex items-center justify-center">
@@ -192,7 +194,7 @@ const Profile = () => {
         </div>
 
         {/* 系统设置列表 */}
-        <div className="mb-5">
+        <div className="module-spacing">
           <h3 className="text-subtitle font-medium text-text-primary mb-4">系统设置</h3>
           <div className="white-card overflow-hidden">
             {settingsItems.map((item, index) => {
@@ -200,15 +202,15 @@ const Profile = () => {
               return (
                 <button
                   key={index}
-                  className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors h-16"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-50 rounded-card-large flex items-center justify-center">
+                    <div className="w-10 h-10 bg-gray-50 rounded-card-large flex items-center justify-center flex-shrink-0">
                       <Icon size={20} className="text-primary" />
                     </div>
                     <span className="text-body text-text-primary">{item.label}</span>
                   </div>
-                  <ChevronRight size={20} className="text-text-tertiary" />
+                  <ChevronRight size={20} className="text-text-tertiary flex-shrink-0" />
                 </button>
               );
             })}

@@ -73,10 +73,10 @@ const Invite = () => {
   };
 
   return (
-    <div className="min-h-screen page-background pb-28">
+    <div className="min-h-screen page-background pb-28 safe-area-left safe-area-right">
       {/* 顶部状态栏 + 欢迎昵称栏 */}
-      <div className="px-5 pt-14 pb-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="pt-safe-top pb-5">
+        <div className="flex items-center justify-between px-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100">
               <img
@@ -103,10 +103,10 @@ const Invite = () => {
 
       <div className="px-5">
         {/* 四栏数据卡片 */}
-        <div className="grid grid-cols-4 gap-3 mb-5">
+        <div className="grid grid-cols-4 gap-4 mb-5">
           {statsData.map((stat, index) => (
-            <div key={index} className="p-4 text-center card-scroll rounded-card-large" style={{ background: stat.bgGradient }}>
-              <div className="w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.8)' }}>
+            <div key={index} className="p-4 text-center card-scroll rounded-card-large flex flex-col items-center justify-center h-[110px]" style={{ background: stat.bgGradient }}>
+              <div className="w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.8)' }}>
                 <stat.icon size={18} style={{ color: stat.color }} />
               </div>
               <p className="text-subtitle font-bold mb-1" style={{ color: stat.color }}>{stat.value}</p>
@@ -121,17 +121,17 @@ const Invite = () => {
             <Trophy size={20} className="text-primary" />
             阶梯额外奖励
           </h3>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-4">
             {stepRewards.map((step, index) => (
-              <div key={index} className="bg-tag-light rounded-card-task p-4 text-center">
+              <div key={index} className="bg-tag-light rounded-card-task p-4 text-center flex flex-col h-[120px]">
                 <p className="text-caption text-text-tertiary mb-1">{step.label}</p>
-                <p className="text-title font-bold text-profit-red mb-2">{formatCurrency(step.reward)}</p>
-                <div className="text-caption">
+                <p className="text-title font-bold text-profit-red mb-2 flex-shrink-0">{formatCurrency(step.reward)}</p>
+                <div className="text-caption flex-shrink-0">
                   <span className="text-primary">{step.completed}</span>
                   <span className="text-text-placeholder">/{step.target}</span>
                 </div>
                 {/* 进度条 */}
-                <div className="mt-2 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                <div className="mt-auto h-1.5 bg-gray-200 rounded-full overflow-hidden">
                   <div 
                     className="h-full primary-gradient transition-all duration-500"
                     style={{ width: `${(step.completed / step.target) * 100}%` }}
@@ -145,7 +145,7 @@ const Invite = () => {
         {/* 我的收益订单四宫格 */}
         <div className="white-card p-5 mb-5">
           <h3 className="text-subtitle font-bold text-text-primary mb-4">我的收益</h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <div className="p-4 rounded-card-task" style={{ background: 'linear-gradient(135deg, rgba(245,63,63,0.12) 0%, rgba(245,63,63,0.04) 100%)' }}>
               <p className="text-caption text-text-tertiary mb-1">今日新增</p>
               <p className="text-[26px] font-bold" style={{ color: '#F53F3F' }}>¥35.50</p>
@@ -187,7 +187,7 @@ const Invite = () => {
         </div>
 
         {/* 常用功能入口 */}
-        <div className="grid grid-cols-4 gap-3 mb-5">
+        <div className="grid grid-cols-4 gap-4 mb-5">
           {functionEntries.map((entry, index) => (
             <button 
               key={index}
@@ -197,7 +197,7 @@ const Invite = () => {
               <div className={`w-12 h-12 ${entry.color} rounded-full flex items-center justify-center shadow-float`}>
                 <entry.icon size={22} className="text-white" />
               </div>
-              <span className="text-caption font-medium text-text-primary">{entry.label}</span>
+              <span className="text-caption font-medium text-text-primary text-center">{entry.label}</span>
             </button>
           ))}
         </div>
@@ -205,15 +205,15 @@ const Invite = () => {
         {/* 已邀请好友列表 */}
         <div className="mb-5">
           <h3 className="text-subtitle font-bold text-text-primary mb-4">已邀请好友</h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {invitedFriends.map((friend) => (
               <div key={friend.id} className="white-card p-4 card-scroll">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <img src={friend.avatar} alt={friend.nickname} className="w-12 h-12 rounded-card-task" />
+                    <img src={friend.avatar} alt={friend.nickname} className="w-12 h-12 rounded-card-task flex-shrink-0" />
                     <div>
-                      <p className="text-body font-medium text-text-primary">{friend.nickname}</p>
-                      <p className="text-caption text-text-tertiary">{friend.registerTime}</p>
+                      <p className="text-body font-medium text-text-primary leading-5">{friend.nickname}</p>
+                      <p className="text-caption text-text-tertiary leading-5">{friend.registerTime}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -226,7 +226,7 @@ const Invite = () => {
                         待完成首单
                       </span>
                     )}
-                    <p className="text-subtitle font-bold text-profit-red">+{formatCurrency(friend.totalReward)}</p>
+                    <p className="text-subtitle font-bold text-profit-red leading-6">+{formatCurrency(friend.totalReward)}</p>
                   </div>
                 </div>
               </div>

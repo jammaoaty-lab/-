@@ -54,19 +54,19 @@ const PublishManage = () => {
   return (
     <div className="min-h-screen page-background pb-32">
       {/* 顶部导航栏 */}
-      <div className="px-5 pt-14 pb-6">
+      <div className="safe-area pt-14 pb-6">
         <h1 className="text-title font-bold text-text-primary text-center">任务发布管理</h1>
       </div>
 
-      <div className="px-5">
-        {/* 资金卡片 */}
-        <div className="p-5 mb-5 rounded-card-large" style={{ background: 'linear-gradient(135deg, #F8FCFF 0%, #E6F7FF 100%)' }}>
+      <div className="safe-area">
+        {/* 资金卡片 - 左右分栏对齐、按钮高度统一 */}
+        <div className="module-spacing card-padding rounded-card-large" style={{ background: 'linear-gradient(135deg, #F8FCFF 0%, #E6F7FF 100%)' }}>
           <div className="flex justify-between items-start mb-4">
-            <div>
+            <div className="flex flex-col justify-center">
               <p className="text-body text-text-secondary mb-1">发单账户余额</p>
-              <p className="text-3xl font-bold" style={{ color: '#00C8E0' }}>{formatCurrency(user?.balance || 0)}</p>
+              <p className="text-amount" style={{ color: '#00C8E0' }}>{formatCurrency(user?.balance || 0)}</p>
             </div>
-            <div className="text-right">
+            <div className="text-right flex flex-col justify-center">
               <p className="text-body text-text-secondary mb-1">上架中任务</p>
               <p className="text-title font-bold" style={{ color: '#10B981' }}>2个</p>
             </div>
@@ -76,7 +76,7 @@ const PublishManage = () => {
             <Button 
               variant="outline" 
               size="md"
-              className="flex-1"
+              className="flex-1 btn-height-md"
               onClick={() => navigate('/wallet')}
             >
               账户充值
@@ -84,7 +84,7 @@ const PublishManage = () => {
             <Button 
               variant="primary" 
               size="md"
-              className="flex-1"
+              className="flex-1 btn-height-md"
               onClick={() => navigate('/wallet')}
             >
               提现余额
@@ -92,14 +92,14 @@ const PublishManage = () => {
           </div>
         </div>
 
-        {/* 状态筛选Tab */}
-        <div className="mb-5 overflow-x-auto pb-2 -mx-5 px-5">
+        {/* 状态筛选Tab - 宽度均分、高度统一 */}
+        <div className="module-spacing overflow-x-auto pb-2">
           <div className="flex gap-2 min-w-max">
             {statusTabs.map((status) => (
               <button
                 key={status}
                 onClick={() => setSelectedStatus(status)}
-                className={`px-5 py-2 capsule-btn text-body font-medium transition-all duration-200 whitespace-nowrap ${
+                className={`px-4 py-2.5 capsule-btn text-body font-medium transition-all duration-200 whitespace-nowrap btn-height-md ${
                   selectedStatus === status
                     ? 'primary-gradient text-white shadow-float'
                     : 'bg-white text-text-tertiary shadow-card btn-press'
@@ -111,11 +111,11 @@ const PublishManage = () => {
           </div>
         </div>
 
-        {/* 已发布任务列表 */}
+        {/* 已发布任务列表 - 内边距统一、按钮尺寸一致 */}
         {publishedTasks.length > 0 ? (
           <div className="space-y-4">
             {publishedTasks.map((task) => (
-              <div key={task.id} className="white-card p-5 task-card-shadow btn-press">
+              <div key={task.id} className="white-card card-padding task-card-shadow btn-press">
                 <div className="flex justify-between items-start gap-4 mb-4">
                   <div className="flex-1 min-w-0">
                     <h3 className="text-title font-semibold text-text-primary mb-2 line-clamp-2">
@@ -130,7 +130,7 @@ const PublishManage = () => {
                       </span>
                     </div>
                   </div>
-                  <span className={`px-3 py-1 tag-round text-xs font-medium ${getStatusColor(task.status)}`}>
+                  <span className={`px-3 py-1 tag-round text-xs font-medium flex-shrink-0 ${getStatusColor(task.status)}`}>
                     {getStatusText(task.status)}
                   </span>
                 </div>
@@ -139,7 +139,7 @@ const PublishManage = () => {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 btn-height-sm"
                   >
                     <Edit size={16} />
                     编辑
@@ -147,7 +147,7 @@ const PublishManage = () => {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    className="flex items-center gap-2 text-profit-red border-red-300"
+                    className="flex items-center gap-2 text-profit-red border-red-300 btn-height-sm"
                   >
                     <Trash2 size={16} />
                     下架
@@ -177,8 +177,8 @@ const PublishManage = () => {
         )}
       </div>
 
-      {/* 右上角悬浮创建按钮 */}
-      <div className="fixed right-5 bottom-28 z-40">
+      {/* 右下角悬浮创建按钮 - 位置适中 */}
+      <div className="fixed right-4 bottom-28 z-40">
         <button
           onClick={() => navigate('/create-task')}
           className="w-14 h-14 primary-gradient rounded-full flex items-center justify-center shadow-float btn-press"

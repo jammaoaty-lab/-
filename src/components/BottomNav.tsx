@@ -28,9 +28,9 @@ const BottomNav = () => {
       {/* 顶部轻量分割线 */}
       <div className="h-[0.5px] bg-gray-100" />
       
-      {/* 导航栏主体 */}
+      {/* 导航栏主体 - 宽度均分、图标文字对齐 */}
       <div className="bg-white">
-        <div className="flex justify-around items-center py-2 px-1 pb-8">
+        <div className="flex justify-center items-center py-2 pb-8">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             
@@ -41,7 +41,7 @@ const BottomNav = () => {
                   setCurrentTab(tab.id);
                   navigate(tab.path);
                 }}
-                className={`flex flex-col items-center gap-1 px-2 py-2 rounded-xl transition-all duration-200 btn-press ${
+                className={`flex-1 flex flex-col items-center justify-center gap-1 py-2 transition-all duration-200 btn-press ${
                   isActive ? 'bg-primary/5' : ''
                 }`}
               >
@@ -53,7 +53,7 @@ const BottomNav = () => {
                   />
                 </div>
                 <span
-                  className={`text-xs font-medium transition-all duration-200 ${
+                  className={`text-caption font-medium transition-all duration-200 text-center ${
                     isActive 
                       ? 'text-primary' 
                       : 'text-text-tertiary'

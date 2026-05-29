@@ -149,18 +149,18 @@ const TaskSquare = () => {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* 顶部状态栏 + 欢迎昵称栏 */}
-      <div className="px-5 pt-14 pb-6">
-        <div className="flex items-center justify-between mb-4">
+      {/* 顶部状态栏 + 欢迎昵称栏 - 安全边距 */}
+      <div className="safe-area pt-14 pb-6">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100">
+            <div className="avatar-md rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
               <img
                 src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'}
                 alt="头像"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div>
+            <div className="flex flex-col justify-center">
               <h2 className="text-title font-bold text-text-primary">Hi {user?.name || '用户'}</h2>
               <p className="text-body text-text-secondary">欢迎来到众包任务</p>
             </div>
@@ -169,7 +169,7 @@ const TaskSquare = () => {
           <div className="flex items-center gap-2">
             <button 
               onClick={handleRefresh}
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-white shadow-card btn-press"
+              className="w-10 h-10 rounded-card-large flex items-center justify-center bg-white shadow-card btn-press"
             >
               {isRefreshing ? (
                 <Loader2 size={20} className="text-primary animate-spin" />
@@ -179,7 +179,7 @@ const TaskSquare = () => {
             </button>
             <button 
               onClick={() => setShowSignIn(true)}
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-white shadow-card btn-press relative"
+              className="w-10 h-10 rounded-card-large flex items-center justify-center bg-white shadow-card btn-press relative"
             >
               <Bell size={20} className="text-text-tertiary" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full" />
@@ -188,16 +188,16 @@ const TaskSquare = () => {
         </div>
       </div>
 
-      <div className="px-5">
-        {/* 1. 通栏系统公告滚动栏 */}
+      <div className="safe-area">
+        {/* 1. 通栏系统公告滚动栏 - 高度精简 */}
         {showAnnouncement && (
           <div 
-            className="mb-5 rounded-card-large p-4 bg-tag-primary cursor-pointer card-scroll"
+            className="module-spacing rounded-card-large p-3 bg-tag-primary cursor-pointer card-scroll"
             onClick={() => navigate('/announcement')}
           >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div className="flex-shrink-0">
-                <Megaphone size={20} className="text-primary" />
+                <Megaphone size={18} className="text-primary" />
               </div>
               <div className="flex-1 overflow-hidden">
                 <div className="whitespace-nowrap text-text-secondary text-body">
@@ -220,62 +220,62 @@ const TaskSquare = () => {
           </div>
         )}
 
-        {/* 2. 横向四宫格功能瓷片区 */}
-        <div className="grid grid-cols-4 gap-3 mb-5">
+        {/* 2. 横向四宫格功能瓷片区 - 宽度均分、高度一致 */}
+        <div className="grid grid-cols-4 gap-3 module-spacing">
           <button 
             onClick={() => navigate('/my-tasks')}
-            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
+            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press aspect-[3/4]"
           >
             <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: '#D1F0F5' }}>
               <MessageSquare size={22} style={{ color: '#4A98A8' }} />
             </div>
-            <span className="text-caption font-medium text-text-primary">我的任务</span>
+            <span className="text-caption font-medium text-text-primary text-center">我的任务</span>
           </button>
 
           <button 
             onClick={() => navigate('/publish')}
-            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
+            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press aspect-[3/4]"
           >
             <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: '#E1F3E8' }}>
               <Gift size={22} style={{ color: '#4CAF7E' }} />
             </div>
-            <span className="text-caption font-medium text-text-primary">发布任务</span>
+            <span className="text-caption font-medium text-text-primary text-center">发布任务</span>
           </button>
 
           <button 
             onClick={() => navigate('/invite')}
-            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
+            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press aspect-[3/4]"
           >
             <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: '#FDECE3' }}>
               <Users size={22} style={{ color: '#E67E50' }} />
             </div>
-            <span className="text-caption font-medium text-text-primary">邀请好友</span>
+            <span className="text-caption font-medium text-text-primary text-center">邀请好友</span>
           </button>
 
           <button 
             onClick={() => navigate('/wallet')}
-            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
+            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press aspect-[3/4]"
           >
             <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: '#EBE5F6' }}>
               <Wallet size={22} style={{ color: '#9B7CCD' }} />
             </div>
-            <span className="text-caption font-medium text-text-primary">在线客服</span>
+            <span className="text-caption font-medium text-text-primary text-center">在线客服</span>
           </button>
         </div>
 
-        {/* 3. 通栏新人奖励Banner（深色运营卡片） */}
+        {/* 3. 通栏新人奖励Banner（深色运营卡片） - 排版紧凑 */}
         {showNewUserBanner && !hasClaimedNewUserReward && (
           <div 
-            className="mb-5 dark-banner p-5 cursor-pointer card-scroll"
+            className="module-spacing dark-banner p-4 cursor-pointer card-scroll"
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="relative">
                   <span className="inline-block px-3 py-1 bg-primary/20 text-primary text-caption font-bold tag-round">新人专属</span>
                 </div>
                 <div>
                   <p className="text-caption text-gray-400 mb-1">新用户注册奖励</p>
-                  <p className="text-3xl font-bold text-profit-red">¥50.00</p>
+                  <p className="text-amount text-profit-red">¥50.00</p>
                 </div>
               </div>
               <Button 
@@ -290,7 +290,7 @@ const TaskSquare = () => {
         )}
 
         {/* 4. 深色科技风运营Banner */}
-        <div className="mb-5 p-5 card-scroll relative overflow-hidden rounded-card-large" style={{ background: 'linear-gradient(135deg, #1A2333 0%, #0F172A 50%, #1E293B 100%)' }}>
+        <div className="module-spacing p-4 card-scroll relative overflow-hidden rounded-card-large" style={{ background: 'linear-gradient(135deg, #1A2333 0%, #0F172A 50%, #1E293B 100%)' }}>
           {/* 多彩渐变光晕背景 */}
           <div className="absolute -top-10 -left-10 w-32 h-32 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #00C8E0 0%, transparent 70%)' }}></div>
           <div className="absolute -bottom-8 -right-8 w-28 h-28 rounded-full opacity-15" style={{ background: 'radial-gradient(circle, #10B981 0%, transparent 70%)' }}></div>
@@ -357,14 +357,14 @@ const TaskSquare = () => {
           </div>
         </div>
 
-        {/* 分类筛选横向胶囊标签栏 */}
-        <div className="mb-5 overflow-x-auto pb-2 -mx-5 px-5">
+        {/* 分类筛选横向胶囊标签栏 - 高度统一 */}
+        <div className="module-spacing overflow-x-auto pb-2">
           <div className="flex gap-2 min-w-max">
             {categories.map((category) => (
               <button
                 key={category.name}
                 onClick={() => setSelectedCategory(category.name)}
-                className={`px-5 py-2 capsule-btn text-body font-medium transition-all duration-200 whitespace-nowrap ${
+                className={`px-4 py-2.5 capsule-btn text-body font-medium transition-all duration-200 whitespace-nowrap btn-height-md ${
                   selectedCategory === category.name
                     ? 'primary-gradient text-white shadow-float'
                     : ''
@@ -379,7 +379,7 @@ const TaskSquare = () => {
 
         {/* 刷新提示 */}
         {isRefreshing && (
-          <div className="text-center py-3 mb-4">
+          <div className="text-center py-3 module-spacing">
             <div className="inline-flex items-center gap-2 text-primary text-body">
               <Loader2 size={16} className="animate-spin" />
               <span>正在刷新任务...</span>
@@ -387,7 +387,7 @@ const TaskSquare = () => {
           </div>
         )}
 
-        {/* 任务列表单列瀑布流 */}
+        {/* 任务列表单列瀑布流 - 卡片间距统一 */}
         <div className="space-y-4 pb-4">
           {displayTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
