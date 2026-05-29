@@ -1,4 +1,4 @@
-import { ChevronRight, Wallet, Briefcase, FileText, Shield, Bell, MessageCircle, FileCheck, Clock, CheckCircle2, AlertCircle, XCircle, Timer } from 'lucide-react';
+import { ChevronRight, Wallet, Briefcase, FileText, Shield, Bell, MessageCircle, FileCheck, Clock, CheckCircle2, AlertCircle, XCircle, Timer, Users, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency } from '../utils/format';
@@ -127,18 +127,40 @@ const Profile = () => {
               </button>
               
               <button
-                onClick={() => navigate('/publish')}
-                className="p-5 bg-white rounded-2xl card-shadow hover:scale-[1.02] transition-all duration-300 text-left relative"
+                onClick={() => navigate('/invite')}
+                className="p-5 bg-white rounded-2xl card-shadow hover:scale-[1.02] transition-all duration-300 text-left relative active:scale-[0.97]"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-12 h-12 bg-[#22C55E] rounded-xl flex items-center justify-center">
-                    <Briefcase size={24} className="text-white" />
+                  <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #A855F7, #9333EA)' }}>
+                    <Users size={24} className="text-white" />
                   </div>
-                  <span className="px-3 py-1 bg-[#22C55E]/10 text-[#22C55E] text-xs font-bold rounded-full">
-                    2
+                  <span className="px-3 py-1 bg-[#A855F7]/10 text-[#A855F7] text-xs font-bold rounded-full">
+                    ¥256
                   </span>
                 </div>
-                <p className="text-sm font-semibold text-slate-700">我发布的任务</p>
+                <p className="text-sm font-semibold text-slate-700">好友邀请</p>
+                <p className="text-xs text-slate-400 mt-1">已邀12人，赚不停</p>
+              </button>
+            </div>
+            
+            {/* 第二行：发布任务入口 */}
+            <div className="mb-6">
+              <button
+                onClick={() => navigate('/publish')}
+                className="w-full p-5 bg-white rounded-2xl card-shadow hover:scale-[1.01] transition-all duration-300 text-left relative active:scale-[0.98]"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-[#22C55E] rounded-xl flex items-center justify-center">
+                      <Briefcase size={24} className="text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-700">我发布的任务</p>
+                      <p className="text-xs text-slate-400 mt-1">2个进行中</p>
+                    </div>
+                  </div>
+                  <ChevronRight size={20} className="text-slate-400" />
+                </div>
               </button>
             </div>
             

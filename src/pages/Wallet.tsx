@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, History, Plus, Minus, ChevronRight } from 'lucide-react';
+import { ArrowLeft, History, Plus, Minus, ChevronRight, Users, Gift } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency } from '../utils/format';
@@ -13,12 +13,24 @@ const Wallet = () => {
 
   const tabs = ['全部流水', '任务收入', '发单支出', '邀请奖励', '充值记录', '提现记录'];
 
-  const transactionList = [
-    { id: '1', type: 'income', amount: 5.5, description: 'APP注册任务奖励', time: '2024-12-15 10:30' },
-    { id: '2', type: 'income', amount: 3.0, description: '问卷调查奖励', time: '2024-12-14 15:20' },
-    { id: '3', type: 'expense', amount: 100.0, description: '提现到微信', time: '2024-12-13 09:15' },
-    { id: '4', type: 'income', amount: 3.0, description: '邀请好友奖励', time: '2024-12-12 18:45' },
-  ];
+  // 根据选中的Tab过滤流水
+  const getFilteredTransactions = () => {
+    const allTransactions = [
+      { id: '1', type: 'income', category: '任务收入', amount: 5.5, description: 'APP注册任务奖励', time: '2024-12-15 10:30' },
+      { id: '2', type: 'income', category: '任务收入', amount: 3.0, description: '问卷调查奖励', time: '2024-12-14 15:20' },
+      { id: '3', type: 'income', category: '邀请奖励', amount: 10.0, description: '好友【小明】注册并完成首单', time: '2024-12-14 14:10' },
+      { id: '4', type: 'income', category: '邀请奖励', amount: 5.0, description: '好友【小红】完成任务佣金', time: '2024-12-13 20:30' },
+      { id: '5', type: 'expense', category: '提现记录', amount: 100.0, description: '提现到微信', time: '2024-12-13 09:15' },
+      { id: '6', type: 'income', category: '邀请奖励', amount: 3.0, description: '好友【小刚】注册奖励', time: '2024-12-12 18:45' },
+    ];
+    
+    if (selectedTab === '全部流水') {
+      return allTransactions;
+    }
+    return allTransactions.filter(t => t.category === selectedTab);
+  };
+  
+  const transactionList = getFilteredTransactions();
 
   return (
     <div className="min-h-screen bg-[#F2F7FF] pb-8">
@@ -146,6 +158,29 @@ const Wallet = () => {
             查看更多 <ChevronRight size={16} className="inline" />
           </button>
         )}
+      </div>
+      
+      {/* 底部邀请引导 */}
+      <div className="px-5 pb-24 mt-8">
+        <button
+          onClick={() => navigate('/invite')}
+          className="w-full glass-effect neon-border rounded-2xl p-5 flex items-center justify-between hover:scale-[1.01] transition-all duration-300 active:scale-[0.98]"
+          style={{ background: 'linear-gradient(135deg, rgba(168,85,247,0.15), rgba(147,51,234,0.08))' }}
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center glow-effect" style={{ background: 'linear-gradient(135deg, #A855F7, #9333EA)' }}>
+              <Gift size={24} className="text-white" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-slate-800">邀请好友赚现金</p>
+              <p className="text-xs text-slate-500 mt-1">邀请好友注册并完成任务，双方都得现金</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-bold gold-text">¥256</span>
+            <ChevronRight size={20} className="text-slate-400" />
+          </div>
+        </button>
       </div>
     </div>
   );

@@ -251,6 +251,12 @@ const TaskSquare = () => {
               <Users size={22} className="text-white" />
             </div>
             <span className="text-xs font-medium text-slate-700">邀请好友</span>
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-slate-400">已邀</span>
+              <span className="text-xs font-bold gold-text">12人</span>
+              <span className="text-xs text-slate-400">收益</span>
+              <span className="text-xs font-bold gold-text">¥256</span>
+            </div>
           </button>
         </div>
 
