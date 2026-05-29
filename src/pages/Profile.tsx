@@ -1,4 +1,4 @@
-import { ChevronRight, Wallet, Briefcase, FileText, Settings, Shield, Bell, MessageCircle, FileCheck } from 'lucide-react';
+import { ChevronRight, Wallet, Briefcase, FileText, Shield, Bell, MessageCircle, FileCheck, Clock, CheckCircle2, AlertCircle, XCircle, Timer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency } from '../utils/format';
@@ -9,9 +9,13 @@ const Profile = () => {
   const navigate = useNavigate();
   const { user } = useStore();
 
-  const workspaceItems = [
-    { icon: Briefcase, label: '我参与的悬赏任务', count: 5 },
-    { icon: Briefcase, label: '我发布的任务', count: 2 },
+  // 接单状态数据
+  const taskStatuses = [
+    { id: 'in_progress', label: '进行中任务', count: 3, icon: Clock, color: '#36B0FF' },
+    { id: 'under_review', label: '审核中任务', count: 2, icon: CheckCircle2, color: '#FFD266' },
+    { id: 'pending_settlement', label: '待结算任务', count: 5, icon: AlertCircle, color: '#22C55E' },
+    { id: 'rejected', label: '已驳回任务', count: 1, icon: XCircle, color: '#EF4444' },
+    { id: 'timeout', label: '已超时任务', count: 0, icon: Timer, color: '#6B7280' },
   ];
 
   const financialItems = [
@@ -27,34 +31,48 @@ const Profile = () => {
     { icon: FileCheck, label: '隐私政策' },
   ];
 
+  // 点击状态卡片跳转
+  const handleStatusClick = (statusId: string) => {
+    // 这里可以传递状态参数，示例直接跳转到任务广场
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-[#F2F7FF] pb-24">
-      {/* 顶部个人信息区域 */}
+      {/* 顶部头部磨砂渐变栏 */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 primary-gradient opacity-10" />
-        <div className="px-5 pt-12 pb-8">
+        <div className="absolute inset-0 primary-gradient opacity-15" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-[#36B0FF]/20 rounded-full blur-3xl" />
+        
+        <div className="px-5 pt-12 pb-8 relative">
           <div className="flex items-center gap-4">
-            <div className="relative">
-              <img
-                src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'}
-                alt="头像"
-                className="w-16 h-16 rounded-2xl object-cover"
-              />
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#36B0FF] rounded-full flex items-center justify-center">
-                <span className="text-white text-xs">✓</span>
+            {/* 左侧圆形头像框 */}
+            <div className="relative flex-shrink-0">
+              <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/50 shadow-lg">
+                <img
+                  src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'}
+                  alt="头像"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 primary-gradient rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white text-xs font-bold">✓</span>
               </div>
             </div>
             
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-slate-800 mb-1">{user?.name}</h2>
+            {/* 中间账号信息 */}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-bold text-slate-800 mb-1 truncate">{user?.name}</h2>
               <p className="text-sm text-slate-500">入驻时间: {user?.joinDate}</p>
             </div>
             
+            {/* 右上角悬浮蓝色发光按钮 */}
             <Button 
               variant="primary" 
               size="sm"
+              isGlow
               onClick={() => navigate('/wallet')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 shadow-xl"
             >
               <Wallet size={18} />
               我的钱包
@@ -64,47 +82,82 @@ const Profile = () => {
       </div>
 
       <div className="px-5">
-        {/* 总资产卡片 */}
-        <GlassCard className="p-6 mb-6 text-center" hasNeonBorder>
+        {/* 总资产玻璃卡片 */}
+        <GlassCard className="p-8 mb-6 text-center" hasNeonBorder>
           <p className="text-sm text-slate-500 mb-2">钱包总资产</p>
-          <p className="text-4xl font-bold gold-text mb-4">{formatCurrency(user?.balance || 0)}</p>
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div>
-              <p className="text-xs text-slate-500 mb-1">可用余额</p>
-              <p className="text-lg font-semibold text-[#0F56E8]">{formatCurrency((user?.balance || 0) - (user?.frozenBalance || 0))}</p>
+          <p className="text-5xl font-bold gold-text mb-6">{formatCurrency(user?.balance || 0)}</p>
+          
+          <div className="grid grid-cols-2 gap-6">
+            <div className="text-center">
+              <p className="text-xs text-slate-500 mb-2">可用余额</p>
+              <p className="text-xl font-bold text-[#0F56E8]">
+                {formatCurrency((user?.balance || 0) - (user?.frozenBalance || 0))}
+              </p>
             </div>
-            <div>
-              <p className="text-xs text-slate-500 mb-1">冻结金额</p>
-              <p className="text-lg font-semibold text-slate-500">{formatCurrency(user?.frozenBalance || 0)}</p>
+            <div className="text-center">
+              <p className="text-xs text-slate-500 mb-2">冻结金额</p>
+              <p className="text-xl font-bold text-slate-500">
+                {formatCurrency(user?.frozenBalance || 0)}
+              </p>
             </div>
           </div>
         </GlassCard>
 
-        {/* 工作台 */}
+        {/* 【我的工作台】磨砂分组大卡片 */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-slate-800 mb-4">我的工作台</h3>
-          <GlassCard className="overflow-hidden">
-            {workspaceItems.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={index}
-                  className="w-full px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors"
-                  onClick={() => item.label.includes('发布') ? navigate('/publish') : null}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 primary-gradient rounded-xl flex items-center justify-center">
-                      <Icon size={20} className="text-white" />
-                    </div>
-                    <span className="text-slate-700">{item.label}</span>
+          
+          <GlassCard className="p-5" hasNeonBorder>
+            {/* 第一行：左右均分两大功能入口卡片 */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <button
+                onClick={() => navigate('/')}
+                className="p-5 bg-white rounded-2xl card-shadow hover:scale-[1.02] transition-all duration-300 text-left relative"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-12 h-12 primary-gradient rounded-xl flex items-center justify-center">
+                    <Briefcase size={24} className="text-white" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-slate-400">{item.count}</span>
-                    <ChevronRight size={20} className="text-slate-400" />
+                  <span className="px-3 py-1 bg-[#36B0FF]/10 text-[#36B0FF] text-xs font-bold rounded-full">
+                    11
+                  </span>
+                </div>
+                <p className="text-sm font-semibold text-slate-700">我参与的悬赏任务</p>
+              </button>
+              
+              <button
+                onClick={() => navigate('/publish')}
+                className="p-5 bg-white rounded-2xl card-shadow hover:scale-[1.02] transition-all duration-300 text-left relative"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="w-12 h-12 bg-[#22C55E] rounded-xl flex items-center justify-center">
+                    <Briefcase size={24} className="text-white" />
                   </div>
-                </button>
-              );
-            })}
+                  <span className="px-3 py-1 bg-[#22C55E]/10 text-[#22C55E] text-xs font-bold rounded-full">
+                    2
+                  </span>
+                </div>
+                <p className="text-sm font-semibold text-slate-700">我发布的任务</p>
+              </button>
+            </div>
+            
+            {/* 第二行：接单状态横向统计面板 */}
+            <div className="grid grid-cols-5 gap-3">
+              {taskStatuses.map((status) => {
+                const Icon = status.icon;
+                return (
+                  <button
+                    key={status.id}
+                    onClick={() => handleStatusClick(status.id)}
+                    className="glass-effect p-4 rounded-2xl neon-border hover:scale-[1.05] transition-all duration-300 text-center"
+                  >
+                    <Icon size={24} style={{ color: status.color }} className="mx-auto mb-2" />
+                    <p className="text-xs font-bold text-slate-800 mb-1">{status.label}</p>
+                    <p className="text-lg font-bold" style={{ color: status.color }}>{status.count}</p>
+                  </button>
+                );
+              })}
+            </div>
           </GlassCard>
         </div>
 
