@@ -283,39 +283,66 @@ const TaskSquare = () => {
         )}
 
         {/* 4. 深色科技风运营Banner */}
-        <div className="mb-5 dark-banner p-5 card-scroll relative overflow-hidden">
-          {/* 微弱粒子光点背景 */}
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute top-3 left-8 w-2 h-2 rounded-full bg-primary animate-pulse"></div>
-            <div className="absolute top-6 right-12 w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
-            <div className="absolute bottom-8 left-20 w-1 h-1 rounded-full bg-primary animate-pulse"></div>
-            <div className="absolute bottom-4 right-6 w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-            <div className="absolute top-12 right-24 w-1 h-1 rounded-full bg-primary animate-pulse"></div>
+        <div className="mb-5 p-5 card-scroll relative overflow-hidden rounded-card-large" style={{ background: 'linear-gradient(135deg, #1A2333 0%, #0F172A 50%, #1E293B 100%)' }}>
+          {/* 多彩渐变光晕背景 */}
+          <div className="absolute -top-10 -left-10 w-32 h-32 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, #00C8E0 0%, transparent 70%)' }}></div>
+          <div className="absolute -bottom-8 -right-8 w-28 h-28 rounded-full opacity-15" style={{ background: 'radial-gradient(circle, #10B981 0%, transparent 70%)' }}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full opacity-10" style={{ background: 'radial-gradient(circle, #F59E0B 0%, transparent 70%)' }}></div>
+          
+          {/* 丰富粒子光点背景 */}
+          <div className="absolute inset-0">
+            <div className="absolute top-3 left-8 w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse shadow-lg shadow-cyan-400/50"></div>
+            <div className="absolute top-8 right-16 w-2 h-2 rounded-full bg-lime-400 animate-pulse shadow-lg shadow-lime-400/50"></div>
+            <div className="absolute bottom-10 left-24 w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse shadow-lg shadow-amber-400/50"></div>
+            <div className="absolute bottom-6 right-10 w-2 h-2 rounded-full bg-violet-400 animate-pulse shadow-lg shadow-violet-400/50"></div>
+            <div className="absolute top-16 right-32 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-400/50"></div>
+            <div className="absolute top-6 left-1/3 w-1 h-1 rounded-full bg-pink-400 animate-pulse"></div>
+            <div className="absolute bottom-16 right-1/4 w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></div>
+            <div className="absolute top-1/2 left-16 w-1 h-1 rounded-full bg-yellow-400 animate-pulse"></div>
           </div>
           
           <div className="relative z-10 flex items-center justify-between">
             {/* 左侧文案 */}
             <div className="flex-1">
-              <h3 className="text-title font-bold text-lime-400 mb-2">全民悬赏接单平台</h3>
-              <p className="text-body text-gray-400">海量正规任务，完成即可现金结算提现</p>
+              <h3 className="text-title font-bold mb-2" style={{ 
+                background: 'linear-gradient(90deg, #00C8E0, #10B981, #F59E0B)', 
+                WebkitBackgroundClip: 'text', 
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>全民悬赏接单平台</h3>
+              <p className="text-body text-gray-300">海量正规任务，完成即可现金结算提现</p>
             </div>
             
             {/* 右侧科技简约配图 */}
-            <div className="ml-4 flex items-center gap-3">
-              <div className="w-16 h-16 rounded-card-large bg-primary/10 flex items-center justify-center border border-primary/30">
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex gap-1">
-                    <div className="w-3 h-3 rounded-full bg-primary"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                  </div>
-                  <div className="flex gap-1">
-                    <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                    <div className="w-3 h-3 rounded-full bg-primary"></div>
-                  </div>
+            <div className="ml-4 flex items-center gap-4">
+              <div className="w-20 h-20 rounded-card-large flex items-center justify-center relative" style={{ 
+                background: 'linear-gradient(145deg, rgba(0,200,224,0.15) 0%, rgba(16,185,129,0.1) 100%)',
+                border: '1px solid rgba(0,200,224,0.3)',
+                boxShadow: '0 0 20px rgba(0,200,224,0.2), inset 0 0 20px rgba(0,200,224,0.05)'
+              }}>
+                {/* 科技感网格 */}
+                <div className="grid grid-cols-3 grid-rows-3 gap-1.5">
+                  <div className="w-4 h-4 rounded-full bg-cyan-400/80 shadow-lg shadow-cyan-400/50"></div>
+                  <div className="w-4 h-4 rounded-full bg-lime-400/80 shadow-lg shadow-lime-400/50"></div>
+                  <div className="w-4 h-4 rounded-full bg-amber-400/80 shadow-lg shadow-amber-400/50"></div>
+                  <div className="w-4 h-4 rounded-full bg-violet-400/80 shadow-lg shadow-violet-400/50"></div>
+                  <div className="w-4 h-4 rounded-full bg-emerald-400/80 shadow-lg shadow-emerald-400/50"></div>
+                  <div className="w-4 h-4 rounded-full bg-sky-400/80 shadow-lg shadow-sky-400/50"></div>
+                  <div className="w-4 h-4 rounded-full bg-pink-400/80 shadow-lg shadow-pink-400/50"></div>
+                  <div className="w-4 h-4 rounded-full bg-yellow-400/80 shadow-lg shadow-yellow-400/50"></div>
+                  <div className="w-4 h-4 rounded-full bg-fuchsia-400/80 shadow-lg shadow-fuchsia-400/50"></div>
                 </div>
+                
+                {/* 连接线条 */}
+                <svg className="absolute inset-0 w-full h-full opacity-30" viewBox="0 0 80 80">
+                  <line x1="15" y1="15" x2="65" y2="65" stroke="#00C8E0" strokeWidth="1"/>
+                  <line x1="65" y1="15" x2="15" y2="65" stroke="#10B981" strokeWidth="1"/>
+                  <line x1="40" y1="10" x2="40" y2="70" stroke="#F59E0B" strokeWidth="0.5"/>
+                </svg>
               </div>
-              <div className="text-gray-500">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              
+              <div className="text-gray-400 hover:text-cyan-400 transition-colors duration-300">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M9 18l6-6-6-6"/>
                 </svg>
               </div>
