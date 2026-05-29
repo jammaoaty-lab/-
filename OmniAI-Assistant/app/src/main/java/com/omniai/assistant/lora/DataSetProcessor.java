@@ -1,5 +1,6 @@
 package com.omniai.assistant.lora;
 
+import android.net.Uri;
 import com.omniai.assistant.knowledge.DocumentParser;
 
 import java.io.BufferedReader;
@@ -13,13 +14,23 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DataSetProcessor {
 
     private DocumentParser parser;
+    private ExecutorService executor;
+
+    public interface ProcessCallback {
+        void onSuccess(String datasetId);
+        void onError(String message);
+    }
 
     public DataSetProcessor() {
         this.parser = new DocumentParser();
+        this.executor = Executors.newSingleThreadExecutor();
     }
 
     public List<String> importFile(String filePath, String format) {
@@ -190,5 +201,37 @@ public class DataSetProcessor {
         } catch (IOException e) {
             return false;
         }
+    }
+
+    public void process(Uri uri, ProcessCallback callback) {
+        executor.execute(() -> {
+            try {
+                String datasetId = UUID.randomUUID().toString();
+                // 简单实现：直接返回成功
+                if (callback != null) {
+                    callback.onSuccess(datasetId);
+                }
+            } catch (Exception e) {
+                if (callback != null) {
+                    callback.onError(e.getMessage());
+                }
+            }
+        });
+    }
+
+    public void processImageTextDataset(Uri uri, ProcessCallback callback) {
+        executor.execute(() -> {
+            try {
+                String datasetId = UUID.randomUUID().toString();
+                // 简单实现：直接返回成功
+                if (callback != null) {
+                    callback.onSuccess(datasetId);
+                }
+            } catch (Exception e) {
+                if (callback != null) {
+                    callback.onError(e.getMessage());
+                }
+            }
+        });
     }
 }

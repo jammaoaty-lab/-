@@ -2,6 +2,15 @@ package com.omniai.assistant.model;
 
 public class AIModel {
 
+    public static final String STATUS_IDLE = "idle";
+    public static final String STATUS_LOADED = "loaded";
+    public static final String STATUS_RUNNING = "running";
+    public static final String STATUS_GPU = "gpu";
+    public static final String STATUS_LORA = "lora";
+    
+    public static final String MODEL_TYPE_VISION = "VISION";
+    public static final String MODEL_TYPE_TEXT = "TEXT";
+
     private String id;
     private String name;
     private String filePath;
@@ -21,6 +30,8 @@ public class AIModel {
     private String downloadUrl;
     private String expectedHash;
     private long downloadSize;
+    private boolean isEnabled;
+    private String status;
 
     public AIModel() {
         this.isLoaded = false;
@@ -29,6 +40,8 @@ public class AIModel {
         this.hasLora = false;
         this.loraScale = 1.0f;
         this.encrypted = false;
+        this.isEnabled = false;
+        this.status = STATUS_IDLE;
     }
 
     public AIModel(String id, String name, String filePath, long fileSize, String quantType, boolean isLoaded, boolean isRunning, boolean gpuAccelerated, boolean hasLora, String loraPath, float loraScale) {
@@ -195,5 +208,31 @@ public class AIModel {
 
     public void setDownloadSize(long downloadSize) {
         this.downloadSize = downloadSize;
+    }
+
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
+    public String getStatus() {
+        if (this.isRunning) {
+            return STATUS_RUNNING;
+        } else if (this.isLoaded) {
+            return STATUS_LOADED;
+        } else if (this.gpuAccelerated) {
+            return STATUS_GPU;
+        } else if (this.hasLora) {
+            return STATUS_LORA;
+        } else {
+            return STATUS_IDLE;
+        }
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

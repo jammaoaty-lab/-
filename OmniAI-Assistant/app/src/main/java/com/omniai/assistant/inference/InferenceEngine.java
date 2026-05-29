@@ -540,4 +540,14 @@ public class InferenceEngine {
         unloadModel();
         inferenceExecutor.shutdownNow();
     }
+
+    public void onLowMemory() {
+        unloadModel();
+        forceGc();
+    }
+
+    private void forceGc() {
+        System.gc();
+        System.runFinalization();
+    }
 }

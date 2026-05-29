@@ -77,6 +77,7 @@ set(LLAMA_SOURCES
     ${LLAMA_SRC_DIR}/llama-io.cpp
     ${LLAMA_SRC_DIR}/llama-kv-cache.cpp
     ${LLAMA_SRC_DIR}/llama-kv-cache-iswa.cpp
+    ${LLAMA_SRC_DIR}/llama-kv-cache-dsa.cpp
     ${LLAMA_SRC_DIR}/llama-memory.cpp
     ${LLAMA_SRC_DIR}/llama-memory-hybrid.cpp
     ${LLAMA_SRC_DIR}/llama-memory-hybrid-iswa.cpp

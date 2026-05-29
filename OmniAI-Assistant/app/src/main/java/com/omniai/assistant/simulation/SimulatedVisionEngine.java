@@ -76,7 +76,7 @@ public class SimulatedVisionEngine {
     }
 
     public void loadModel(AIModel model, final LoadCallback callback) {
-        if (isModelLoaded && currentModel != null && currentModel.id.equals(model.id)) {
+        if (isModelLoaded && currentModel != null && currentModel.getId().equals(model.getId())) {
             if (callback != null) {
                 mainHandler.post(() -> callback.onSuccess());
             }
@@ -104,7 +104,7 @@ public class SimulatedVisionEngine {
 
             isModelLoaded = true;
             currentModel = model;
-            isQwenModel = model.id.contains("qwen") || model.id.contains("Qwen");
+            isQwenModel = model.getId().contains("qwen") || model.getId().contains("Qwen");
 
             mainHandler.post(() -> {
                 if (callback != null) {
@@ -249,22 +249,22 @@ public class SimulatedVisionEngine {
     public List<AIModel> getAvailableModels() {
         List<AIModel> models = new ArrayList<>();
         AIModel qwen2VL = new AIModel();
-        qwen2VL.id = "qwen3-vl-2b";
-        qwen2VL.name = "Qwen3-VL-2B";
-        qwen2VL.modelType = AIModel.MODEL_TYPE_VISION;
-        qwen2VL.isPreinstalled = true;
+        qwen2VL.setId("qwen3-vl-2b");
+        qwen2VL.setName("Qwen3-VL-2B");
+        qwen2VL.setModelType(AIModel.MODEL_TYPE_VISION);
+        qwen2VL.setPreinstalled(true);
         models.add(qwen2VL);
 
         AIModel qwen7VL = new AIModel();
-        qwen7VL.id = "qwen2.5-vl-7b";
-        qwen7VL.name = "Qwen2.5-VL-7B";
-        qwen7VL.modelType = AIModel.MODEL_TYPE_VISION;
+        qwen7VL.setId("qwen2.5-vl-7b");
+        qwen7VL.setName("Qwen2.5-VL-7B");
+        qwen7VL.setModelType(AIModel.MODEL_TYPE_VISION);
         models.add(qwen7VL);
 
         AIModel smol = new AIModel();
-        smol.id = "smolvlm2-256m";
-        smol.name = "SmolVLM2-256M";
-        smol.modelType = AIModel.MODEL_TYPE_VISION;
+        smol.setId("smolvlm2-256m");
+        smol.setName("SmolVLM2-256M");
+        smol.setModelType(AIModel.MODEL_TYPE_VISION);
         models.add(smol);
 
         return models;
@@ -272,7 +272,7 @@ public class SimulatedVisionEngine {
 
     public AIModel getDefaultModel() {
         for (AIModel model : getAvailableModels()) {
-            if (model.isPreinstalled) return model;
+            if (model.isPreinstalled()) return model;
         }
         return getAvailableModels().get(0);
     }

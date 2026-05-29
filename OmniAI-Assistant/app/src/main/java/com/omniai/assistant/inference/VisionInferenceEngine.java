@@ -9,7 +9,6 @@ import com.omniai.assistant.common.Constants;
 import com.omniai.assistant.model.AIModel;
 import com.omniai.assistant.nativebridge.LlamaBridge;
 import com.omniai.assistant.scheduler.InferenceParams;
-import com.omniai.assistant.settings.InferenceSpeedMode;
 import com.omniai.assistant.simulation.SimulatedVisionEngine;
 
 import java.util.ArrayList;

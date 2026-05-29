@@ -139,6 +139,10 @@ public class ThermalMonitor {
         return status;
     }
 
+    public void stop() {
+        // Empty for compatibility, already handled in VisionInferenceEngine
+    }
+
     public enum ThermalStatus {
         NORMAL,
         WARM,

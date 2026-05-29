@@ -222,4 +222,8 @@ public class CloudFallbackManager {
     public CloudInferenceClient getCloudClient() {
         return cloudClient;
     }
+
+    public void shutdown() {
+        // Empty for compatibility
+    }
 }

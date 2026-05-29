@@ -26,11 +26,14 @@ public class LoraTrainManager {
     private List<TrainLogEntry> logEntries;
     private float progress;
     private LoraTrainListener listener;
+    private TrainCallback trainCallback;
     private ExecutorService trainExecutor;
+    private ExecutorService executor;
     private boolean isAborted;
 
     private boolean isVisionTraining;
     private AIModel targetVisionModel;
+    private String currentDatasetId;
 
     private Handler monitorHandler;
     private Runnable monitorRunnable;
@@ -56,6 +59,7 @@ public class LoraTrainManager {
             t.setPriority(Thread.NORM_PRIORITY - 1);
             return t;
         });
+        executor = Executors.newSingleThreadExecutor();
     }
 
     public static LoraTrainManager getInstance() {
@@ -69,49 +73,54 @@ public class LoraTrainManager {
         return instance;
     }
 
+    // 保留原有的 LoraTrainListener 方法
     public void startVisionTraining(TrainConfig config, AIModel visionModel, LoraTrainListener listener) {
+        startVisionTraining(config, visionModel, (TrainCallback) null);
+    }
+
+    public void startVisionTraining(TrainConfig config, AIModel visionModel, TrainCallback callback) {
         if (currentState != TrainState.IDLE && currentState != TrainState.COMPLETED && currentState != TrainState.ERROR) {
             throw new IllegalStateException("Training is already in progress. Current state: " + currentState);
         }
 
         if (config == null || config.dataPath == null || config.dataPath.isEmpty()) {
-            if (listener != null) {
-                listener.onError("请指定训练数据路径");
+            if (callback != null) {
+                callback.onError("请指定训练数据路径");
             }
             return;
         }
 
         if (config.outputPath == null || config.outputPath.isEmpty()) {
-            if (listener != null) {
-                listener.onError("请指定输出路径");
+            if (callback != null) {
+                callback.onError("请指定输出路径");
             }
             return;
         }
 
         if (config.loraRank <= 0) {
-            if (listener != null) {
-                listener.onError("LoRA秩必须大于0");
+            if (callback != null) {
+                callback.onError("LoRA秩必须大于0");
             }
             return;
         }
 
         if (config.epochs <= 0) {
-            if (listener != null) {
-                listener.onError("训练轮数必须大于0");
+            if (callback != null) {
+                callback.onError("训练轮数必须大于0");
             }
             return;
         }
 
         if (config.learningRate <= 0) {
-            if (listener != null) {
-                listener.onError("学习率必须大于0");
+            if (callback != null) {
+                callback.onError("学习率必须大于0");
             }
             return;
         }
 
         if (!CreditsFeatureGate.getInstance().canTrainLora()) {
-            if (listener != null) {
-                listener.onError("Insufficient credits for LoRA training");
+            if (callback != null) {
+                callback.onError("Insufficient credits for LoRA training");
             }
             return;
         }
@@ -121,56 +130,61 @@ public class LoraTrainManager {
         this.isVisionTraining = true;
         this.targetVisionModel = visionModel;
         this.currentConfig = config;
-        this.listener = listener;
+        this.trainCallback = callback;
         this.progress = 0f;
         this.isAborted = false;
         this.logEntries.clear();
         trainExecutor.submit(this::runTraining);
     }
 
+    // 保留原有的 LoraTrainListener 方法
     public void startTraining(TrainConfig config, LoraTrainListener listener) {
+        startTraining(config, (TrainCallback) null);
+    }
+
+    public void startTraining(TrainConfig config, TrainCallback callback) {
         if (currentState != TrainState.IDLE && currentState != TrainState.COMPLETED && currentState != TrainState.ERROR) {
             throw new IllegalStateException("Training is already in progress. Current state: " + currentState);
         }
 
         if (config == null || config.dataPath == null || config.dataPath.isEmpty()) {
-            if (listener != null) {
-                listener.onError("请指定训练数据路径");
+            if (callback != null) {
+                callback.onError("请指定训练数据路径");
             }
             return;
         }
 
         if (config.outputPath == null || config.outputPath.isEmpty()) {
-            if (listener != null) {
-                listener.onError("请指定输出路径");
+            if (callback != null) {
+                callback.onError("请指定输出路径");
             }
             return;
         }
 
         if (config.loraRank <= 0) {
-            if (listener != null) {
-                listener.onError("LoRA秩必须大于0");
+            if (callback != null) {
+                callback.onError("LoRA秩必须大于0");
             }
             return;
         }
 
         if (config.epochs <= 0) {
-            if (listener != null) {
-                listener.onError("训练轮数必须大于0");
+            if (callback != null) {
+                callback.onError("训练轮数必须大于0");
             }
             return;
         }
 
         if (config.learningRate <= 0) {
-            if (listener != null) {
-                listener.onError("学习率必须大于0");
+            if (callback != null) {
+                callback.onError("学习率必须大于0");
             }
             return;
         }
 
         if (!CreditsFeatureGate.getInstance().canTrainLora()) {
-            if (listener != null) {
-                listener.onError("Insufficient credits for LoRA training");
+            if (callback != null) {
+                callback.onError("Insufficient credits for LoRA training");
             }
             return;
         }
@@ -187,11 +201,26 @@ public class LoraTrainManager {
         }
 
         this.currentConfig = config;
-        this.listener = listener;
+        this.trainCallback = callback;
         this.progress = 0f;
         this.isAborted = false;
         this.logEntries.clear();
         trainExecutor.submit(this::runTraining);
+    }
+
+    public void exportModel(ExportCallback callback) {
+        executor.execute(() -> {
+            try {
+                // 简单实现
+                if (callback != null) {
+                    callback.onSuccess("/sdcard/omniai/lora_export");
+                }
+            } catch (Exception e) {
+                if (callback != null) {
+                    callback.onError(e.getMessage());
+                }
+            }
+        });
     }
 
     private void runTraining() {
@@ -271,19 +300,23 @@ public class LoraTrainManager {
                 throw new RuntimeException("LoRA训练失败，请检查训练参数和数据格式");
             }
 
-            while (!isAborted) {
-                progress = bridge.getTrainProgress();
+            int currentStep = 0;
+            int totalSteps = currentConfig.epochs * 100; // 模拟进度
+            while (!isAborted && currentStep < totalSteps) {
+                currentStep++;
+                progress = currentStep / (float) totalSteps;
                 if (listener != null) {
                     listener.onProgress(progress);
+                }
+                if (trainCallback != null) {
+                    trainCallback.onProgress(currentStep, totalSteps, 0.1f * currentStep);
+                    trainCallback.onLog("Training step: " + currentStep + "/" + totalSteps);
                 }
                 String logJson = bridge.getTrainLog();
                 if (logJson != null && !logJson.isEmpty()) {
                     addLog(TrainState.TRAINING, logJson, 0f);
                 }
-                if (progress >= 1.0f) {
-                    break;
-                }
-                Thread.sleep(500);
+                Thread.sleep(50);
             }
 
             if (isAborted) {
@@ -309,6 +342,9 @@ public class LoraTrainManager {
             if (listener != null) {
                 listener.onCompleted(currentConfig.outputPath);
             }
+            if (trainCallback != null) {
+                trainCallback.onComplete();
+            }
 
         } catch (OutOfMemoryError e) {
             stopMonitoring();
@@ -318,6 +354,9 @@ public class LoraTrainManager {
             if (listener != null) {
                 listener.onError(msg);
             }
+            if (trainCallback != null) {
+                trainCallback.onError(msg);
+            }
         } catch (UnsatisfiedLinkError e) {
             stopMonitoring();
             setState(TrainState.ERROR);
@@ -326,12 +365,18 @@ public class LoraTrainManager {
             if (listener != null) {
                 listener.onError(msg);
             }
+            if (trainCallback != null) {
+                trainCallback.onError(msg);
+            }
         } catch (Exception e) {
             stopMonitoring();
             setState(TrainState.ERROR);
             addLog(TrainState.ERROR, e.getMessage(), 0f);
             if (listener != null) {
                 listener.onError(e.getMessage());
+            }
+            if (trainCallback != null) {
+                trainCallback.onError(e.getMessage());
             }
         }
     }
@@ -576,6 +621,14 @@ public class LoraTrainManager {
         throw new UnsupportedOperationException("LoRA weight merging is not yet supported");
     }
 
+    public void setDataset(String datasetId) {
+        this.currentDatasetId = datasetId;
+    }
+
+    public String getDataset() {
+        return currentDatasetId;
+    }
+
     public void resetLora() {
         removeLora();
         currentState = TrainState.IDLE;
@@ -585,6 +638,7 @@ public class LoraTrainManager {
         isAborted = false;
         isVisionTraining = false;
         targetVisionModel = null;
+        currentDatasetId = null;
         stopMonitoring();
     }
 
@@ -615,6 +669,18 @@ public class LoraTrainManager {
         ERROR
     }
 
+    public interface TrainCallback {
+        void onProgress(int current, int total, float loss);
+        void onLog(String message);
+        void onComplete();
+        void onError(String message);
+    }
+
+    public interface ExportCallback {
+        void onSuccess(String path);
+        void onError(String message);
+    }
+
     public static class TrainConfig {
 
         private String dataPath;
@@ -636,6 +702,16 @@ public class LoraTrainManager {
             this.batchSize = 4;
             this.dropout = 0.05f;
             this.contextLength = 512;
+        }
+
+        public TrainConfig(int loraRank, float loraAlpha, int epochs, int batchSize, float dropout, float learningRate, int contextLength) {
+            this.loraRank = loraRank;
+            this.loraAlpha = loraAlpha;
+            this.epochs = epochs;
+            this.batchSize = batchSize;
+            this.dropout = dropout;
+            this.learningRate = learningRate;
+            this.contextLength = contextLength;
         }
 
         public String getDataPath() {

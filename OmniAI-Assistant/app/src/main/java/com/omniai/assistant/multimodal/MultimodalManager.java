@@ -321,7 +321,7 @@ public class MultimodalManager {
             switch (status) {
                 case CRITICAL: return 50.0f;
                 case HIGH: return 46.0f;
-                case MODERATE: return 40.0f;
+                case WARM: return 40.0f;
                 default: return 35.0f;
             }
         } catch (Exception e) {

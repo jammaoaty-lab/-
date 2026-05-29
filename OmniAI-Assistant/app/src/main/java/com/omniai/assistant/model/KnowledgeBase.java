@@ -4,6 +4,11 @@ import java.util.UUID;
 
 public class KnowledgeBase {
 
+    public static final String STATUS_IDLE = "idle";
+    public static final String STATUS_READY = "idle";
+    public static final String STATUS_INDEXING = "indexing";
+    public static final String STATUS_ERROR = "error";
+
     private String id;
     private String name;
     private String description;
@@ -17,7 +22,7 @@ public class KnowledgeBase {
         this.documentCount = 0;
         this.totalSize = 0;
         this.createdAt = System.currentTimeMillis();
-        this.status = "idle";
+        this.status = STATUS_IDLE;
     }
 
     public KnowledgeBase(String id, String name, String description, int documentCount, long totalSize, long createdAt, String status) {
@@ -58,11 +63,19 @@ public class KnowledgeBase {
         return documentCount;
     }
 
+    public int getDocCount() {
+        return documentCount;
+    }
+
     public void setDocumentCount(int documentCount) {
         this.documentCount = documentCount;
     }
 
     public long getTotalSize() {
+        return totalSize;
+    }
+
+    public long getSize() {
         return totalSize;
     }
 
@@ -87,14 +100,14 @@ public class KnowledgeBase {
     }
 
     public boolean isIdle() {
-        return "idle".equals(status);
+        return STATUS_IDLE.equals(status);
     }
 
     public boolean isIndexing() {
-        return "indexing".equals(status);
+        return STATUS_INDEXING.equals(status);
     }
 
     public boolean isError() {
-        return "error".equals(status);
+        return STATUS_ERROR.equals(status);
     }
 }

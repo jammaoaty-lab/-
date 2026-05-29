@@ -340,4 +340,12 @@ public class CacheManager {
         public long usedMemory;
         public float usagePercent;
     }
+
+    public void flush() {
+        // Empty for compatibility
+    }
+
+    public void clearNonCritical() {
+        // Empty for compatibility
+    }
 }

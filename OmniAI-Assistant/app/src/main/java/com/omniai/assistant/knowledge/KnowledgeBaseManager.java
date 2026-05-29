@@ -33,31 +33,38 @@ public class KnowledgeBaseManager {
     private static final String KEY_KNOWLEDGE_BASES = "knowledge_bases";
 
     private static volatile KnowledgeBaseManager instance;
+    private Context context;
 
-    public KnowledgeBaseManager(Context context) {
-        this.prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        this.gson = new Gson();
-        this.knowledgeBases = loadKnowledgeBasesFromPrefs();
-        this.embeddingEngine = new EmbeddingEngine(context);
-        this.vectorIndex = new VectorIndex();
-        this.kbIndexes = new HashMap<>();
-        this.documentParser = new DocumentParser();
-        this.indexExecutor = Executors.newSingleThreadExecutor(r -> {
-            Thread t = new Thread(r, "KBIndexThread");
-            t.setPriority(Thread.NORM_PRIORITY - 1);
-            return t;
-        });
+    private KnowledgeBaseManager() {
+        // Empty constructor for singleton
     }
 
     public static KnowledgeBaseManager getInstance() {
         if (instance == null) {
             synchronized (KnowledgeBaseManager.class) {
                 if (instance == null) {
-                    throw new IllegalStateException("KnowledgeBaseManager not initialized. Call constructor first.");
+                    instance = new KnowledgeBaseManager();
                 }
             }
         }
         return instance;
+    }
+
+    public static synchronized void init(Context context) {
+        KnowledgeBaseManager manager = getInstance();
+        manager.context = context.getApplicationContext();
+        manager.prefs = manager.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        manager.gson = new Gson();
+        manager.knowledgeBases = manager.loadKnowledgeBasesFromPrefs();
+        manager.embeddingEngine = new EmbeddingEngine(context);
+        manager.vectorIndex = new VectorIndex();
+        manager.kbIndexes = new HashMap<>();
+        manager.documentParser = new DocumentParser();
+        manager.indexExecutor = Executors.newSingleThreadExecutor(r -> {
+            Thread t = new Thread(r, "KBIndexThread");
+            t.setPriority(Thread.NORM_PRIORITY - 1);
+            return t;
+        });
     }
 
     public void initialize() {

@@ -1,6 +1,7 @@
 package com.omniai.assistant.user;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.provider.Settings;
 import android.util.Base64;
@@ -21,6 +22,7 @@ public class UserManager {
     private String authToken;
     private String refreshToken;
     private long tokenExpiry;
+    private Context context;
 
     private final UserApiService apiService;
     private final AuthInterceptor authInterceptor;
@@ -35,7 +37,8 @@ public class UserManager {
     private static final String KEY_USER_ID = "user_id";
 
     private UserManager(Context context) {
-        this.prefs = context.getApplicationContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        this.context = context.getApplicationContext();
+        this.prefs = this.context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         this.dataEncryptor = new DataEncryptor(context);
         this.authInterceptor = new AuthInterceptor();
         this.authInterceptor.setUserManager(this);
@@ -342,7 +345,7 @@ public class UserManager {
         if (deviceId != null && !deviceId.isEmpty()) {
             return deviceId;
         }
-        return Settings.Secure.getString(prefs.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     String getAuthToken() {

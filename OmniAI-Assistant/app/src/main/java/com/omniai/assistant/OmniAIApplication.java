@@ -42,15 +42,22 @@ public class OmniAIApplication extends Application {
         CreditsManager.init(this);
         VisionInferenceEngine.init(this);
 
-        userManager = new UserManager(this);
-        securityManager = new SecurityManager(this);
-        cacheManager = new CacheManager(this);
+        UserManager.init(this);
+        userManager = UserManager.getInstance();
+        
+        securityManager = SecurityManager.getInstance(this);
+        cacheManager = CacheManager.getInstance(this);
         creditsManager = CreditsManager.getInstance();
-        thermalMonitor = new ThermalMonitor(this);
-        knowledgeBaseManager = new KnowledgeBaseManager(this);
-        inferenceEngine = new InferenceEngine(this);
+        thermalMonitor = ThermalMonitor.getInstance();
+        
+        // Initialize KnowledgeBaseManager
+        KnowledgeBaseManager.init(this);
+        knowledgeBaseManager = KnowledgeBaseManager.getInstance();
+        
+        inferenceEngine = InferenceEngine.getInstance();
         visionInferenceEngine = VisionInferenceEngine.getInstance();
-        cloudFallbackManager = new CloudFallbackManager(this);
+        cloudFallbackManager = CloudFallbackManager.getInstance();
+        cloudFallbackManager.setContext(this);
 
         preinstalledModelManager = PreinstalledModelManager.getInstance(this);
         preinstalledModelManager.ensureModelsExtracted(new PreinstalledModelManager.ExtractionCallback() {
@@ -65,15 +72,10 @@ public class OmniAIApplication extends Application {
 
             @Override
             public void onError(String message) {}
+            
+            @Override
+            public void onRequiresFeatureInstall() {}
         });
-
-        userManager.initialize();
-        securityManager.initialize();
-        cacheManager.initialize();
-        thermalMonitor.start();
-        knowledgeBaseManager.initialize();
-        inferenceEngine.initialize();
-        cloudFallbackManager.initialize();
     }
 
     public static OmniAIApplication getInstance() {

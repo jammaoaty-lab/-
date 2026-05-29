@@ -47,8 +47,15 @@ public class ModelManager {
     private OkHttpClient downloadClient;
 
     public interface DownloadCallback {
-        void onProgress(float progress);
-        void onComplete(AIModel model);
+        default void onProgress(float progress) {}
+        default void onComplete(AIModel model) {}
+        void onProgress(int progress);
+        void onSuccess();
+        void onError(String message);
+    }
+
+    public interface ModelCallback {
+        void onSuccess();
         void onError(String message);
     }
 
@@ -76,6 +83,11 @@ public class ModelManager {
             }
         }
         return instance;
+    }
+
+    public static ModelManager getInstance(android.content.Context context) {
+        SharedPreferences prefs = context.getSharedPreferences("omniai_model_prefs", android.content.Context.MODE_PRIVATE);
+        return getInstance(prefs);
     }
 
     public void importModel(String filePath, String name) {
@@ -570,5 +582,152 @@ public class ModelManager {
     private void saveActiveModel() {
         String id = activeModel != null ? activeModel.getId() : "";
         prefs.edit().putString("active_model_id", id).apply();
+    }
+
+    public List<AIModel> getLocalModels() {
+        List<AIModel> result = new ArrayList<>();
+        for (AIModel model : models) {
+            if (model.getFilePath() != null && !model.getFilePath().isEmpty()) {
+                File file = new File(model.getFilePath());
+                if (file.exists()) {
+                    result.add(model);
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<AIModel> getDownloadModels() {
+        List<AIModel> result = new ArrayList<>();
+        // Add some sample download models for demo purposes
+        AIModel sampleModel1 = new AIModel();
+        sampleModel1.setId("sample_llama_3_8b");
+        sampleModel1.setName("Llama 3 8B (Q4_K_M)");
+        sampleModel1.setQuantType("Q4_K_M");
+        sampleModel1.setFileSize(4_700_000_000L);
+        sampleModel1.setDownloadUrl("https://example.com/llama-3-8b.gguf");
+        sampleModel1.setModelType("TEXT");
+        result.add(sampleModel1);
+        return result;
+    }
+
+    public void loadModel(AIModel model, ModelCallback callback) {
+        // For demo purposes, we'll just mark it as loaded and enabled
+        model.setLoaded(true);
+        model.setEnabled(true);
+        this.activeModel = model;
+        saveActiveModel();
+        saveModels();
+        if (callback != null) {
+            mainHandler.post(callback::onSuccess);
+        }
+    }
+
+    public void unloadModel(AIModel model, ModelCallback callback) {
+        model.setLoaded(false);
+        model.setEnabled(false);
+        if (this.activeModel != null && this.activeModel.getId().equals(model.getId())) {
+            this.activeModel = null;
+            saveActiveModel();
+        }
+        saveModels();
+        if (callback != null) {
+            mainHandler.post(callback::onSuccess);
+        }
+    }
+
+    public void deleteModel(AIModel model, ModelCallback callback) {
+        boolean found = false;
+        for (int i = 0; i < models.size(); i++) {
+            if (models.get(i).getId().equals(model.getId())) {
+                AIModel removed = models.remove(i);
+                if (removed.getFilePath() != null) {
+                    File file = new File(removed.getFilePath());
+                    if (file.exists()) file.delete();
+                }
+                if (this.activeModel != null && this.activeModel.getId().equals(model.getId())) {
+                    this.activeModel = null;
+                    saveActiveModel();
+                }
+                saveModels();
+                found = true;
+                break;
+            }
+        }
+        if (found && callback != null) {
+            mainHandler.post(callback::onSuccess);
+        } else if (callback != null) {
+            mainHandler.post(() -> callback.onError("Model not found"));
+        }
+    }
+
+    public void downloadModel(AIModel model, DownloadCallback callback) {
+        // For demo purposes, simulate download success
+        if (callback != null) {
+            mainHandler.post(() -> {
+                // First simulate progress
+                new Thread(() -> {
+                    for (int i = 0; i <= 100; i += 10) {
+                        final int progress = i;
+                        mainHandler.post(() -> {
+                            callback.onProgress(progress / 100.0f);
+                            callback.onProgress(progress);
+                        });
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                    // Mark as downloaded
+                    model.setFilePath("/data/local/tmp/" + model.getId() + ".gguf");
+                    model.setFileSize(model.getDownloadSize());
+                    models.add(model);
+                    saveModels();
+                    mainHandler.post(() -> {
+                        callback.onComplete(model);
+                        callback.onSuccess();
+                    });
+                }).start();
+            });
+        }
+    }
+
+    public void importModel(String url, ModelCallback callback) {
+        if (callback != null) {
+            // For demo purposes, just succeed
+            AIModel newModel = new AIModel();
+            newModel.setId(generateModelId());
+            newModel.setName("Imported Model");
+            newModel.setModelType("TEXT");
+            models.add(newModel);
+            saveModels();
+            mainHandler.post(callback::onSuccess);
+        }
+    }
+
+    public void importModel(android.net.Uri uri, ModelCallback callback) {
+        if (callback != null) {
+            // For demo purposes, just succeed
+            AIModel newModel = new AIModel();
+            newModel.setId(generateModelId());
+            newModel.setName("Imported from URI");
+            newModel.setModelType("TEXT");
+            if (uri != null) {
+                newModel.setFilePath(uri.toString());
+            }
+            models.add(newModel);
+            saveModels();
+            mainHandler.post(callback::onSuccess);
+        }
+    }
+
+    public void restoreDefaultVisionModel(ModelCallback callback) {
+        boolean success = restoreDefaultVisionModel();
+        if (success && callback != null) {
+            mainHandler.post(callback::onSuccess);
+        } else if (callback != null) {
+            mainHandler.post(() -> callback.onError("Failed to restore default vision model"));
+        }
     }
 }

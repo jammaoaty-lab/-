@@ -71,7 +71,7 @@ public class ModelCardAdapter extends RecyclerView.Adapter<ModelCardAdapter.View
                 .setBackgroundThreadExecutor(Executors.newSingleThreadExecutor())
                 .build();
 
-        this.differ = new AsyncListDiffer<>(this, config);
+        this.differ = new AsyncListDiffer<AIModel>(this, config);
         this.differ.submitList(models != null ? models : new ArrayList<>());
     }
 

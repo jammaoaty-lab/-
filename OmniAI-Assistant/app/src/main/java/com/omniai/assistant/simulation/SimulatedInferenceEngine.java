@@ -62,7 +62,7 @@ public class SimulatedInferenceEngine {
     }
 
     public void loadModel(AIModel model, final LoadCallback callback) {
-        if (isModelLoaded && currentModel != null && currentModel.id.equals(model.id)) {
+        if (isModelLoaded && currentModel != null && currentModel.getId().equals(model.getId())) {
             if (callback != null) {
                 mainHandler.post(() -> callback.onSuccess());
             }

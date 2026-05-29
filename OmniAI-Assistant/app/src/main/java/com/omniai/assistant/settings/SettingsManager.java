@@ -1,14 +1,19 @@
 package com.omniai.assistant.settings;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import com.omniai.assistant.BuildConfig;
 import com.google.gson.Gson;
+import java.io.File;
 
 public class SettingsManager {
 
     private static volatile SettingsManager instance;
     private final SharedPreferences prefs;
     private final Gson gson;
+    private final Context context;
 
     public static class AiSettings {
         public String defaultModel;
@@ -126,9 +131,26 @@ public class SettingsManager {
         }
     }
 
+    public interface CacheCallback {
+        void onComplete();
+    }
+
+    public interface UpdateCallback {
+        void onUpdateAvailable(String version);
+        void onUpToDate();
+        void onError(String message);
+    }
+
     private SettingsManager(SharedPreferences prefs) {
         this.prefs = prefs;
         this.gson = new Gson();
+        this.context = null;
+    }
+
+    private SettingsManager(Context context) {
+        this.prefs = context.getSharedPreferences("omniai_settings", Context.MODE_PRIVATE);
+        this.gson = new Gson();
+        this.context = context;
     }
 
     public static SettingsManager getInstance(SharedPreferences prefs) {
@@ -136,6 +158,17 @@ public class SettingsManager {
             synchronized (SettingsManager.class) {
                 if (instance == null) {
                     instance = new SettingsManager(prefs);
+                }
+            }
+        }
+        return instance;
+    }
+
+    public static SettingsManager getInstance(Context context) {
+        if (instance == null) {
+            synchronized (SettingsManager.class) {
+                if (instance == null) {
+                    instance = new SettingsManager(context);
                 }
             }
         }
@@ -283,5 +316,238 @@ public class SettingsManager {
                 .remove("incognito_mode")
                 .remove("cloud_fallback")
                 .apply();
+    }
+
+    // 新增的所有缺失方法
+    public String getLanguage() {
+        return prefs.getString("language", "简体中文");
+    }
+
+    public void setLanguage(String language) {
+        prefs.edit().putString("language", language).apply();
+    }
+
+    public String getTheme() {
+        return prefs.getString("theme", "跟随系统");
+    }
+
+    public void setTheme(String theme) {
+        prefs.edit().putString("theme", theme).apply();
+    }
+
+    public boolean isNotificationsEnabled() {
+        return prefs.getBoolean("settings_notifications", true);
+    }
+
+    public void setNotificationsEnabled(boolean enabled) {
+        prefs.edit().putBoolean("settings_notifications", enabled).apply();
+    }
+
+    public String getDefaultModel() {
+        AiSettings settings = getAiSettings();
+        return settings.defaultModel;
+    }
+
+    public void setDefaultModel(String model) {
+        AiSettings settings = getAiSettings();
+        settings.defaultModel = model;
+        updateAiSettings(settings);
+    }
+
+    public String getInferenceMode() {
+        return prefs.getString("settings_inference_mode", "本地推理");
+    }
+
+    public void setInferenceMode(String mode) {
+        prefs.edit().putString("settings_inference_mode", mode).apply();
+    }
+
+    public boolean isStreamOutput() {
+        return prefs.getBoolean("settings_stream_output", true);
+    }
+
+    public void setStreamOutput(boolean enabled) {
+        prefs.edit().putBoolean("settings_stream_output", enabled).apply();
+    }
+
+    public float getTemperature() {
+        AiSettings settings = getAiSettings();
+        return settings.temperature;
+    }
+
+    public void setTemperature(float temp) {
+        AiSettings settings = getAiSettings();
+        settings.temperature = temp;
+        updateAiSettings(settings);
+    }
+
+    public boolean isCloudGpuEnabled() {
+        return prefs.getBoolean("云端GPU加速", false);
+    }
+
+    public void setCloudGpuEnabled(boolean enabled) {
+        prefs.edit().putBoolean("云端GPU加速", enabled).apply();
+    }
+
+    public boolean isLongContextEnabled() {
+        return prefs.getBoolean("超长上下文", false);
+    }
+
+    public void setLongContextEnabled(boolean enabled) {
+        prefs.edit().putBoolean("超长上下文", enabled).apply();
+    }
+
+    public boolean isAutoOcrEnabled() {
+        return isAutoOcr();
+    }
+
+    public void setAutoOcrEnabled(boolean enabled) {
+        setAutoOcr(enabled);
+    }
+
+    public String getVisionInferenceMode() {
+        return prefs.getString("vision_inference_mode", "均衡");
+    }
+
+    public void setVisionInferenceMode(String mode) {
+        prefs.edit().putString("vision_inference_mode", mode).apply();
+    }
+
+    public boolean isImageCacheAutoClean() {
+        PrivacySettings settings = getPrivacySettings();
+        return settings.autoCleanImageCache;
+    }
+
+    public void setImageCacheAutoClean(boolean enabled) {
+        PrivacySettings settings = getPrivacySettings();
+        settings.autoCleanImageCache = enabled;
+        updatePrivacySettings(settings);
+    }
+
+    public boolean isCreditsConsumeWarning() {
+        return prefs.getBoolean("积分消耗提醒", true);
+    }
+
+    public void setCreditsConsumeWarning(boolean enabled) {
+        prefs.edit().putBoolean("积分消耗提醒", enabled).apply();
+    }
+
+    public boolean isAnalyticsEnabled() {
+        return prefs.getBoolean("settings_analytics", true);
+    }
+
+    public void setAnalyticsEnabled(boolean enabled) {
+        prefs.edit().putBoolean("settings_analytics", enabled).apply();
+    }
+
+    public boolean isCrashReportEnabled() {
+        return prefs.getBoolean("settings_crash_report", true);
+    }
+
+    public void setCrashReportEnabled(boolean enabled) {
+        prefs.edit().putBoolean("settings_crash_report", enabled).apply();
+    }
+
+    public String getCacheSize() {
+        if (context == null) return "0 MB";
+        try {
+            long size = 0;
+            File cacheDir = context.getCacheDir();
+            if (cacheDir != null && cacheDir.exists()) {
+                size += getDirSize(cacheDir);
+            }
+            return String.format("%.2f MB", size / (1024.0 * 1024.0));
+        } catch (Exception e) {
+            return "0 MB";
+        }
+    }
+
+    private long getDirSize(File dir) {
+        long size = 0;
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    size += getDirSize(file);
+                } else {
+                    size += file.length();
+                }
+            }
+        }
+        return size;
+    }
+
+    public void clearCache(CacheCallback callback) {
+        new Thread(() -> {
+            if (context != null) {
+                File cacheDir = context.getCacheDir();
+                if (cacheDir != null && cacheDir.exists()) {
+                    deleteDir(cacheDir);
+                }
+            }
+            if (callback != null) {
+                callback.onComplete();
+            }
+        }).start();
+    }
+
+    private boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        return dir.delete();
+    }
+
+    public String getVersionName() {
+        if (context == null) return "Unknown";
+        try {
+            PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return info.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "Unknown";
+        }
+    }
+
+    public void checkForUpdate(UpdateCallback callback) {
+        if (callback != null) {
+            callback.onUpToDate();
+        }
+    }
+
+    public String getLicenses() {
+        return "llama.cpp (MIT License)\n" +
+               "AndroidX (Apache 2.0)\n" +
+               "Material Components (Apache 2.0)\n" +
+               "Gson (Apache 2.0)";
+    }
+
+    public boolean isDebugLogEnabled() {
+        return prefs.getBoolean("settings_debug_log", false);
+    }
+
+    public void setDebugLogEnabled(boolean enabled) {
+        prefs.edit().putBoolean("settings_debug_log", enabled).apply();
+    }
+
+    public String getApiEndpoint() {
+        return prefs.getString("settings_api_endpoint", BuildConfig.API_BASE_URL);
+    }
+
+    public void setApiEndpoint(String endpoint) {
+        prefs.edit().putString("settings_api_endpoint", endpoint).apply();
+    }
+
+    public String[] getAvailableModels() {
+        return new String[]{"llama-3-8b", "qwen2-7b", "mistral-7b", "gemma-2-9b"};
+    }
+
+    public void putBoolean(String key, boolean value) {
+        prefs.edit().putBoolean(key, value).apply();
     }
 }
