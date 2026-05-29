@@ -51,10 +51,10 @@ public class KnowledgeBaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_knowledge_base);
 
-        kbManager = KnowledgeBaseManager.getInstance(this);
+        kbManager = KnowledgeBaseManager.getInstance();
         visionEngine = VisionInferenceEngine.getInstance();
 
-        kbList = findViewById(R.id.rv_kb_list);
+        kbList = findViewById(R.id.rv_knowledge_bases);
         fabCreate = findViewById(R.id.fab_create);
         searchInput = findViewById(R.id.et_search);
 

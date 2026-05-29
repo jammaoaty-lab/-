@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tv_header_title"
-    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tv_group_title"
+    style="@style/Senta.TextView.Label"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
-    android:paddingTop="16dp"
-    android:paddingBottom="8dp"
-    android:textSize="12sp"
-    android:textStyle="bold"
-    android:textColor="#64748B"
-    android:textAllCaps="true" />
+    android:paddingHorizontal="@dimen/spacing_lg"
+    android:paddingTop="@dimen/spacing_xxl"
+    android:paddingBottom="@dimen/spacing_sm"
+    tools:text="分组标题" />

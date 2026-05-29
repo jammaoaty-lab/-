@@ -79,31 +79,31 @@ public class LoraTrainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lora_train);
 
-        trainManager = LoraTrainManager.getInstance(this);
+        trainManager = LoraTrainManager.getInstance();
         dataSetProcessor = new DataSetProcessor();
         uiHandler = new Handler(Looper.getMainLooper());
         hwMonitorHandler = new Handler(Looper.getMainLooper());
         llamaBridge = LlamaBridge.getInstance();
 
-        rankSeek = findViewById(R.id.seek_rank);
-        alphaSeek = findViewById(R.id.seek_alpha);
-        epochsSeek = findViewById(R.id.seek_epochs);
-        batchSizeSeek = findViewById(R.id.seek_batch_size);
-        dropoutSeek = findViewById(R.id.seek_dropout);
-        lrInput = findViewById(R.id.input_lr);
-        ctxInput = findViewById(R.id.input_ctx);
+        rankSeek = findViewById(R.id.seekbar_lora_rank);
+        alphaSeek = findViewById(R.id.seekbar_lora_alpha);
+        epochsSeek = findViewById(R.id.seekbar_epochs);
+        batchSizeSeek = findViewById(R.id.seekbar_batch_size);
+        dropoutSeek = findViewById(R.id.seekbar_dropout);
+        lrInput = findViewById(R.id.et_learning_rate);
+        ctxInput = findViewById(R.id.et_context_length);
         progressBar = findViewById(R.id.progress_bar);
         progressText = findViewById(R.id.tv_progress);
-        logOutput = findViewById(R.id.tv_log);
+        logOutput = findViewById(R.id.tv_log_output);
         startBtn = findViewById(R.id.btn_start);
         pauseBtn = findViewById(R.id.btn_pause);
         resumeBtn = findViewById(R.id.btn_resume);
         stopBtn = findViewById(R.id.btn_stop);
         exportBtn = findViewById(R.id.btn_export);
 
-        trainTargetSpinner = findViewById(R.id.spinner_train_target);
-        visionModelSpinner = findViewById(R.id.spinner_vision_model);
-        visionModelSection = findViewById(R.id.layout_vision_model_section);
+        trainTargetSpinner = findViewById(R.id.train_target_spinner);
+        visionModelSpinner = findViewById(R.id.vision_model_spinner);
+        visionModelSection = findViewById(R.id.vision_model_section);
 
         setupTrainTargetSpinner();
         setupVisionModelSpinner();
@@ -170,7 +170,7 @@ public class LoraTrainActivity extends AppCompatActivity {
     }
 
     private void setupSeekBarListeners() {
-        TextView rankLabel = findViewById(R.id.tv_rank_value);
+        TextView rankLabel = findViewById(R.id.tv_lora_rank_value);
         rankSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -184,7 +184,7 @@ public class LoraTrainActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        TextView alphaLabel = findViewById(R.id.tv_alpha_value);
+        TextView alphaLabel = findViewById(R.id.tv_lora_alpha_value);
         alphaSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -212,7 +212,7 @@ public class LoraTrainActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        TextView batchLabel = findViewById(R.id.tv_batch_value);
+        TextView batchLabel = findViewById(R.id.tv_batch_size_value);
         batchSizeSeek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {

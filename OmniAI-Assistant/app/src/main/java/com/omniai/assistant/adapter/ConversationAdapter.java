@@ -135,11 +135,11 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
         ViewHolder(View itemView) {
             super(itemView);
-            titleText = itemView.findViewById(R.id.text_conversation_title);
-            timeText = itemView.findViewById(R.id.text_conversation_time);
-            modelTag = itemView.findViewById(R.id.text_model_tag);
-            pinIcon = itemView.findViewById(R.id.icon_pin);
-            deleteButton = itemView.findViewById(R.id.btn_delete_conversation);
+            titleText = itemView.findViewById(R.id.tv_conversation_title);
+            timeText = itemView.findViewById(R.id.tv_conversation_time);
+            modelTag = itemView.findViewById(R.id.tv_model_tag);
+            pinIcon = itemView.findViewById(R.id.iv_pin);
+            deleteButton = itemView.findViewById(R.id.btn_delete);
         }
     }
 

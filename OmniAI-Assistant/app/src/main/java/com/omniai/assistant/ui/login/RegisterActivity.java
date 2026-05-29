@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.snackbar.Snackbar;
 import com.omniai.assistant.R;
 import com.omniai.assistant.user.UserManager;
+import com.omniai.assistant.user.UserProfile;
 import com.omniai.assistant.ui.chat.ChatActivity;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -31,14 +32,14 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        userManager = UserManager.getInstance(this);
+        userManager = UserManager.getInstance();
 
-        accountInput = findViewById(R.id.input_account);
-        passwordInput = findViewById(R.id.input_password);
-        confirmPasswordInput = findViewById(R.id.input_confirm_password);
-        codeInput = findViewById(R.id.input_code);
+        accountInput = findViewById(R.id.et_phone);
+        passwordInput = findViewById(R.id.et_password);
+        confirmPasswordInput = findViewById(R.id.et_confirm_password);
+        codeInput = findViewById(R.id.et_verify_code);
         registerBtn = findViewById(R.id.btn_register);
-        sendCodeBtn = findViewById(R.id.btn_send_code);
+        sendCodeBtn = findViewById(R.id.tv_send_code);
 
         sendCodeBtn.setOnClickListener(v -> sendVerificationCode());
         registerBtn.setOnClickListener(v -> attemptRegister());
@@ -124,7 +125,7 @@ public class RegisterActivity extends AppCompatActivity {
         registerBtn.setEnabled(false);
         userManager.register(account, password, code, new UserManager.RegisterCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(UserProfile profile) {
                 autoLogin(account, password);
             }
 
@@ -139,7 +140,7 @@ public class RegisterActivity extends AppCompatActivity {
     private void autoLogin(String account, String password) {
         userManager.login(account, password, new UserManager.LoginCallback() {
             @Override
-            public void onSuccess() {
+            public void onSuccess(UserProfile profile) {
                 navigateToChat();
             }
 

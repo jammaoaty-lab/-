@@ -26,8 +26,8 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        splashLogo = findViewById(R.id.splash_logo);
-        userManager = UserManager.getInstance(this);
+        splashLogo = findViewById(R.id.iv_splash_logo);
+        userManager = UserManager.getInstance();
 
         AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
         fadeIn.setDuration(800);

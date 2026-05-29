@@ -73,11 +73,11 @@ public class ProfileActivity extends AppCompatActivity {
         avatarView = findViewById(R.id.iv_avatar);
         nicknameText = findViewById(R.id.tv_nickname);
         uidText = findViewById(R.id.tv_uid);
-        creditsBadgeText = findViewById(R.id.tv_vip_badge);
+        creditsBadgeText = findViewById(R.id.tv_credits_badge);
         deviceCountText = findViewById(R.id.tv_device_count);
-        creditsCard = findViewById(R.id.cv_vip);
-        creditsBalanceText = findViewById(R.id.tv_vip_plan);
-        inviteCodeText = findViewById(R.id.tv_vip_expiry);
+        creditsCard = findViewById(R.id.cv_credits);
+        creditsBalanceText = findViewById(R.id.tv_credits_balance);
+        inviteCodeText = findViewById(R.id.tv_invite_code);
     }
 
     private void loadUserProfile() {
@@ -100,7 +100,7 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(new Intent(this, CreditsCenterActivity.class));
         });
 
-        MaterialButton upgradeBtn = findViewById(R.id.btn_upgrade);
+        MaterialButton upgradeBtn = findViewById(R.id.btn_credits_center);
         if (upgradeBtn != null) {
             upgradeBtn.setText("积分中心");
             upgradeBtn.setOnClickListener(v -> {

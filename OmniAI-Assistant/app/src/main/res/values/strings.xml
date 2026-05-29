@@ -319,4 +319,92 @@
     <string name="switch_to_code_login">切换到验证码登录</string>
     <string name="send">发送</string>
 
+    <!-- Knowledge Base -->
+    <string name="create">创建</string>
+    <string name="create_knowledge_base">创建知识库</string>
+    <string name="error_kb_name_empty">请输入知识库名称</string>
+    <string name="kb_created">知识库创建成功</string>
+    <string name="ocr_no_text_extracted">未提取到文字</string>
+    <string name="ocr_error">OCR 识别失败: %s</string>
+    <string name="image_imported_with_ocr">图片导入成功</string>
+
+    <!-- Login/Register -->
+    <string name="error_account_empty">请输入账号</string>
+    <string name="error_account_format">账号格式不正确</string>
+    <string name="error_password_empty">请输入密码</string>
+    <string name="error_password_too_short">密码太短</string>
+    <string name="error_password_mismatch">密码不匹配</string>
+    <string name="error_code_empty">请输入验证码</string>
+    <string name="error_phone_empty">请输入手机号</string>
+    <string name="error_phone_format">手机号格式不正确</string>
+    <string name="resend_code">重新发送(%d)</string>
+    <string name="send_code">发送验证码</string>
+    <string name="switch_to_password_login">切换到密码登录</string>
+
+    <!-- Settings -->
+    <string name="settings">设置</string>
+    <string name="settings_group_general">通用</string>
+    <string name="settings_group_ai">AI</string>
+    <string name="settings_group_privacy">隐私</string>
+    <string name="settings_group_about">关于</string>
+    <string name="settings_group_developer">开发者</string>
+    <string name="settings_language">语言</string>
+    <string name="settings_theme">主题</string>
+    <string name="settings_notifications">通知</string>
+    <string name="settings_default_model">默认模型</string>
+    <string name="settings_inference_mode">推理模式</string>
+    <string name="settings_stream_output">流式输出</string>
+    <string name="settings_temperature">温度</string>
+    <string name="settings_analytics">数据分析</string>
+    <string name="settings_crash_report">崩溃报告</string>
+    <string name="settings_clear_cache">清除缓存</string>
+    <string name="settings_version">版本</string>
+    <string name="settings_check_update">检查更新</string>
+    <string name="settings_licenses">开源许可</string>
+    <string name="settings_developer_mode">开发者模式</string>
+    <string name="settings_debug_log">调试日志</string>
+    <string name="settings_api_endpoint">API 端点</string>
+    <string name="cache_cleared">缓存已清除</string>
+    <string name="developer_mode_enabled">开发者模式已启用</string>
+    <string name="developer_mode_already_enabled">开发者模式已启用</string>
+    <string name="update_available">发现新版本: %s</string>
+    <string name="already_up_to_date">已是最新版本</string>
+
+    <!-- String Arrays -->
+    <string-array name="languages">
+        <item>简体中文</item>
+        <item>English</item>
+    </string-array>
+    <string-array name="themes">
+        <item>跟随系统</item>
+        <item>浅色</item>
+        <item>深色</item>
+    </string-array>
+    <string-array name="inference_modes">
+        <item>本地推理</item>
+        <item>云端推理</item>
+        <item>混合模式</item>
+    </string-array>
+    <string-array name="model_categories">
+        <item>全部</item>
+        <item>文本</item>
+        <item>视觉</item>
+        <item>量化</item>
+    </string-array>
+
+    <!-- LoRA Training -->
+    <string name="error_lr_empty">请输入学习率</string>
+    <string name="error_ctx_empty">请输入上下文长度</string>
+    <string name="train_progress_format">训练进度: %d/%d - Loss: %.4f</string>
+    <string name="train_completed">训练完成</string>
+    <string name="export_success">导出成功: %s</string>
+    <string name="dataset_imported">数据集已导入</string>
+
+    <!-- Knowledge Base -->
+    <string name="doc_count_format">%d 文档</string>
+    <string name="kb_status_ready">就绪</string>
+    <string name="kb_status_indexing">索引中</string>
+    <string name="kb_status_error">错误</string>
+    <string name="kb_status_idle">空闲</string>
+
 </resources>

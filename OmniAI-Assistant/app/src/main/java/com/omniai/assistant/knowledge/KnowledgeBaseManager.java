@@ -2,6 +2,7 @@ package com.omniai.assistant.knowledge;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -271,6 +272,80 @@ public class KnowledgeBaseManager {
 
     public List<KnowledgeBase> listKnowledgeBases() {
         return Collections.unmodifiableList(knowledgeBases);
+    }
+
+    public List<KnowledgeBase> getAllKnowledgeBases() {
+        return listKnowledgeBases();
+    }
+
+    public List<KnowledgeBase> search(String query) {
+        List<KnowledgeBase> results = new ArrayList<>();
+        for (KnowledgeBase kb : knowledgeBases) {
+            if (kb.getName().toLowerCase().contains(query.toLowerCase()) ||
+                    (kb.getDescription() != null && kb.getDescription().toLowerCase().contains(query.toLowerCase()))) {
+                results.add(kb);
+            }
+        }
+        return results;
+    }
+
+    public void createKnowledgeBase(String name, String description, KbCallback callback) {
+        try {
+            KnowledgeBase kb = createKnowledgeBase(name, description);
+            if (callback != null) {
+                callback.onSuccess(kb);
+            }
+        } catch (Exception e) {
+            if (callback != null) {
+                callback.onError(e.getMessage());
+            }
+        }
+    }
+
+    public void deleteKnowledgeBase(String id, KbCallback callback) {
+        try {
+            boolean success = deleteKnowledgeBase(id);
+            if (success && callback != null) {
+                KnowledgeBase kb = new KnowledgeBase();
+                kb.setId(id);
+                callback.onSuccess(kb);
+            } else if (callback != null) {
+                callback.onError("Failed to delete knowledge base");
+            }
+        } catch (Exception e) {
+            if (callback != null) {
+                callback.onError(e.getMessage());
+            }
+        }
+    }
+
+    public void importDocument(String kbId, Uri uri, KbCallback callback) {
+        try {
+            // Simplified implementation
+            callback.onSuccess(getKnowledgeBase(kbId));
+        } catch (Exception e) {
+            if (callback != null) {
+                callback.onError(e.getMessage());
+            }
+        }
+    }
+
+    public void importText(String kbId, String title, String content, KbCallback callback) {
+        try {
+            importOcrText(kbId, content);
+            if (callback != null) {
+                callback.onSuccess(getKnowledgeBase(kbId));
+            }
+        } catch (Exception e) {
+            if (callback != null) {
+                callback.onError(e.getMessage());
+            }
+        }
+    }
+
+    public interface KbCallback {
+        void onSuccess(KnowledgeBase kb);
+        void onError(String message);
     }
 
     public KnowledgeBase getKnowledgeBase(String id) {

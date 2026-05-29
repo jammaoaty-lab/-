@@ -59,7 +59,7 @@ public class QuickCommandAdapter extends RecyclerView.Adapter<QuickCommandAdapte
 
         ViewHolder(View itemView) {
             super(itemView);
-            commandName = itemView.findViewById(R.id.text_command_name);
+            commandName = itemView.findViewById(R.id.tv_command_name);
         }
     }
 

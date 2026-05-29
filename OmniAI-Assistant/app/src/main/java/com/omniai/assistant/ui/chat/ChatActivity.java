@@ -22,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -212,7 +213,7 @@ public class ChatActivity extends AppCompatActivity {
         voiceBtn = findViewById(R.id.btn_voice);
         attachBtn = findViewById(R.id.btn_attach);
         modelNameText = findViewById(R.id.tv_model_name);
-        modelStatusText = findViewById(R.id.tv_model_status);
+        modelStatusText = findViewById(R.id.tv_vision_status);
         statusDot = findViewById(R.id.view_status_dot);
         statusText = findViewById(R.id.tv_status_text);
         statusBarLayout = findViewById(R.id.layout_status_bar);

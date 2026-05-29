@@ -222,7 +222,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         UserMessageViewHolder(View itemView) {
             super(itemView);
-            contentText = itemView.findViewById(R.id.text_message_content);
+            contentText = itemView.findViewById(R.id.tv_message_content);
             timeText = itemView.findViewById(R.id.text_message_time);
             attachmentImage = itemView.findViewById(R.id.image_attachment);
         }

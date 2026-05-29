@@ -38,13 +38,13 @@ public class VisionInferenceEngine {
     }
 
     public interface VisionCallback {
-        void onProgress(String partialText);
+        default void onProgress(String partialText) {}
         void onSuccess(String result);
         void onError(String error);
     }
 
     public interface OcrCallback {
-        void onProgress(int percent, String message);
+        default void onProgress(int percent, String message) {}
         void onSuccess(String text);
         void onError(String error);
     }
@@ -312,7 +312,7 @@ public class VisionInferenceEngine {
     }
 
     public InferenceParams getVisionModeParams() {
-        InferenceSpeedMode mode = modeManager.getMode();
+        InferenceModeManager.InferenceSpeedMode mode = modeManager.getMode();
         switch (mode) {
             case FAST:
                 return new InferenceParams.Builder()

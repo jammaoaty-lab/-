@@ -34,11 +34,11 @@ public class PreinstalledModelManager {
     private final DynamicFeatureManager dynamicFeatureManager;
 
     public interface ExtractionCallback {
-        void onProgress(String modelName, float progress);
-        void onModelReady(AIModel model);
-        void onAllModelsReady();
-        void onError(String message);
-        void onRequiresFeatureInstall();
+        default void onProgress(String modelName, float progress) {}
+        default void onModelReady(AIModel model) {}
+        default void onAllModelsReady() {}
+        default void onError(String message) {}
+        default void onRequiresFeatureInstall() {}
     }
 
     private PreinstalledModelManager(Context context) {

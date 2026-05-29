@@ -440,7 +440,7 @@ public class ModelManagerActivity extends AppCompatActivity {
     }
 
     private void downloadModel(AIModel model) {
-        UserManager userManager = UserManager.getInstance(this);
+        UserManager userManager = UserManager.getInstance();
         if (!userManager.isLoggedIn()) {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.login_required))
@@ -517,7 +517,7 @@ public class ModelManagerActivity extends AppCompatActivity {
     }
 
     private void startVisionModelDownload(AIModel model) {
-        UserManager userManager = UserManager.getInstance(this);
+        UserManager userManager = UserManager.getInstance();
         if (!userManager.isLoggedIn()) {
             new AlertDialog.Builder(this)
                     .setTitle(getString(R.string.login_required))
@@ -663,7 +663,7 @@ public class ModelManagerActivity extends AppCompatActivity {
                 .setTitle(getString(R.string.import_from_url))
                 .setView(dialogView)
                 .setPositiveButton("导入", (dialog, which) -> {
-                    android.widget.EditText urlInput = dialogView.findViewById(R.id.input_url);
+                    android.widget.EditText urlInput = dialogView.findViewById(R.id.et_import_url);
                     String url = urlInput.getText().toString().trim();
                     if (!url.isEmpty()) {
                         importModelFromUrl(url);

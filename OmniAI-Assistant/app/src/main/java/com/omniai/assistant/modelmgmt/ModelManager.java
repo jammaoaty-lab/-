@@ -462,10 +462,11 @@ public class ModelManager {
             defaultModel.setFileSize(1_500_000_000L);
             defaultModel.setQuantType("Q4_K_M");
         }
+        final AIModel finalDefaultModel = defaultModel;
         VisionInferenceEngine visionEngine = VisionInferenceEngine.getInstance();
         final boolean[] success = {false};
         Thread thread = new Thread(() -> {
-            visionEngine.switchVisionModel(defaultModel, new VisionInferenceEngine.LoadCallback() {
+            visionEngine.switchVisionModel(finalDefaultModel, new VisionInferenceEngine.LoadCallback() {
                 @Override
                 public void onLoaded(AIModel model) {
                     success[0] = true;

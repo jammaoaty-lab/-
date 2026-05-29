@@ -9,7 +9,7 @@
     android:background="?attr/selectableItemBackground">
 
     <ImageView
-        android:id="@+id/iv_setting_icon"
+        android:id="@+id/iv_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:tint="#64748B" />
@@ -22,14 +22,14 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tv_setting_title"
+            android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="15sp"
             android:textColor="#1E293B" />
 
         <TextView
-            android:id="@+id/tv_setting_subtitle"
+            android:id="@+id/tv_subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="12sp"
@@ -37,14 +37,14 @@
             android:visibility="gone" />
     </LinearLayout>
 
-    <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switch_setting"
+    <Switch
+        android:id="@+id/switch_toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone" />
 
     <TextView
-        android:id="@+id/tv_setting_value"
+        android:id="@+id/tv_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="13sp"
@@ -52,7 +52,7 @@
         android:visibility="gone" />
 
     <ImageView
-        android:id="@+id/iv_setting_arrow"
+        android:id="@+id/iv_arrow"
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:layout_marginStart="8dp"
