@@ -5,13 +5,15 @@ interface GlassCardProps {
   className?: string;
   hasNeonBorder?: boolean;
   rounded?: 'sm' | 'md' | 'lg' | 'xl';
+  onClick?: () => void;
 }
 
 const GlassCard = ({ 
   children, 
   className = '', 
   hasNeonBorder = false,
-  rounded = 'xl' 
+  rounded = 'xl',
+  onClick
 }: GlassCardProps) => {
   const roundedClasses = {
     sm: 'rounded-lg',
@@ -28,6 +30,7 @@ const GlassCard = ({
         ${hasNeonBorder ? 'neon-border glass-card-shadow' : 'card-shadow'} 
         ${className}
       `}
+      onClick={onClick}
     >
       {children}
     </div>
