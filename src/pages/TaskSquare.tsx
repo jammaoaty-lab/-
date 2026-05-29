@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency } from '../utils/format';
 import { Task } from '../types';
-import GlassCard from '../components/GlassCard';
 import TaskCard from '../components/TaskCard';
 import Button from '../components/Button';
 
@@ -139,59 +138,62 @@ const TaskSquare = () => {
 
   return (
     <div 
-      className="min-h-screen bg-[#F2F7FF] pb-24"
+      className="min-h-screen page-background pb-28"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* 顶部导航栏 */}
-      <div className="px-5 pt-12 pb-5">
-        <div className="flex items-center justify-between">
+      {/* 顶部状态栏 + 欢迎昵称栏 */}
+      <div className="px-5 pt-14 pb-6">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 primary-gradient rounded-xl flex items-center justify-center glow-effect">
-              <span className="text-white font-bold text-lg">众</span>
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100">
+              <img
+                src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'}
+                alt="头像"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <h1 className="text-xl font-bold text-slate-800">众包任务</h1>
+            <div>
+              <h2 className="text-title font-bold text-text-primary">Hi {user?.name || '用户'}</h2>
+              <p className="text-body text-text-secondary">欢迎来到众包任务</p>
+            </div>
           </div>
           
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 glass-effect rounded-xl flex items-center justify-center neon-border">
-              <Search size={20} className="text-slate-500" />
-            </div>
+          <div className="flex items-center gap-2">
             <button 
               onClick={handleRefresh}
-              className="w-10 h-10 glass-effect rounded-xl flex items-center justify-center neon-border transition-transform duration-300 active:scale-90"
+              className="w-10 h-10 rounded-xl flex items-center justify-center bg-white shadow-card btn-press"
             >
               {isRefreshing ? (
-                <Loader2 size={20} className="text-[#36B0FF] animate-spin" />
+                <Loader2 size={20} className="text-primary animate-spin" />
               ) : (
-                <RefreshCw size={20} className="text-slate-500" />
+                <RefreshCw size={20} className="text-text-tertiary" />
               )}
             </button>
             <button 
               onClick={() => setShowSignIn(true)}
-              className="w-10 h-10 glass-effect rounded-xl flex items-center justify-center neon-border relative"
+              className="w-10 h-10 rounded-xl flex items-center justify-center bg-white shadow-card btn-press relative"
             >
-              <Bell size={20} className="text-slate-500" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-[#FFD266] rounded-full" />
+              <Bell size={20} className="text-text-tertiary" />
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full" />
             </button>
           </div>
         </div>
       </div>
 
       <div className="px-5">
-        {/* 1. 通栏系统公告栏 */}
+        {/* 1. 通栏系统公告滚动栏 */}
         {showAnnouncement && (
           <div 
-            className="mb-5 rounded-2xl glass-effect neon-border p-4 cursor-pointer hover:scale-[1.01] transition-transform duration-300"
-            style={{ background: 'linear-gradient(135deg, rgba(54,176,255,0.15), rgba(15,86,232,0.08))' }}
+            className="mb-5 rounded-card-large p-4 bg-tag-primary cursor-pointer card-scroll"
             onClick={() => navigate('/announcement')}
           >
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
-                <Megaphone size={20} className="text-[#36B0FF]" />
+                <Megaphone size={20} className="text-primary" />
               </div>
               <div className="flex-1 overflow-hidden">
-                <div className="whitespace-nowrap text-slate-700 text-sm">
+                <div className="whitespace-nowrap text-text-secondary text-body">
                   <div className="animate-marquee inline-block">
                     📢 系统公告：新用户专享¥50现金奖励！每日签到领¥10，邀请好友赚更多！新人好礼，限时领取！&nbsp;&nbsp;&nbsp;&nbsp;
                     📢 系统公告：新用户专享¥50现金奖励！每日签到领¥10，邀请好友赚更多！新人好礼，限时领取！&nbsp;&nbsp;&nbsp;&nbsp;
@@ -203,83 +205,75 @@ const TaskSquare = () => {
                   e.stopPropagation();
                   setShowAnnouncement(false);
                 }}
-                className="flex-shrink-0 w-6 h-6 glass-effect rounded-full flex items-center justify-center"
+                className="flex-shrink-0 w-6 h-6 flex items-center justify-center"
               >
-                <X size={14} className="text-slate-400" />
+                <X size={14} className="text-text-placeholder" />
               </button>
             </div>
           </div>
         )}
 
-        {/* 2. 4宫格功能瓷片区 */}
+        {/* 2. 横向四宫格功能瓷片区 */}
         <div className="grid grid-cols-4 gap-3 mb-5">
           <button 
-            onClick={() => navigate('/wallet')}
-            className="glass-effect neon-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300 active:scale-95"
-          >
-            <div className="w-12 h-12 primary-gradient rounded-full flex items-center justify-center glow-effect">
-              <Wallet size={22} className="text-white" />
-            </div>
-            <span className="text-xs font-medium text-slate-700">我的钱包</span>
-          </button>
-
-          <button 
             onClick={() => navigate('/my-tasks')}
-            className="glass-effect neon-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300 active:scale-95"
+            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
           >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center glow-effect" style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)' }}>
+            <div className="w-12 h-12 primary-gradient rounded-full flex items-center justify-center">
               <MessageSquare size={22} className="text-white" />
             </div>
-            <span className="text-xs font-medium text-slate-700">我的任务</span>
+            <span className="text-caption font-medium text-text-primary">我的任务</span>
           </button>
 
           <button 
-            onClick={() => navigate('/announcement')}
-            className="glass-effect neon-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300 active:scale-95"
+            onClick={() => navigate('/publish')}
+            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
           >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center glow-effect" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
-              <Bell size={22} className="text-white" />
+            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+              <Gift size={22} className="text-white" />
             </div>
-            <span className="text-xs font-medium text-slate-700">公告中心</span>
+            <span className="text-caption font-medium text-text-primary">发布任务</span>
           </button>
 
           <button 
             onClick={() => navigate('/invite')}
-            className="glass-effect neon-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300 active:scale-95"
+            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
           >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center glow-effect" style={{ background: 'linear-gradient(135deg, #A855F7, #9333EA)' }}>
+            <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
               <Users size={22} className="text-white" />
             </div>
-            <span className="text-xs font-medium text-slate-700">邀请好友</span>
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-slate-400">已邀</span>
-              <span className="text-xs font-bold gold-text">12人</span>
-              <span className="text-xs text-slate-400">收益</span>
-              <span className="text-xs font-bold gold-text">¥256</span>
+            <span className="text-caption font-medium text-text-primary">邀请好友</span>
+          </button>
+
+          <button 
+            onClick={() => navigate('/wallet')}
+            className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
+          >
+            <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center">
+              <Wallet size={22} className="text-white" />
             </div>
+            <span className="text-caption font-medium text-text-primary">在线客服</span>
           </button>
         </div>
 
-        {/* 3. 新人专享奖励通栏Banner */}
+        {/* 3. 通栏新人奖励Banner（深色运营卡片） */}
         {showNewUserBanner && !hasClaimedNewUserReward && (
           <div 
-            className="mb-5 rounded-2xl p-5 cursor-pointer hover:scale-[1.01] transition-transform duration-300"
-            style={{ background: 'linear-gradient(135deg, rgba(255,210,102,0.25), rgba(54,176,255,0.15))' }}
+            className="mb-5 dark-banner p-5 cursor-pointer card-scroll"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <span className="inline-block px-3 py-1 bg-[#FFD266] text-slate-800 text-xs font-bold rounded-full">新人专属</span>
+                  <span className="inline-block px-3 py-1 bg-primary/20 text-primary text-caption font-bold tag-round">新人专属</span>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500 mb-1">新用户注册奖励</p>
-                  <p className="text-3xl font-bold gold-text">¥50.00</p>
+                  <p className="text-caption text-gray-400 mb-1">新用户注册奖励</p>
+                  <p className="text-3xl font-bold text-profit-red">¥50.00</p>
                 </div>
               </div>
               <Button 
                 variant="primary" 
                 size="md" 
-                isGlow
                 onClick={handleClaimNewUserReward}
               >
                 立即领取
@@ -288,39 +282,17 @@ const TaskSquare = () => {
           </div>
         )}
 
-        {/* 现金资产条 */}
-        <GlassCard className="p-4 mb-6" hasNeonBorder>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 primary-gradient rounded-xl flex items-center justify-center">
-                <Wallet size={20} className="text-white" />
-              </div>
-              <div>
-                <p className="text-sm text-slate-500 mb-1">钱包现金余额</p>
-                <p className="text-2xl font-bold gold-text">{formatCurrency(user?.balance || 0)}</p>
-              </div>
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => navigate('/wallet')}
-            >
-              打开钱包
-            </Button>
-          </div>
-        </GlassCard>
-
-        {/* 分类筛选 */}
-        <div className="mb-6 overflow-x-auto pb-2 -mx-5 px-5">
-          <div className="flex gap-3 min-w-max">
+        {/* 分类筛选横向胶囊标签栏 */}
+        <div className="mb-5 overflow-x-auto pb-2 -mx-5 px-5">
+          <div className="flex gap-2 min-w-max">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${
+                className={`px-5 py-2 capsule-btn text-body font-medium transition-all duration-200 whitespace-nowrap ${
                   selectedCategory === category
-                    ? 'primary-gradient text-white glow-effect'
-                    : 'glass-effect text-slate-600 neon-border'
+                    ? 'primary-gradient text-white shadow-float'
+                    : 'bg-white text-text-tertiary shadow-card'
                 }`}
               >
                 {category}
@@ -332,15 +304,15 @@ const TaskSquare = () => {
         {/* 刷新提示 */}
         {isRefreshing && (
           <div className="text-center py-3 mb-4">
-            <div className="inline-flex items-center gap-2 text-[#36B0FF] text-sm">
+            <div className="inline-flex items-center gap-2 text-primary text-body">
               <Loader2 size={16} className="animate-spin" />
               <span>正在刷新任务...</span>
             </div>
           </div>
         )}
 
-        {/* 任务列表 */}
-        <div className="space-y-4">
+        {/* 任务列表单列瀑布流 */}
+        <div className="space-y-4 pb-4">
           {displayTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
           ))}
@@ -349,48 +321,45 @@ const TaskSquare = () => {
 
       {/* Toast提示 */}
       {showToast && (
-        <div className="fixed top-16 left-1/2 transform -translate-x-1/2 z-[60]">
-          <div className="glass-effect neon-border px-6 py-3 rounded-xl flex items-center gap-2">
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[60]">
+          <div className="bg-white shadow-float px-6 py-3 rounded-card-large flex items-center gap-2">
             <div className="w-6 h-6 primary-gradient rounded-full flex items-center justify-center">
               <span className="text-white text-xs">✓</span>
             </div>
-            <span className="text-slate-700 font-medium">
+            <span className="text-text-primary font-medium text-body">
               {hasClaimedNewUserReward ? '新人奖励领取成功，¥50已到账！' : '签到成功，¥10已到账！'}
             </span>
           </div>
         </div>
       )}
 
-      {/* 签到弹窗 */}
+      {/* 签到弹窗（居中悬浮） */}
       {showSignIn && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
           <div 
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setShowSignIn(false)}
           />
-          <div className="relative w-full max-w-md glass-effect rounded-[26px] neon-border glass-card-shadow p-6 animate-fade-in">
+          <div className="relative w-full max-w-md bg-white modal-round shadow-float p-6 animate-slide-up">
             {/* 关闭按钮 */}
             <button 
               onClick={() => setShowSignIn(false)}
-              className="absolute top-4 right-4 w-8 h-8 glass-effect rounded-full flex items-center justify-center neon-border hover:bg-slate-100 transition-colors"
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-text-placeholder hover:text-text-tertiary"
             >
-              <X size={18} className="text-slate-500" />
+              <X size={18} />
             </button>
             
-            {/* 顶部装饰条 */}
-            <div className="w-12 h-1 bg-slate-300/50 rounded-full mx-auto mb-6" />
-            
-            <h2 className="text-xl font-bold text-slate-800 text-center mb-6">每日签到</h2>
+            <h2 className="text-title font-bold text-text-primary text-center mb-6">每日签到</h2>
             
             {/* 日历签到 */}
             <div className="grid grid-cols-7 gap-3 mb-6">
               {[1, 2, 3, 4, 5, 6, 7].map((day) => (
                 <div 
                   key={day}
-                  className={`aspect-square rounded-[12px] flex flex-col items-center justify-center transition-all duration-300 ${
+                  className={`aspect-square rounded-card-large flex flex-col items-center justify-center transition-all duration-200 ${
                     signedDays.includes(day) 
-                      ? 'primary-gradient text-white' 
-                      : 'glass-effect neon-border text-slate-400'
+                      ? 'primary-gradient text-white shadow-float' 
+                      : 'bg-gray-50 text-text-placeholder'
                   }`}
                 >
                   <span className="text-[10px] opacity-80">周{['一', '二', '三', '四', '五', '六', '日'][day-1]}</span>
@@ -400,16 +369,15 @@ const TaskSquare = () => {
             </div>
             
             {/* 连续签到奖励 */}
-            <div className="p-5 mb-6 text-center">
-              <p className="text-sm text-slate-500 mb-2">连续签到7天可领取现金奖励</p>
-              <p className="text-3xl font-bold gold-text">¥10.00</p>
+            <div className="p-5 mb-6 text-center bg-gray-50 rounded-card-large">
+              <p className="text-body text-text-tertiary mb-2">连续签到7天可领取现金奖励</p>
+              <p className="text-3xl font-bold text-profit-red">¥10.00</p>
             </div>
             
             {/* 签到按钮 */}
             <Button 
               variant="primary" 
               size="lg" 
-              isGlow
               className="w-full"
               disabled={todaySigned}
               onClick={handleSignIn}

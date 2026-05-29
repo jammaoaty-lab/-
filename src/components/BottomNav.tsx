@@ -11,7 +11,8 @@ const BottomNav = () => {
     { id: 0, type: 'tasks' as const, label: '任务广场', path: '/' },
     { id: 1, type: 'invite' as const, label: '好友邀约', path: '/invite' },
     { id: 2, type: 'publish' as const, label: '发布管理', path: '/publish' },
-    { id: 3, type: 'profile' as const, label: '个人中心', path: '/profile' }
+    { id: 3, type: 'wallet' as const, label: '我的钱包', path: '/wallet' },
+    { id: 4, type: 'profile' as const, label: '个人中心', path: '/profile' }
   ];
 
   const getCurrentTab = () => {
@@ -23,13 +24,13 @@ const BottomNav = () => {
   const activeTab = getCurrentTab();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50">
-      {/* 顶部冰蓝色分割线 */}
-      <div className="h-[1px] bg-gradient-to-r from-transparent via-[#36B0FF] to-transparent" />
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white">
+      {/* 顶部轻量分割线 */}
+      <div className="h-[0.5px] bg-gray-100" />
       
       {/* 导航栏主体 */}
-      <div className="glass-effect">
-        <div className="flex justify-around items-center py-3 px-2">
+      <div className="bg-white">
+        <div className="flex justify-around items-center py-2 px-1 pb-8">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             
@@ -40,22 +41,22 @@ const BottomNav = () => {
                   setCurrentTab(tab.id);
                   navigate(tab.path);
                 }}
-                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-300 ${
-                  isActive ? 'scale-95' : 'hover:scale-105'
+                className={`flex flex-col items-center gap-1 px-2 py-2 rounded-xl transition-all duration-200 btn-press ${
+                  isActive ? 'bg-primary/5' : ''
                 }`}
               >
-                <div className={`relative ${isActive ? 'glow-effect' : ''}`}>
+                <div className="flex items-center justify-center w-10 h-10">
                   <BottomNavIcon
                     type={tab.type}
-                    size={40}
+                    size={22}
                     active={isActive}
                   />
                 </div>
                 <span
-                  className={`text-xs font-medium transition-all duration-300 ${
+                  className={`text-xs font-medium transition-all duration-200 ${
                     isActive 
-                      ? 'text-[#36B0FF]' 
-                      : 'text-gray-500'
+                      ? 'text-primary' 
+                      : 'text-text-tertiary'
                   }`}
                 >
                   {tab.label}

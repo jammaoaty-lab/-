@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { Share2, Users, Gift, CheckCircle, Copy, Link, Image, MessageSquare, ChevronDown, ChevronUp } from 'lucide-react';
+import { Share2, Users, Gift, CheckCircle, Copy, Link, Image, MessageSquare, ChevronDown, ChevronUp, Bell, Wallet, TrendingUp, Trophy, Coins } from 'lucide-react';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency } from '../utils/format';
-import GlassCard from '../components/GlassCard';
 import Button from '../components/Button';
 
 const Invite = () => {
   const { user } = useStore();
   const [copied, setCopied] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
+  const [signedDays, setSignedDays] = useState([1, 2, 3]);
+  const [showToast, setShowToast] = useState(false);
+  const [todaySigned, setTodaySigned] = useState(false);
 
   // 模拟已邀请好友列表
   const invitedFriends = [
@@ -26,6 +29,22 @@ const Invite = () => {
     { target: 20, reward: 400, completed: 2, label: '邀请满20位' },
   ];
 
+  // 四宫格数据
+  const statsData = [
+    { label: '已邀请', value: '12', icon: Users, color: 'text-primary' },
+    { label: '今日收益', value: '¥35.5', icon: Coins, color: 'text-profit-red' },
+    { label: '累计收益', value: '¥256.0', icon: Wallet, color: 'text-profit-red' },
+    { label: '待结算', value: '¥85.5', icon: TrendingUp, color: 'text-primary' },
+  ];
+
+  // 常用功能入口
+  const functionEntries = [
+    { label: '复制链接', icon: Link, color: 'primary-gradient' },
+    { label: '生成海报', icon: Image, color: 'bg-orange-500' },
+    { label: '微信分享', icon: MessageSquare, color: 'bg-green-500' },
+    { label: '我的团队', icon: Users, color: 'bg-purple-500' },
+  ];
+
   const handleCopyCode = () => {
     if (user?.inviteCode) {
       navigator.clipboard.writeText(user.inviteCode);
@@ -41,167 +60,200 @@ const Invite = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // 签到功能
+  const handleSignIn = () => {
+    if (todaySigned) return;
+    
+    const newSignedDays = [...signedDays, Math.max(...signedDays) + 1];
+    setSignedDays(newSignedDays);
+    setTodaySigned(true);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 2000);
+    setTimeout(() => setShowSignIn(false), 1500);
+  };
+
   return (
-    <div className="min-h-screen bg-[#F2F7FF] pb-24">
-      {/* 顶部渐变Banner */}
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 primary-gradient opacity-15" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#36B0FF]/30 rounded-full blur-3xl" />
-        <div className="absolute -top-10 -right-10 w-48 h-48 bg-[#FFD266]/20 rounded-full blur-2xl" />
-        
-        <div className="px-5 pt-16 pb-10 relative">
-          <h1 className="text-2xl font-bold text-slate-800 text-center mb-3">邀请好友做任务</h1>
-          <p className="text-slate-500 text-center mb-6">双向都得现金奖励</p>
-          
-          {/* 核心收益 */}
-          <div className="text-center mb-8">
-            <p className="text-sm text-slate-500 mb-2">每邀请1位好友，您和好友都有奖励</p>
-            <div className="flex items-baseline justify-center gap-2">
-              <span className="text-5xl font-bold gold-text">{formatCurrency(10)}</span>
-              <span className="text-lg text-slate-600">起</span>
+    <div className="min-h-screen page-background pb-28">
+      {/* 顶部状态栏 + 欢迎昵称栏 */}
+      <div className="px-5 pt-14 pb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-100">
+              <img
+                src={user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'}
+                alt="头像"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <h2 className="text-title font-bold text-text-primary">Hi {user?.name || '用户'}</h2>
+              <p className="text-body text-text-secondary">邀请好友赚更多</p>
             </div>
           </div>
-
-          {/* 邀请码输入框 */}
-          <GlassCard className="p-4 flex items-center gap-3">
-            <div className="flex-1">
-              <p className="text-xs text-slate-500 mb-1">我的邀请码</p>
-              <p className="text-lg font-bold text-[#0F56E8]">{user?.inviteCode}</p>
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={handleCopyCode}
-              className="flex items-center gap-2"
-            >
-              {copied ? <CheckCircle size={18} /> : <Copy size={18} />}
-              {copied ? '已复制' : '复制'}
-            </Button>
-          </GlassCard>
+          
+          <button 
+            onClick={() => setShowSignIn(true)}
+            className="w-10 h-10 rounded-card-large flex items-center justify-center bg-white shadow-card btn-press relative"
+          >
+            <Bell size={20} className="text-text-tertiary" />
+            <span className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full" />
+          </button>
         </div>
       </div>
 
       <div className="px-5">
-        {/* 数据统计卡片 */}
-        <GlassCard className="p-6 mb-6" hasNeonBorder>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <p className="text-3xl font-bold gold-text">12</p>
-              <p className="text-sm text-slate-500 mt-1">已邀请人数</p>
+        {/* 四栏数据卡片 */}
+        <div className="grid grid-cols-4 gap-3 mb-5">
+          {statsData.map((stat, index) => (
+            <div key={index} className="white-card p-4 text-center card-scroll">
+              <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-tag-primary flex items-center justify-center">
+                <stat.icon size={18} className={stat.color} />
+              </div>
+              <p className={`text-subtitle font-bold ${stat.color} mb-1`}>{stat.value}</p>
+              <p className="text-caption text-text-tertiary">{stat.label}</p>
             </div>
-            <div>
-              <p className="text-3xl font-bold gold-text">{formatCurrency(85.5)}</p>
-              <p className="text-sm text-slate-500 mt-1">待结算佣金</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold gold-text">{formatCurrency(256.0)}</p>
-              <p className="text-sm text-slate-500 mt-1">累计已到账</p>
-            </div>
-          </div>
-        </GlassCard>
+          ))}
+        </div>
 
-        {/* 阶梯额外奖励 */}
-        <GlassCard className="p-5 mb-6">
-          <h3 className="font-semibold text-slate-800 mb-4">🎉 阶梯额外奖励</h3>
+        {/* 裂变等级进度 */}
+        <div className="white-card p-5 mb-5">
+          <h3 className="text-subtitle font-bold text-text-primary mb-4 flex items-center gap-2">
+            <Trophy size={20} className="text-primary" />
+            阶梯额外奖励
+          </h3>
           <div className="grid grid-cols-3 gap-3">
             {stepRewards.map((step, index) => (
-              <div key={index} className="p-3 glass-effect rounded-xl text-center">
-                <p className="text-xs text-slate-500 mb-1">{step.label}</p>
-                <p className="text-xl font-bold gold-text mb-2">{formatCurrency(step.reward)}</p>
-                <div className="text-xs">
-                  <span className="text-[#36B0FF]">{step.completed}</span>
-                  <span className="text-slate-400">/{step.target}</span>
+              <div key={index} className="bg-tag-light rounded-card-task p-4 text-center">
+                <p className="text-caption text-text-tertiary mb-1">{step.label}</p>
+                <p className="text-title font-bold text-profit-red mb-2">{formatCurrency(step.reward)}</p>
+                <div className="text-caption">
+                  <span className="text-primary">{step.completed}</span>
+                  <span className="text-text-placeholder">/{step.target}</span>
+                </div>
+                {/* 进度条 */}
+                <div className="mt-2 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full primary-gradient transition-all duration-500"
+                    style={{ width: `${(step.completed / step.target) * 100}%` }}
+                  />
                 </div>
               </div>
             ))}
           </div>
-        </GlassCard>
+        </div>
 
-        {/* 三大分享按钮 */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <button 
-            onClick={handleCopyLink}
-            className="glass-effect neon-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300 active:scale-95"
-          >
-            <div className="w-12 h-12 primary-gradient rounded-full flex items-center justify-center glow-effect">
-              <Link size={22} className="text-white" />
+        {/* 我的收益订单四宫格 */}
+        <div className="white-card p-5 mb-5">
+          <h3 className="text-subtitle font-bold text-text-primary mb-4">我的收益</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-4 bg-tag-primary rounded-card-task">
+              <p className="text-caption text-text-tertiary mb-1">今日新增</p>
+              <p className="text-[26px] font-bold text-profit-red">¥35.50</p>
+              <p className="text-caption text-text-tertiary mt-1">+12.5%</p>
             </div>
-            <span className="text-xs font-medium text-slate-700">复制链接</span>
-          </button>
+            <div className="p-4 bg-tag-primary rounded-card-task">
+              <p className="text-caption text-text-tertiary mb-1">待结算</p>
+              <p className="text-[26px] font-bold text-text-primary">¥85.50</p>
+              <p className="text-caption text-text-tertiary mt-1">7天后到账</p>
+            </div>
+          </div>
+        </div>
 
-          <button 
-            onClick={() => {}}
-            className="glass-effect neon-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300 active:scale-95"
-          >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center glow-effect" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
-              <Image size={22} className="text-white" />
+        {/* 深色Banner */}
+        <div className="dark-banner p-5 mb-5 card-scroll">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <span className="inline-block px-3 py-1 bg-primary/20 text-primary text-caption font-bold tag-round">限时福利</span>
+              </div>
+              <div>
+                <p className="text-caption text-gray-400 mb-1">每邀请1位好友</p>
+                <p className="text-[28px] font-bold text-profit-red">¥10.00</p>
+                <p className="text-caption text-gray-400">双向都得现金奖励</p>
+              </div>
             </div>
-            <span className="text-xs font-medium text-slate-700">生成海报</span>
-          </button>
+            <div className="text-right">
+              <p className="text-caption text-gray-400 mb-1">我的邀请码</p>
+              <p className="text-lg font-bold text-white">{user?.inviteCode}</p>
+              <button 
+                onClick={handleCopyCode}
+                className="mt-2 px-4 py-1.5 bg-white/10 text-white text-caption rounded-full flex items-center gap-1 mx-auto"
+              >
+                {copied ? <CheckCircle size={14} /> : <Copy size={14} />}
+                {copied ? '已复制' : '复制'}
+              </button>
+            </div>
+          </div>
+        </div>
 
-          <button 
-            onClick={() => {}}
-            className="glass-effect neon-border rounded-2xl p-4 flex flex-col items-center gap-2 hover:scale-105 transition-transform duration-300 active:scale-95"
-          >
-            <div className="w-12 h-12 rounded-full flex items-center justify-center glow-effect" style={{ background: 'linear-gradient(135deg, #22C55E, #16A34A)' }}>
-              <MessageSquare size={22} className="text-white" />
-            </div>
-            <span className="text-xs font-medium text-slate-700">微信分享</span>
-          </button>
+        {/* 常用功能入口 */}
+        <div className="grid grid-cols-4 gap-3 mb-5">
+          {functionEntries.map((entry, index) => (
+            <button 
+              key={index}
+              onClick={index === 0 ? handleCopyLink : undefined}
+              className="white-card p-4 flex flex-col items-center gap-2 btn-press"
+            >
+              <div className={`w-12 h-12 ${entry.color} rounded-full flex items-center justify-center shadow-float`}>
+                <entry.icon size={22} className="text-white" />
+              </div>
+              <span className="text-caption font-medium text-text-primary">{entry.label}</span>
+            </button>
+          ))}
         </div>
 
         {/* 已邀请好友列表 */}
-        <div className="mb-6">
-          <h3 className="font-semibold text-slate-800 mb-4">已邀请好友</h3>
+        <div className="mb-5">
+          <h3 className="text-subtitle font-bold text-text-primary mb-4">已邀请好友</h3>
           <div className="space-y-3">
             {invitedFriends.map((friend) => (
-              <GlassCard key={friend.id} className="p-4">
+              <div key={friend.id} className="white-card p-4 card-scroll">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <img src={friend.avatar} alt={friend.nickname} className="w-12 h-12 rounded-xl" />
+                    <img src={friend.avatar} alt={friend.nickname} className="w-12 h-12 rounded-card-task" />
                     <div>
-                      <p className="font-medium text-slate-800">{friend.nickname}</p>
-                      <p className="text-xs text-slate-400">{friend.registerTime}</p>
+                      <p className="text-body font-medium text-text-primary">{friend.nickname}</p>
+                      <p className="text-caption text-text-tertiary">{friend.registerTime}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     {friend.hasFirstTask ? (
-                      <span className="inline-block px-2 py-1 bg-green-100 text-green-600 text-xs font-medium rounded-full mb-1">
+                      <span className="inline-block px-3 py-1 bg-green-50 text-green-600 text-caption font-medium tag-round mb-1">
                         已完成首单
                       </span>
                     ) : (
-                      <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-600 text-xs font-medium rounded-full mb-1">
+                      <span className="inline-block px-3 py-1 bg-yellow-50 text-yellow-600 text-caption font-medium tag-round mb-1">
                         待完成首单
                       </span>
                     )}
-                    <p className="font-bold gold-text">+{formatCurrency(friend.totalReward)}</p>
+                    <p className="text-subtitle font-bold text-profit-red">+{formatCurrency(friend.totalReward)}</p>
                   </div>
                 </div>
-              </GlassCard>
+              </div>
             ))}
           </div>
         </div>
 
         {/* 活动规则折叠面板 */}
-        <div className="mb-6">
+        <div className="mb-5">
           <button 
             onClick={() => setShowRules(!showRules)}
-            className="w-full flex items-center justify-between text-slate-600 mb-3"
+            className="w-full flex items-center justify-between text-text-secondary mb-3"
           >
-            <span className="font-medium">📋 活动规则</span>
-            {showRules ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            <span className="text-subtitle font-bold text-text-primary">📋 活动规则</span>
+            {showRules ? <ChevronUp size={20} className="text-text-tertiary" /> : <ChevronDown size={20} className="text-text-tertiary" />}
           </button>
           
           {showRules && (
-            <GlassCard className="p-5">
-              <div className="space-y-4">
+            <div className="white-card p-5 animate-fade-in">
+              <div className="space-y-5">
                 {/* 一级直邀奖励 */}
                 <div>
-                  <h4 className="font-semibold text-slate-800 mb-2 flex items-center gap-2">
-                    <span className="w-6 h-6 primary-gradient rounded-full flex items-center justify-center text-white text-xs">1</span>
+                  <h4 className="text-body font-bold text-text-primary mb-3 flex items-center gap-2">
+                    <span className="w-6 h-6 primary-gradient rounded-full flex items-center justify-center text-white text-caption">1</span>
                     一级直邀奖励
                   </h4>
-                  <ul className="space-y-2 text-sm text-slate-600 ml-8">
+                  <ul className="space-y-2 text-body text-text-secondary ml-8">
                     <li>• 好友注册+实名认证：您获得¥5</li>
                     <li>• 好友首单任务完成：您额外获得¥3</li>
                     <li>• 好友后续每单：您获得任务赏金5%佣金（永久）</li>
@@ -210,20 +262,20 @@ const Invite = () => {
 
                 {/* 二级间接奖励 */}
                 <div>
-                  <h4 className="font-semibold text-slate-800 mb-2 flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>2</span>
+                  <h4 className="text-body font-bold text-text-primary mb-3 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-caption" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>2</span>
                     二级间接奖励
                   </h4>
-                  <ul className="space-y-2 text-sm text-slate-600 ml-8">
+                  <ul className="space-y-2 text-body text-text-secondary ml-8">
                     <li>• 好友邀请的用户注册并完成首单：您获得¥2</li>
                     <li>• 二级用户后续每单：您获得任务赏金2%佣金</li>
                   </ul>
                 </div>
 
-                {/* 冻结规则 */}
+                {/* 资金结算规则 */}
                 <div>
-                  <h4 className="font-semibold text-slate-800 mb-2">💰 资金结算规则</h4>
-                  <ul className="space-y-2 text-sm text-slate-600">
+                  <h4 className="text-body font-bold text-text-primary mb-3">💰 资金结算规则</h4>
+                  <ul className="space-y-2 text-body text-text-secondary">
                     <li>• 所有奖励先进入冻结余额，7天冻结期后自动解冻</li>
                     <li>• 好友任务审核驳回、弃单、封号，对应奖励作废</li>
                     <li>• 奖励明细在钱包-邀请奖励分类中查看</li>
@@ -232,15 +284,15 @@ const Invite = () => {
 
                 {/* 防作弊规则 */}
                 <div>
-                  <h4 className="font-semibold text-slate-800 mb-2">⚠️ 防作弊规则</h4>
-                  <ul className="space-y-2 text-sm text-slate-600">
+                  <h4 className="text-body font-bold text-text-primary mb-3">⚠️ 防作弊规则</h4>
+                  <ul className="space-y-2 text-body text-text-secondary">
                     <li>• 同一设备/IP短时间批量注册判定异常</li>
                     <li>• 一个身份证仅一个有效账号</li>
                     <li>• 作弊账号直接封号，清空所有邀请收益</li>
                   </ul>
                 </div>
               </div>
-            </GlassCard>
+            </div>
           )}
         </div>
 
@@ -248,13 +300,80 @@ const Invite = () => {
         <Button 
           variant="primary" 
           size="xl" 
-          isGlow
-          className="w-full flex items-center justify-center gap-2"
+          className="w-full flex items-center justify-center gap-2 shadow-float"
         >
           <Share2 size={24} />
           立即分享邀请
         </Button>
       </div>
+
+      {/* Toast提示 */}
+      {showToast && (
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[60]">
+          <div className="bg-white shadow-float px-6 py-3 rounded-card-large flex items-center gap-2">
+            <div className="w-6 h-6 primary-gradient rounded-full flex items-center justify-center">
+              <span className="text-white text-xs">✓</span>
+            </div>
+            <span className="text-text-primary font-medium text-body">
+              签到成功，¥10已到账！
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* 签到弹窗 */}
+      {showSignIn && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowSignIn(false)}
+          />
+          <div className="relative w-full max-w-md bg-white modal-round shadow-float p-6 animate-slide-up">
+            <button 
+              onClick={() => setShowSignIn(false)}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-text-placeholder hover:text-text-tertiary"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+            
+            <h2 className="text-title font-bold text-text-primary text-center mb-6">每日签到</h2>
+            
+            {/* 日历签到 */}
+            <div className="grid grid-cols-7 gap-3 mb-6">
+              {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                <div 
+                  key={day}
+                  className={`aspect-square rounded-card-large flex flex-col items-center justify-center transition-all duration-200 ${
+                    signedDays.includes(day) 
+                      ? 'primary-gradient text-white shadow-float' 
+                      : 'bg-gray-50 text-text-placeholder'
+                  }`}
+                >
+                  <span className="text-[10px] opacity-80">周{['一', '二', '三', '四', '五', '六', '日'][day-1]}</span>
+                  <span className="font-bold text-lg">{day}</span>
+                </div>
+              ))}
+            </div>
+            
+            {/* 连续签到奖励 */}
+            <div className="p-5 mb-6 text-center bg-gray-50 rounded-card-large">
+              <p className="text-body text-text-tertiary mb-2">连续签到7天可领取现金奖励</p>
+              <p className="text-3xl font-bold text-profit-red">¥10.00</p>
+            </div>
+            
+            {/* 签到按钮 */}
+            <Button 
+              variant="primary" 
+              size="lg" 
+              className="w-full"
+              disabled={todaySigned}
+              onClick={handleSignIn}
+            >
+              {todaySigned ? '今日已签到' : '立即签到'}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

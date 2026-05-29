@@ -116,7 +116,7 @@ const AppLayout = () => {
   const location = useLocation();
   
   // 判断是否显示底部导航栏的页面
-  const showBottomNav = ['/', '/invite', '/publish', '/profile'].includes(location.pathname);
+  const showBottomNav = ['/', '/invite', '/publish', '/wallet', '/profile'].includes(location.pathname);
 
   return (
     <div className="relative">

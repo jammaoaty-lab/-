@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { Plus, Edit, Trash2, Package } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency } from '../utils/format';
-import GlassCard from '../components/GlassCard';
 import Button from '../components/Button';
 
 const PublishManage = () => {
@@ -53,32 +52,23 @@ const PublishManage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F2F7FF] pb-24">
+    <div className="min-h-screen page-background pb-32">
       {/* 顶部导航栏 */}
-      <div className="px-5 pt-12 pb-5">
-        <h1 className="text-xl font-bold text-slate-800 text-center">任务发布管理</h1>
-        <div className="absolute top-12 right-5">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => navigate('/wallet')}
-          >
-            账户充值
-          </Button>
-        </div>
+      <div className="px-5 pt-14 pb-6">
+        <h1 className="text-title font-bold text-text-primary text-center">任务发布管理</h1>
       </div>
 
       <div className="px-5">
         {/* 资金卡片 */}
-        <GlassCard className="p-5 mb-6" hasNeonBorder>
+        <div className="white-card p-5 mb-5">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <p className="text-sm text-slate-500 mb-1">发单账户余额</p>
-              <p className="text-3xl font-bold gold-text">{formatCurrency(user?.balance || 0)}</p>
+              <p className="text-body text-text-secondary mb-1">发单账户余额</p>
+              <p className="text-3xl font-bold text-profit-red">{formatCurrency(user?.balance || 0)}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-slate-500 mb-1">上架中任务</p>
-              <p className="text-xl font-bold text-[#0F56E8]">2个</p>
+              <p className="text-body text-text-secondary mb-1">上架中任务</p>
+              <p className="text-title font-bold text-primary">2个</p>
             </div>
           </div>
           
@@ -100,19 +90,19 @@ const PublishManage = () => {
               提现余额
             </Button>
           </div>
-        </GlassCard>
+        </div>
 
         {/* 状态筛选Tab */}
-        <div className="mb-6 overflow-x-auto pb-2 -mx-5 px-5">
+        <div className="mb-5 overflow-x-auto pb-2 -mx-5 px-5">
           <div className="flex gap-2 min-w-max">
             {statusTabs.map((status) => (
               <button
                 key={status}
                 onClick={() => setSelectedStatus(status)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${
+                className={`px-5 py-2 capsule-btn text-body font-medium transition-all duration-200 whitespace-nowrap ${
                   selectedStatus === status
-                    ? 'primary-gradient text-white'
-                    : 'text-slate-600 hover:bg-slate-100'
+                    ? 'primary-gradient text-white shadow-float'
+                    : 'bg-white text-text-tertiary shadow-card btn-press'
                 }`}
               >
                 {status}
@@ -125,22 +115,22 @@ const PublishManage = () => {
         {publishedTasks.length > 0 ? (
           <div className="space-y-4">
             {publishedTasks.map((task) => (
-              <GlassCard key={task.id} className="p-5">
+              <div key={task.id} className="white-card p-5 task-card-shadow btn-press">
                 <div className="flex justify-between items-start gap-4 mb-4">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-slate-800 mb-2 line-clamp-2">
+                    <h3 className="text-title font-semibold text-text-primary mb-2 line-clamp-2">
                       {task.title}
                     </h3>
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className="text-slate-500">
-                        总预算: <span className="gold-text font-semibold">{formatCurrency(task.budget)}</span>
+                    <div className="flex items-center gap-4 text-body">
+                      <span className="text-text-secondary">
+                        总预算: <span className="text-profit-red font-semibold">{formatCurrency(task.budget)}</span>
                       </span>
-                      <span className="text-slate-500">
-                        已接单: <span className="text-[#0F56E8] font-semibold">{task.currentUsers}人</span>
+                      <span className="text-text-secondary">
+                        已接单: <span className="text-primary font-semibold">{task.currentUsers}人</span>
                       </span>
                     </div>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
+                  <span className={`px-3 py-1 tag-round text-xs font-medium ${getStatusColor(task.status)}`}>
                     {getStatusText(task.status)}
                   </span>
                 </div>
@@ -157,28 +147,27 @@ const PublishManage = () => {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    className="flex items-center gap-2 text-red-500 border-red-300"
+                    className="flex items-center gap-2 text-profit-red border-red-300"
                   >
                     <Trash2 size={16} />
                     下架
                   </Button>
                 </div>
-              </GlassCard>
+              </div>
             ))}
           </div>
         ) : (
           /* 空状态 */
           <div className="text-center py-16">
             <div className="w-24 h-24 mx-auto mb-6 opacity-50">
-              <Package size={96} className="text-slate-300" />
+              <Package size={96} className="text-gray-300" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-700 mb-2">暂无发布中的悬赏任务</h3>
-            <p className="text-slate-500 mb-8">创建您的第一个任务开始赚钱吧</p>
+            <h3 className="text-title font-semibold text-text-primary mb-2">暂无发布中的悬赏任务</h3>
+            <p className="text-body text-text-secondary mb-8">创建您的第一个任务开始赚钱吧</p>
             
             <Button 
               variant="primary" 
-              size="xl" 
-              isGlow
+              size="lg" 
               onClick={() => navigate('/create-task')}
             >
               <Plus size={24} className="mr-2" />
@@ -186,20 +175,16 @@ const PublishManage = () => {
             </Button>
           </div>
         )}
+      </div>
 
-        {/* 创建任务按钮（始终显示） */}
-        <div className="mt-8">
-          <Button 
-            variant="primary" 
-            size="xl" 
-            isGlow
-            className="w-full"
-            onClick={() => navigate('/create-task')}
-          >
-            <Plus size={24} className="mr-2" />
-            创建新悬赏任务
-          </Button>
-        </div>
+      {/* 右上角悬浮创建按钮 */}
+      <div className="fixed right-5 bottom-28 z-40">
+        <button
+          onClick={() => navigate('/create-task')}
+          className="w-14 h-14 primary-gradient rounded-full flex items-center justify-center shadow-float btn-press"
+        >
+          <Plus size={28} className="text-white" />
+        </button>
       </div>
     </div>
   );
