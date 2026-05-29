@@ -19,6 +19,16 @@ export interface Task {
   status: 'active' | 'pending' | 'paused' | 'ended' | 'removed';
   deadline: string;
   publisherId: string;
+  // 新增字段
+  isPinned?: boolean; // 置顶
+  isHot?: boolean; // 热门
+  publisherName?: string; // 发布者名称
+  publisherAvatar?: string; // 发布者头像
+  reviewTime?: string; // 审核时效
+  viewCount?: number; // 浏览量
+  completionRate?: number; // 完成率
+  createTime?: string; // 创建时间
+  score?: number; // 推荐算法分数
 }
 
 export interface Transaction {

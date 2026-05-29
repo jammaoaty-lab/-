@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { Search, Bell, Wallet } from 'lucide-react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { Search, Bell, Wallet, RefreshCw, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '../hooks/useStore';
 import { formatCurrency } from '../utils/format';
+import { Task } from '../types';
 import GlassCard from '../components/GlassCard';
 import TaskCard from '../components/TaskCard';
 import Button from '../components/Button';
@@ -12,15 +13,88 @@ const TaskSquare = () => {
   const { user, tasks } = useStore();
   const [selectedCategory, setSelectedCategory] = useState('全部悬赏');
   const [showSignIn, setShowSignIn] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [displayTasks, setDisplayTasks] = useState<Task[]>([]);
+  const touchStartY = useRef(0);
 
   const categories = ['全部悬赏', '简单任务', 'APP注册', '问卷调研', '游戏任务', '高额赏金'];
 
+  // 智能排序算法
+  const sortTasks = useCallback((tasksToSort: Task[]): Task[] => {
+    const sortedTasks = [...tasksToSort];
+    
+    // 1. 置顶任务永远在最上面
+    // 2. 热门任务在置顶下方
+    // 3. 剩余任务按算法分数排序 + 随机微调保证多样性
+    return sortedTasks.sort((a, b) => {
+      // 置顶优先
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      
+      // 热门其次
+      if (a.isHot && !b.isHot) return -1;
+      if (!a.isHot && b.isHot) return 1;
+      
+      // 算法分数 + 随机微调
+      const scoreA = (a.score || 0) + Math.random() * 10;
+      const scoreB = (b.score || 0) + Math.random() * 10;
+      return scoreB - scoreA;
+    });
+  }, []);
+
+  // 初始化和筛选任务
   const filteredTasks = selectedCategory === '全部悬赏' 
     ? tasks 
     : tasks.filter(task => task.category === selectedCategory);
 
+  // 第一次加载和筛选变化时更新displayTasks
+  useEffect(() => {
+    setDisplayTasks(sortTasks(filteredTasks));
+  }, [selectedCategory, filteredTasks, sortTasks]);
+
+  // 刷新功能
+  const handleRefresh = useCallback(async () => {
+    if (isRefreshing) return;
+    
+    setIsRefreshing(true);
+    
+    // 模拟刷新请求
+    setTimeout(() => {
+      // 刷新时重新排序，模拟新任务
+      const refreshedTasks = filteredTasks.map(task => ({
+        ...task,
+        currentUsers: Math.min(
+          task.currentUsers + Math.floor(Math.random() * 3),
+          task.minUsers
+        )
+      }));
+      
+      setDisplayTasks(sortTasks(refreshedTasks));
+      setIsRefreshing(false);
+    }, 1000);
+  }, [isRefreshing, filteredTasks, sortTasks]);
+
+  // 下拉手势刷新
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const touchEndY = e.changedTouches[0].clientY;
+    const diff = touchEndY - touchStartY.current;
+    
+    // 下拉超过100px触发刷新
+    if (diff > 100) {
+      handleRefresh();
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#F2F7FF] pb-24">
+    <div 
+      className="min-h-screen bg-[#F2F7FF] pb-24"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* 顶部导航栏 */}
       <div className="px-5 pt-12 pb-5">
         <div className="flex items-center justify-between">
@@ -35,6 +109,16 @@ const TaskSquare = () => {
             <div className="w-10 h-10 glass-effect rounded-xl flex items-center justify-center neon-border">
               <Search size={20} className="text-slate-500" />
             </div>
+            <button 
+              onClick={handleRefresh}
+              className="w-10 h-10 glass-effect rounded-xl flex items-center justify-center neon-border transition-transform duration-300 active:scale-90"
+            >
+              {isRefreshing ? (
+                <Loader2 size={20} className="text-[#36B0FF] animate-spin" />
+              ) : (
+                <RefreshCw size={20} className="text-slate-500" />
+              )}
+            </button>
             <button 
               onClick={() => setShowSignIn(true)}
               className="w-10 h-10 glass-effect rounded-xl flex items-center justify-center neon-border relative"
@@ -88,9 +172,19 @@ const TaskSquare = () => {
           </div>
         </div>
 
+        {/* 刷新提示 */}
+        {isRefreshing && (
+          <div className="text-center py-3 mb-4">
+            <div className="inline-flex items-center gap-2 text-[#36B0FF] text-sm">
+              <Loader2 size={16} className="animate-spin" />
+              <span>正在刷新任务...</span>
+            </div>
+          </div>
+        )}
+
         {/* 任务列表 */}
         <div className="space-y-4">
-          {filteredTasks.map((task) => (
+          {displayTasks.map((task) => (
             <TaskCard key={task.id} task={task} />
           ))}
         </div>
