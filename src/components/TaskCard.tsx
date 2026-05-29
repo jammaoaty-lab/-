@@ -16,9 +16,9 @@ const TaskCard = ({ task, onClick }: TaskCardProps) => {
       className="bg-white rounded-card-task shadow-card p-5 cursor-pointer card-scroll relative overflow-hidden"
       onClick={onClick}
     >
-      {/* 置顶标签 - 左上角 */}
+      {/* 置顶标签 - 左上角（调整位置避免覆盖头像） */}
       {task.isPinned && (
-        <div className="absolute top-4 left-4 z-10">
+        <div className="absolute top-3 left-3 z-10">
           <span className="inline-block px-3 py-1 primary-gradient text-white text-caption font-semibold tag-round">
             置顶
           </span>
@@ -27,7 +27,7 @@ const TaskCard = ({ task, onClick }: TaskCardProps) => {
       
       {/* 热门标签 - 右上角 */}
       {task.isHot && (
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-3 right-3 z-10">
           <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-400 text-white text-caption font-semibold tag-round">
             <Flame size={12} fill="currentColor" />
             热门
@@ -35,7 +35,7 @@ const TaskCard = ({ task, onClick }: TaskCardProps) => {
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className={`space-y-4 ${(task.isPinned || task.isHot) ? 'pt-7' : ''}`}>
         {/* 第一行：悬赏主信息 + 赏金 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
