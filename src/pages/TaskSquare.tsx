@@ -22,7 +22,14 @@ const TaskSquare = () => {
   const [hasClaimedNewUserReward, setHasClaimedNewUserReward] = useState(false);
   const touchStartY = useRef(0);
 
-  const categories = ['全部悬赏', '简单任务', 'APP注册', '问卷调研', '游戏任务', '高额赏金'];
+  const categories = [
+    { name: '全部悬赏', bgColor: '#E5E7EB', textColor: '#6B7280' },
+    { name: '简单任务', bgColor: '#D1F0F5', textColor: '#4A98A8' },
+    { name: 'APP注册', bgColor: '#E1F3E8', textColor: '#4CAF7E' },
+    { name: '问卷调研', bgColor: '#FDECE3', textColor: '#E67E50' },
+    { name: '游戏任务', bgColor: '#EBE5F6', textColor: '#9B7CCD' },
+    { name: '高额赏金', bgColor: '#FCE4E4', textColor: '#E05263' }
+  ];
 
   // 智能排序算法
   const sortTasks = useCallback((tasksToSort: Task[]): Task[] => {
@@ -219,8 +226,8 @@ const TaskSquare = () => {
             onClick={() => navigate('/my-tasks')}
             className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
           >
-            <div className="w-12 h-12 primary-gradient rounded-full flex items-center justify-center">
-              <MessageSquare size={22} className="text-white" />
+            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: '#D1F0F5' }}>
+              <MessageSquare size={22} style={{ color: '#4A98A8' }} />
             </div>
             <span className="text-caption font-medium text-text-primary">我的任务</span>
           </button>
@@ -229,8 +236,8 @@ const TaskSquare = () => {
             onClick={() => navigate('/publish')}
             className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
           >
-            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-              <Gift size={22} className="text-white" />
+            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: '#E1F3E8' }}>
+              <Gift size={22} style={{ color: '#4CAF7E' }} />
             </div>
             <span className="text-caption font-medium text-text-primary">发布任务</span>
           </button>
@@ -239,8 +246,8 @@ const TaskSquare = () => {
             onClick={() => navigate('/invite')}
             className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
           >
-            <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-              <Users size={22} className="text-white" />
+            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: '#FDECE3' }}>
+              <Users size={22} style={{ color: '#E67E50' }} />
             </div>
             <span className="text-caption font-medium text-text-primary">邀请好友</span>
           </button>
@@ -249,8 +256,8 @@ const TaskSquare = () => {
             onClick={() => navigate('/wallet')}
             className="bg-white rounded-card-large p-4 flex flex-col items-center gap-2 shadow-card btn-press"
           >
-            <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center">
-              <Wallet size={22} className="text-white" />
+            <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: '#EBE5F6' }}>
+              <Wallet size={22} style={{ color: '#9B7CCD' }} />
             </div>
             <span className="text-caption font-medium text-text-primary">在线客服</span>
           </button>
@@ -355,15 +362,16 @@ const TaskSquare = () => {
           <div className="flex gap-2 min-w-max">
             {categories.map((category) => (
               <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
+                key={category.name}
+                onClick={() => setSelectedCategory(category.name)}
                 className={`px-5 py-2 capsule-btn text-body font-medium transition-all duration-200 whitespace-nowrap ${
-                  selectedCategory === category
+                  selectedCategory === category.name
                     ? 'primary-gradient text-white shadow-float'
-                    : 'bg-white text-text-tertiary shadow-card'
+                    : ''
                 }`}
+                style={selectedCategory === category.name ? undefined : { backgroundColor: category.bgColor, color: category.textColor }}
               >
-                {category}
+                {category.name}
               </button>
             ))}
           </div>

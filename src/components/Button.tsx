@@ -16,7 +16,7 @@ const Button = ({
   ...props
 }: ButtonProps) => {
   const variantClasses = {
-    primary: 'primary-gradient text-white',
+    primary: 'primary-button text-white',
     secondary: 'bg-white text-[#0F56E8]',
     outline: 'bg-white border border-[#36B0FF] text-[#0F56E8]',
     text: 'bg-transparent text-[#0F56E8]'
@@ -34,12 +34,11 @@ const Button = ({
   return (
     <button
       className={`
-        font-semibold transition-all duration-300 
+        font-semibold transition-all duration-200 ease-out
         ${variantClasses[variant]} 
         ${sizeClasses[size]} 
         ${glowClass}
-        active:scale-95
-        hover:opacity-90
+        active:scale-[0.97]
         ${className}
       `}
       {...props}

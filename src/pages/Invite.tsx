@@ -31,10 +31,10 @@ const Invite = () => {
 
   // 四宫格数据
   const statsData = [
-    { label: '已邀请', value: '12', icon: Users, color: 'text-primary' },
-    { label: '今日收益', value: '¥35.5', icon: Coins, color: 'text-profit-red' },
-    { label: '累计收益', value: '¥256.0', icon: Wallet, color: 'text-profit-red' },
-    { label: '待结算', value: '¥85.5', icon: TrendingUp, color: 'text-primary' },
+    { label: '已邀请', value: '12', icon: Users, color: '#00C8E0', bgGradient: 'linear-gradient(135deg, rgba(0,200,224,0.15) 0%, rgba(0,200,224,0.05) 100%)' },
+    { label: '今日收益', value: '¥35.5', icon: Coins, color: '#F53F3F', bgGradient: 'linear-gradient(135deg, rgba(245,63,63,0.15) 0%, rgba(245,63,63,0.05) 100%)' },
+    { label: '累计收益', value: '¥256.0', icon: Wallet, color: '#F53F3F', bgGradient: 'linear-gradient(135deg, rgba(245,63,63,0.12) 0%, rgba(245,63,63,0.04) 100%)' },
+    { label: '待结算', value: '¥85.5', icon: TrendingUp, color: '#00C8E0', bgGradient: 'linear-gradient(135deg, rgba(0,200,224,0.12) 0%, rgba(0,200,224,0.04) 100%)' },
   ];
 
   // 常用功能入口
@@ -105,11 +105,11 @@ const Invite = () => {
         {/* 四栏数据卡片 */}
         <div className="grid grid-cols-4 gap-3 mb-5">
           {statsData.map((stat, index) => (
-            <div key={index} className="white-card p-4 text-center card-scroll">
-              <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-tag-primary flex items-center justify-center">
-                <stat.icon size={18} className={stat.color} />
+            <div key={index} className="p-4 text-center card-scroll rounded-card-large" style={{ background: stat.bgGradient }}>
+              <div className="w-10 h-10 mx-auto mb-2 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.8)' }}>
+                <stat.icon size={18} style={{ color: stat.color }} />
               </div>
-              <p className={`text-subtitle font-bold ${stat.color} mb-1`}>{stat.value}</p>
+              <p className="text-subtitle font-bold mb-1" style={{ color: stat.color }}>{stat.value}</p>
               <p className="text-caption text-text-tertiary">{stat.label}</p>
             </div>
           ))}
@@ -146,14 +146,14 @@ const Invite = () => {
         <div className="white-card p-5 mb-5">
           <h3 className="text-subtitle font-bold text-text-primary mb-4">我的收益</h3>
           <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 bg-tag-primary rounded-card-task">
+            <div className="p-4 rounded-card-task" style={{ background: 'linear-gradient(135deg, rgba(245,63,63,0.12) 0%, rgba(245,63,63,0.04) 100%)' }}>
               <p className="text-caption text-text-tertiary mb-1">今日新增</p>
-              <p className="text-[26px] font-bold text-profit-red">¥35.50</p>
+              <p className="text-[26px] font-bold" style={{ color: '#F53F3F' }}>¥35.50</p>
               <p className="text-caption text-text-tertiary mt-1">+12.5%</p>
             </div>
-            <div className="p-4 bg-tag-primary rounded-card-task">
+            <div className="p-4 rounded-card-task" style={{ background: 'linear-gradient(135deg, rgba(0,200,224,0.12) 0%, rgba(0,200,224,0.04) 100%)' }}>
               <p className="text-caption text-text-tertiary mb-1">待结算</p>
-              <p className="text-[26px] font-bold text-text-primary">¥85.50</p>
+              <p className="text-[26px] font-bold" style={{ color: '#00C8E0' }}>¥85.50</p>
               <p className="text-caption text-text-tertiary mt-1">7天后到账</p>
             </div>
           </div>

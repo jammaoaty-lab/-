@@ -10,16 +10,19 @@ interface TaskCardProps {
 
 const TaskCard = ({ task, onClick }: TaskCardProps) => {
   const progress = (task.currentUsers / task.minUsers) * 100;
+  // 判断是否为高额任务：category为"高额赏金"或reward>=10
+  const isHighReward = task.category === '高额赏金' || task.reward >= 10;
 
   return (
     <div 
-      className="bg-white rounded-card-task shadow-card p-5 cursor-pointer card-scroll relative overflow-hidden"
+      className="rounded-card-task shadow-card p-5 cursor-pointer card-scroll relative overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(248,252,255,0.92) 100%)' }}
       onClick={onClick}
     >
       {/* 置顶标签 - 左上角（调整位置避免覆盖头像） */}
       {task.isPinned && (
         <div className="absolute top-3 left-3 z-10">
-          <span className="inline-block px-3 py-1 primary-gradient text-white text-caption font-semibold tag-round">
+          <span className="inline-block px-3 py-1 text-primary text-caption font-semibold tag-round" style={{ background: '#E6F7FF' }}>
             置顶
           </span>
         </div>
@@ -28,14 +31,23 @@ const TaskCard = ({ task, onClick }: TaskCardProps) => {
       {/* 热门标签 - 右上角 */}
       {task.isHot && (
         <div className="absolute top-3 right-3 z-10">
-          <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-400 text-white text-caption font-semibold tag-round">
+          <span className="inline-flex items-center gap-1 px-3 py-1 text-white text-caption font-semibold tag-round" style={{ background: 'linear-gradient(135deg, #FF9A50 0%, #FF6B35 100%)' }}>
             <Flame size={12} fill="currentColor" />
             热门
           </span>
         </div>
       )}
+      
+      {/* 高额任务标签 - 如果同时有置顶和热门，放在热门标签左侧 */}
+      {isHighReward && (
+        <div className={`absolute top-3 z-10 ${task.isHot ? 'right-20' : 'right-3'}`}>
+          <span className="inline-flex items-center gap-1 px-3 py-1 text-white text-caption font-semibold tag-round" style={{ background: 'linear-gradient(135deg, #FF6B6B 0%, #F53F3F 100%)' }}>
+            高额
+          </span>
+        </div>
+      )}
 
-      <div className={`space-y-4 ${(task.isPinned || task.isHot) ? 'pt-7' : ''}`}>
+      <div className={`space-y-4 ${(task.isPinned || task.isHot || isHighReward) ? 'pt-7' : ''}`}>
         {/* 第一行：悬赏主信息 + 赏金 */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

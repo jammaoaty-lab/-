@@ -60,15 +60,15 @@ const PublishManage = () => {
 
       <div className="px-5">
         {/* 资金卡片 */}
-        <div className="white-card p-5 mb-5">
+        <div className="p-5 mb-5 rounded-card-large" style={{ background: 'linear-gradient(135deg, #F8FCFF 0%, #E6F7FF 100%)' }}>
           <div className="flex justify-between items-start mb-4">
             <div>
               <p className="text-body text-text-secondary mb-1">发单账户余额</p>
-              <p className="text-3xl font-bold text-profit-red">{formatCurrency(user?.balance || 0)}</p>
+              <p className="text-3xl font-bold" style={{ color: '#00C8E0' }}>{formatCurrency(user?.balance || 0)}</p>
             </div>
             <div className="text-right">
               <p className="text-body text-text-secondary mb-1">上架中任务</p>
-              <p className="text-title font-bold text-primary">2个</p>
+              <p className="text-title font-bold" style={{ color: '#10B981' }}>2个</p>
             </div>
           </div>
           

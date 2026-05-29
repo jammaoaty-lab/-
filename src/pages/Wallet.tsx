@@ -53,8 +53,8 @@ const Wallet = () => {
           <p className="text-4xl font-bold text-white mb-6">{formatCurrency(user?.balance || 0)}</p>
           
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-white/10 rounded-2xl">
-              <p className="text-[11px] text-gray-400 mb-1">可用余额</p>
+            <div className="p-4 rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.05) 100%)' }}>
+              <p className="text-[11px] text-emerald-300 mb-1">可用余额</p>
               <p className="text-xl font-semibold text-white mb-3">
                 {formatCurrency((user?.balance || 0) - (user?.frozenBalance || 0))}
               </p>
@@ -67,8 +67,8 @@ const Wallet = () => {
                 提现
               </Button>
             </div>
-            <div className="p-4 bg-white/10 rounded-2xl">
-              <p className="text-[11px] text-gray-400 mb-1">冻结金额</p>
+            <div className="p-4 rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(0,200,224,0.15) 0%, rgba(0,200,224,0.05) 100%)' }}>
+              <p className="text-[11px] text-cyan-300 mb-1">冻结金额</p>
               <p className="text-xl font-semibold text-gray-400 mb-3">
                 {formatCurrency(user?.frozenBalance || 0)}
               </p>
@@ -119,30 +119,50 @@ const Wallet = () => {
         </div>
 
         <div className="space-y-3">
-          {transactionList.map((transaction) => (
-            <div key={transaction.id} className="white-card p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-task flex items-center justify-center ${
-                    transaction.type === 'income' 
-                      ? 'bg-green-50 text-green-600' 
-                      : 'bg-red-50 text-red-600'
-                  }`}>
-                    {transaction.type === 'income' ? <Plus size={18} strokeWidth={2} /> : <Minus size={18} strokeWidth={2} />}
+          {transactionList.map((transaction) => {
+            // 根据类别设置颜色
+            let iconBg, iconColor, amountColor;
+            if (transaction.category === '任务收入') {
+              iconBg = 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0.05) 100%)';
+              iconColor = '#10B981'; // 薄荷绿
+              amountColor = '#10B981';
+            } else if (transaction.category === '邀请奖励') {
+              iconBg = 'linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.05) 100%)';
+              iconColor = '#F59E0B'; // 暖橙色
+              amountColor = '#F59E0B';
+            } else if (transaction.category === '提现记录') {
+              iconBg = 'linear-gradient(135deg, rgba(245,63,63,0.15) 0%, rgba(245,63,63,0.05) 100%)';
+              iconColor = '#F53F3F'; // 浅红色
+              amountColor = '#1D2129';
+            } else if (transaction.category === '发单支出') {
+              iconBg = 'linear-gradient(135deg, rgba(156,163,175,0.15) 0%, rgba(156,163,175,0.05) 100%)';
+              iconColor = '#9CA3AF'; // 灰色
+              amountColor = '#1D2129';
+            } else {
+              iconBg = 'linear-gradient(135deg, rgba(0,200,224,0.15) 0%, rgba(0,200,224,0.05) 100%)';
+              iconColor = '#00C8E0'; // 主色
+              amountColor = transaction.type === 'income' ? '#10B981' : '#1D2129';
+            }
+            
+            return (
+              <div key={transaction.id} className="white-card p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-task flex items-center justify-center" style={{ background: iconBg }}>
+                      {transaction.type === 'income' ? <Plus size={18} strokeWidth={2} style={{ color: iconColor }} /> : <Minus size={18} strokeWidth={2} style={{ color: iconColor }} />}
+                    </div>
+                    <div>
+                      <p className="text-body font-medium text-text-primary">{transaction.description}</p>
+                      <p className="text-caption text-text-tertiary">{transaction.time}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-body font-medium text-text-primary">{transaction.description}</p>
-                    <p className="text-caption text-text-tertiary">{transaction.time}</p>
-                  </div>
+                  <p className="text-lg font-bold" style={{ color: amountColor }}>
+                    {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                  </p>
                 </div>
-                <p className={`text-lg font-bold ${
-                  transaction.type === 'income' ? 'text-profit-red' : 'text-text-primary'
-                }`}>
-                  {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
-                </p>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {transactionList.length > 0 && (

@@ -67,21 +67,21 @@ const Profile = () => {
       <div className="px-5">
         {/* 四栏数据卡片 */}
         <div className="grid grid-cols-4 gap-3 mb-5">
-          <div className="white-card p-4 text-center btn-press">
+          <div className="p-4 text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(245,63,63,0.12) 0%, rgba(245,63,63,0.04) 100%)' }}>
             <p className="text-caption text-text-secondary mb-1">总资产</p>
-            <p className="text-xl font-bold text-profit-red">{formatCurrency(user?.balance || 0)}</p>
+            <p className="text-xl font-bold" style={{ color: '#F53F3F' }}>{formatCurrency(user?.balance || 0)}</p>
           </div>
-          <div className="white-card p-4 text-center btn-press">
+          <div className="p-4 text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(16,185,129,0.04) 100%)' }}>
             <p className="text-caption text-text-secondary mb-1">可用余额</p>
-            <p className="text-xl font-bold text-primary">{formatCurrency((user?.balance || 0) - (user?.frozenBalance || 0))}</p>
+            <p className="text-xl font-bold" style={{ color: '#10B981' }}>{formatCurrency((user?.balance || 0) - (user?.frozenBalance || 0))}</p>
           </div>
-          <div className="white-card p-4 text-center btn-press">
+          <div className="p-4 text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(0,200,224,0.12) 0%, rgba(0,200,224,0.04) 100%)' }}>
             <p className="text-caption text-text-secondary mb-1">冻结金额</p>
-            <p className="text-xl font-bold text-text-tertiary">{formatCurrency(user?.frozenBalance || 0)}</p>
+            <p className="text-xl font-bold" style={{ color: '#00C8E0' }}>{formatCurrency(user?.frozenBalance || 0)}</p>
           </div>
-          <div className="white-card p-4 text-center btn-press">
+          <div className="p-4 text-center btn-press rounded-card-large" style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.12) 0%, rgba(245,158,11,0.04) 100%)' }}>
             <p className="text-caption text-text-secondary mb-1">累计收益</p>
-            <p className="text-xl font-bold text-profit-red">¥888</p>
+            <p className="text-xl font-bold" style={{ color: '#F59E0B' }}>¥888</p>
           </div>
         </div>
 

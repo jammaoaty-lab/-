@@ -45,9 +45,9 @@ export default {
       },
       boxShadow: {
         // 普通卡片阴影
-        "card": "0 2px 12px rgba(0,200,224,0.06)",
+        "card": "0 4px 24px rgba(0,200,224,0.04), 0 8px 48px rgba(0,200,224,0.03), 0 0 0 1px rgba(0,200,224,0.01)",
         // 悬浮按钮/Banner阴影
-        "float": "0 4px 18px rgba(0,200,224,0.12)",
+        "float": "0 8px 32px rgba(0,200,224,0.08), 0 12px 56px rgba(0,200,224,0.05), 0 0 0 1px rgba(0,200,224,0.02)",
       },
       fontSize: {
         // 标题22sp
