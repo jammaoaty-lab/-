@@ -78,3 +78,19 @@
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out;
 }
+
+/* 横向无缝滚动动画 */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 15s linear infinite;
+  white-space: nowrap;
+}
