@@ -231,12 +231,12 @@ const TaskSquare = () => {
 
       {/* 签到弹窗 */}
       {showSignIn && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
           <div 
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => setShowSignIn(false)}
           />
-          <div className="relative w-full max-w-md glass-effect rounded-t-[26px] neon-border glass-card-shadow p-6 animate-slide-up">
+          <div className="relative w-full max-w-md glass-effect rounded-[26px] neon-border glass-card-shadow p-6 animate-fade-in">
             {/* 关闭按钮 */}
             <button 
               onClick={() => setShowSignIn(false)}
