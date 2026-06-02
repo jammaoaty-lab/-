@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/stores/auth-store';
+import NotificationBell from '@/components/cosmic/NotificationBell';
 import clsx from 'clsx';
 
 export default function CosmicNavbar() {
@@ -17,7 +18,6 @@ export default function CosmicNavbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
-  const [hasNotification, setHasNotification] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -47,15 +47,7 @@ export default function CosmicNavbar() {
     }
   };
 
-  // 模拟通知动画
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setHasNotification((v) => !v);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
+ return (
     <nav className="cosmic-navbar h-16 px-4 flex items-center gap-4 z-50">
       {/* Logo */}
       <Link href="/" className="flex items-center gap-2 shrink-0 group">
@@ -118,28 +110,7 @@ export default function CosmicNavbar() {
       {/* 右侧操作区 */}
       <div className="flex items-center gap-3 shrink-0">
         {/* 通知铃铛 */}
-        <button
-          className="relative p-2 rounded-full hover:bg-white/10 transition-colors"
-          onClick={() => setHasNotification(false)}
-        >
-          <svg className="w-5 h-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
-              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-          {hasNotification && (
-            <>
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-danger-red rounded-full" />
-              <span className="absolute top-0 right-0 w-3 h-3 bg-danger-red rounded-full animate-ping opacity-75" />
-              {/* 环绕小卫星 */}
-              <motion.span
-                className="absolute top-1/2 left-1/2 w-1 h-1 bg-warning-gold rounded-full"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                style={{ transformOrigin: '-8px -8px' }}
-              />
-            </>
-          )}
-        </button>
+        <NotificationBell />
 
         {/* 用户区域 */}
         {isAuthenticated && user ? (
@@ -168,7 +139,7 @@ export default function CosmicNavbar() {
 
                   <button
                     className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 transition-colors text-sm"
-                    onClick={() => { router.push(`/profile/${user.username}`); setMenuOpen(false); }}
+                    onClick={() => { router.push('/profile'); setMenuOpen(false); }}
                   >
                     我的星图
                   </button>
