@@ -1,0 +1,18 @@
+{
+  "name": "neural-town",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Neural Town「无限星河」—— AI 原生宇宙社区",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev -w apps/web",
+    "dev:server": "npm run dev -w apps/server",
+    "build:web": "npm run build -w apps/web",
+    "build:shared": "npm run build -w packages/shared",
+    "lint": "npm run lint -w apps/web && npm run lint -w apps/server",
+    "typecheck": "npm run typecheck -w apps/web"
+  }
+}

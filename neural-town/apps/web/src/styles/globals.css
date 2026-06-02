@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[#030614] text-white font-sans overflow-x-hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-nebulae-purple/30 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-nebulae-purple/50;
+  }
+}
+
+@layer components {
+  /* ─── 宇宙卡片 ─── */
+  .cosmic-card {
+    @apply rounded-2xl border border-cosmic-border bg-space-card backdrop-blur-xl;
+    @apply transition-all duration-300;
+  }
+
+  .cosmic-card:hover {
+    @apply border-cosmic-border-hover;
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 30px rgba(108, 92, 231, 0.1),
+      0 0 60px rgba(0, 229, 255, 0.05);
+  }
+
+  /* ─── 宇宙按钮 ─── */
+  .cosmic-btn {
+    @apply relative overflow-hidden rounded-xl font-display font-medium;
+    @apply transition-all duration-300;
+    @apply bg-gradient-to-r from-nebulae-purple via-nebulae-purple/80 to-ai-blue;
+    @apply px-6 py-3 text-white;
+    @apply border border-white/10;
+  }
+
+  .cosmic-btn::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+    transform: translateX(-100%);
+  }
+
+  .cosmic-btn:hover::before {
+    @apply opacity-100;
+    transform: translateX(100%);
+  }
+
+  .cosmic-btn:active {
+    @apply scale-95;
+  }
+
+  .cosmic-btn-secondary {
+    @apply bg-transparent border border-cosmic-border-hover;
+    @apply hover:bg-space-card hover:border-nebulae-purple;
+  }
+
+  .cosmic-btn-ghost {
+    @apply bg-transparent border border-transparent;
+    @apply hover:bg-white/5 hover:border-white/10;
+  }
+
+  /* ─── 输入框 ─── */
+  .cosmic-input {
+    @apply w-full rounded-xl bg-space-card border border-cosmic-border;
+    @apply px-4 py-3 text-white placeholder:text-white/30;
+    @apply transition-all duration-300 outline-none;
+  }
+
+  .cosmic-input:focus {
+    @apply border-nebulae-purple;
+    box-shadow: 0 0 20px rgba(108, 92, 231, 0.2);
+  }
+
+  /* ─── 毛玻璃导航栏 ─── */
+  .cosmic-navbar {
+    @apply fixed top-0 left-0 right-0 z-50;
+    @apply bg-space-card backdrop-blur-xl;
+    @apply border-b border-cosmic-border;
+  }
+
+  /* ─── 星图导航 ─── */
+  .star-navigation {
+    @apply fixed left-0 top-16 bottom-0 z-40;
+    @apply bg-space-card/95 backdrop-blur-xl;
+    @apply border-r border-cosmic-border;
+    @apply w-64 transition-transform duration-300;
+  }
+
+  .star-navigation.collapsed {
+    transform: translateX(-100%);
+  }
+
+  /* ─── 毛玻璃面板 ─── */
+  .glass-panel {
+    @apply bg-space-card backdrop-blur-2xl;
+    @apply border border-cosmic-border rounded-2xl;
+  }
+
+  /* ─── 文本渐变 ─── */
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-nebulae-purple to-ai-blue;
+  }
+
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-warning-gold to-danger-red;
+  }
+
+  /* ─── 星空粒子爆破 ─── */
+  .particle-burst {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+  }
+}
+
+@layer utilities {
+  /* ─── 自定义属性动画 ─── */
+  @property --border-glow {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: rgba(108, 92, 231, 0.3);
+  }
+
+  .border-glow-animated {
+    border-color: var(--border-glow);
+    transition: --border-glow 0.3s ease;
+  }
+
+  .border-glow-animated:hover {
+    --border-glow: rgba(108, 92, 231, 0.8);
+  }
+}
+
+/* ─── 动画关键帧 ─── */
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(30px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(30px) rotate(-360deg); }
+}
+
+@keyframes pulsing-star {
+  0%, 100% { opacity: 0.3; transform: scale(0.5); }
+  50%      { opacity: 1; transform: scale(1); }
+}
