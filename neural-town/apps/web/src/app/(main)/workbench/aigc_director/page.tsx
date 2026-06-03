@@ -12,8 +12,9 @@ import toast from 'react-hot-toast';
 const MultiTrackTimeline = dynamic(() => import('@/components/director/MultiTrackTimeline'), { ssr: false });
 const CharacterPanel = dynamic(() => import('@/components/director/CharacterPanel'), { ssr: false });
 const ScriptEditor = dynamic(() => import('@/components/director/ScriptEditor'), { ssr: false });
-const DirectorPreview = dynamic(() => import('@/components/director/DirectorPreview'), { ssr: false });
+const DirectorPreviewWithVideo = dynamic(() => import('@/components/director/DirectorPreviewWithVideo'), { ssr: false });
 const AssetLibrary = dynamic(() => import('@/components/director/AssetLibrary'), { ssr: false });
+const AIPipelineEditor = dynamic(() => import('@/components/director/AIPipelineEditor'), { ssr: false });
 
 // Reuse existing components that still work well
 const EmotionCurveEditor = dynamic(() => import('@/components/director/EmotionCurveEditor'), { ssr: false });
@@ -26,6 +27,8 @@ export default function AIGCDirectorWorkbench() {
     showScriptEditor, toggleScriptEditor, isGenerating,
     play, pause, stop, currentTime, totalDuration,
   } = useDirectorStore();
+
+  const [showPipelineEditor, setShowPipelineEditor] = useState(false);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -93,6 +96,19 @@ export default function AIGCDirectorWorkbench() {
           </button>
         </div>
 
+        {/* Pipeline Editor Toggle */}
+        <button
+          onClick={() => setShowPipelineEditor(!showPipelineEditor)}
+          className={`ml-2 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] border transition-colors ${
+            showPipelineEditor
+              ? 'border-[#FF6B6B]/40 text-[#FF6B6B] bg-[#FF6B6B]/10'
+              : 'border-white/10 text-white/50 hover:border-[#FF6B6B]/30'
+          }`}
+          title="AI 生成管线 (react-flow)"
+        >
+          ⚡ 管线
+        </button>
+
         {/* Right actions */}
         <div className="ml-auto flex items-center gap-2">
           <button
@@ -157,9 +173,13 @@ export default function AIGCDirectorWorkbench() {
           )}
         </AnimatePresence>
 
-        {/* Center: Preview + Canvas */}
+        {/* Center: Preview + Canvas or Pipeline Editor */}
         <div className="flex-1 flex flex-col min-w-0">
-          <DirectorPreview />
+          {showPipelineEditor ? (
+            <AIPipelineEditor />
+          ) : (
+            <DirectorPreviewWithVideo />
+          )}
         </div>
 
         {/* Right Panel: Property / Character Panel */}
